@@ -1,13 +1,14 @@
 """The package never looks more finished or more certain than its source allows."""
 import csv
+import html
 import re
 import tempfile
 import unittest
 from pathlib import Path
 
-from tests.generator import example_source, load_generator_module, run_generator, run_generator_on_text
+from tests.generator import example_source, run_generator, run_generator_on_text
 
-harnessgen = load_generator_module()
+from harness import svg  # noqa: E402  (tests.generator puts scripts/ on the path)
 
 two_wire_harness = """
 drawing: {title: TWO WIRE, number: T-1, rev: A}
@@ -74,12 +75,12 @@ def generate(test: unittest.TestCase, source_text: str | None) -> GeneratedPacka
 
 
 def svg_texts(svg: str) -> list[str]:
-    return [harnessgen.html.unescape(content) for content in re.findall(r"<text[^>]*>([^<]*)</text>", svg)]
+    return [html.unescape(content) for content in re.findall(r"<text[^>]*>([^<]*)</text>", svg)]
 
 
 class FailedChecksMarkTheSheetsTest(unittest.TestCase):
     def test_every_sheet_of_a_package_with_errors_says_it_is_not_for_release(self) -> None:
-        package = generate(self, None)
+        package = generate(self, two_wire_harness + "expect: {nets: {GND: [P1:1, J1:2]}}\n")
         self.assertEqual(package.process.returncode, 1)
         for number, sheet in enumerate(package.sheets(), 1):
             self.assertIn("NOT FOR RELEASE", sheet, f"sheet {number}")
@@ -126,22 +127,22 @@ class TableTextIsCompleteTest(unittest.TestCase):
 
     def test_the_example_sleeving_references_are_all_listed(self) -> None:
         table_text = " ".join(svg_texts(generate(self, None).sheets()[1]))
-        for segment in ("P1-B1", "B1-SP1", "SP1-SP2", "SP2-B2"):
+        for segment in ("P1-B1", "B1-SP1", "SP1-SP2", "SP2-SP3", "SP3-SP4", "SP4-B2"):
             self.assertIn(segment, table_text)
 
     def test_every_cell_line_fits_inside_its_cell(self) -> None:
         cells = [("FIND", 40, "c"), ("DESCRIPTION", 120, "l")]
         rows = [[7, "Receptacle housing, dual row, polarized, positive latch, WWWWWWWWWWWWWWWWWWWWWWWW"]]
-        svg, height, used = harnessgen.table(0, 0, cells, rows, "A TABLE TITLE LONGER THAN BOTH OF ITS COLUMNS")
+        drawn, height, used = svg.table(0, 0, cells, rows, "A TABLE TITLE LONGER THAN BOTH OF ITS COLUMNS")
         self.assertEqual(used, 1)
         rectangles = [tuple(map(float, found)) for found in
-                      re.findall(r'<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"', svg)]
+                      re.findall(r'<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"', drawn)]
         texts = re.findall(r'<text x="([\d.]+)" y="([\d.]+)"[^>]*font-size="([\d.]+)" text-anchor="(\w+)" '
-                           r'font-weight="(\w+)"[^>]*>([^<]*)</text>', svg)
+                           r'font-weight="(\w+)"[^>]*>([^<]*)</text>', drawn)
         self.assertGreater(len(texts), 4)
         for x, y, size, anchor, weight, content in texts:
             x, y, size = float(x), float(y), float(size)
-            width = harnessgen.text_width(harnessgen.html.unescape(content), size, weight == "bold")
+            width = svg.text_width(html.unescape(content), size, weight == "bold")
             left = x if anchor == "start" else x - width / 2
             cell = min((r for r in rectangles if r[0] <= x <= r[0] + r[2] and r[1] <= y - 2 <= r[1] + r[3]),
                        key=lambda r: r[2] * r[3])
@@ -151,9 +152,9 @@ class TableTextIsCompleteTest(unittest.TestCase):
         self.assertEqual(height, max(r[1] + r[3] for r in rectangles))
 
     def test_text_width_uses_helvetica_metrics(self) -> None:
-        self.assertAlmostEqual(harnessgen.text_width("M", 10, False), 8.33)
-        self.assertAlmostEqual(harnessgen.text_width("il", 10, False), 4.44)
-        self.assertAlmostEqual(harnessgen.text_width("b", 10, True), 6.11)
+        self.assertAlmostEqual(svg.text_width("M", 10, False), 8.33)
+        self.assertAlmostEqual(svg.text_width("il", 10, False), 4.44)
+        self.assertAlmostEqual(svg.text_width("b", 10, True), 6.11)
 
 
 class BillOfMaterialsTest(unittest.TestCase):

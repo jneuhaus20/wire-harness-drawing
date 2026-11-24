@@ -1,4 +1,1 @@
-WARN   J2: labelled pins not wired: 3(SCL), 4(SDA)
-WARN   J3: labelled pins not wired: 2(+12V)
-ERROR  net SCL: not wired at J2:3
-ERROR  net SDA: not wired at J2:4
+OK     no findings

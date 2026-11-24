@@ -35,7 +35,7 @@ From one `harness.yaml`, `scripts/harnessgen.py` (in this skill's directory) wri
 5. **Look at it.** Render each sheet to PNG (`python3 -c "import cairosvg;cairosvg.svg2png(url='out/x.sheet1.svg',write_to='s1.png',output_width=1600)"`) and inspect: overlapping text, dimensions on the wrong side, balloons pointing at the wrong thing, a crowded branch. Adjust `layout` order/lengths or drawing data and regenerate. Never hand-edit the SVGs; they are regenerated.
 6. **Deliver** the PDF plus CSVs, and state the dimensioning datum and tolerances used.
 
-Setup (once per machine): `pip install pyyaml wireviz cairosvg pypdf` and Graphviz (`brew install graphviz` / `apt install graphviz`). Without WireViz/Graphviz the wiring-diagram sheet is skipped; without cairosvg/pypdf the PDF is skipped. Python 3.9+.
+Setup (once per machine): `pip install pyyaml wireviz cairosvg pypdf` and Graphviz (`brew install graphviz` / `apt install graphviz`). Without WireViz/Graphviz the wiring-diagram sheet is skipped; without cairosvg/pypdf the PDF is skipped. Python 3.10+.
 
 ## Conventions the drawing follows (and where they come from)
 

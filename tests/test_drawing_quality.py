@@ -4,22 +4,19 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tests.generator import example_source, load_generator_module, run_generator_on_text
-from tests.test_output_integrity import GeneratedPackage, generate, svg_texts, two_wire_harness
+from tests.generator import example_source
+from tests.test_output_integrity import generate, svg_texts, two_wire_harness
 
-harnessgen = load_generator_module()
+from harness.formboard import formboard_sheet  # noqa: E402  (tests.generator puts scripts/ on the path)
+from harness.package import analyse
+from harness.source import load_source
+from harness.wiring import wireviz_source
 
 
 def lay_out_sheet_one(source: Path):
     """Run the generator's pipeline on a source and return sheet 1's layout record."""
-    d = harnessgen.load(source)
-    findings = harnessgen.Err()
-    harnessgen.validate_source(d, findings)
-    tree = harnessgen.build_tree(d, findings)
-    segment_wires = harnessgen.compute_lengths(d, tree, findings)
-    harnessgen.check(d, tree, findings)
-    bom = harnessgen.build_bom(d, tree)
-    _, layout = harnessgen.sheet_drawing(d, tree, segment_wires, bom, 1, 0)
+    analysis = analyse(load_source(source))
+    _, layout = formboard_sheet(analysis.source, analysis.tree, analysis.routes, analysis.bom, 1, 0)
     return layout
 
 
@@ -147,9 +144,8 @@ class WiringDiagramTest(unittest.TestCase):
     def wireviz_source(self, source_text: str) -> dict:
         directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
         (directory / "harness.yaml").write_text(source_text)
-        d = harnessgen.load(directory / "harness.yaml")
-        harnessgen.validate_source(d, harnessgen.Err())
-        return harnessgen.wireviz_yaml(d)
+        analysis = analyse(load_source(directory / "harness.yaml"))
+        return wireviz_source(analysis.source, analysis.routes)
 
     def test_a_twist_group_is_its_own_labelled_bundle(self) -> None:
         cables = self.wireviz_source(twisted_harness)["cables"]
@@ -157,6 +153,12 @@ class WiringDiagramTest(unittest.TestCase):
         self.assertEqual(cables["T1"]["wirelabels"], ["W1", "W2"])
         self.assertEqual(cables["T1"]["type"], "Twisted pair")
         self.assertTrue(cables["T1"]["show_name"])
+
+    def test_lengths_are_given_in_the_unit_wire_is_bought_in(self) -> None:
+        source = two_wire_harness.replace("rev: A}", "rev: A, units: in, round_to: 1}").replace("500]", "24]")
+        bundle = self.wireviz_source(source)["cables"]["B1"]
+        self.assertEqual((bundle["length"], bundle["length_unit"]), (2, "ft"))
+        self.assertEqual(self.wireviz_source(two_wire_harness)["cables"]["B1"]["length"], 0.5)
 
     def test_a_cable_is_drawn_as_that_cable(self) -> None:
         source = two_wire_harness.replace("color: BK}", "color: BK, cable: C1}").replace("color: RD}", "color: RD, cable: C1}")

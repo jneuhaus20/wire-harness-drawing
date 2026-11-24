@@ -1,0 +1,350 @@
+metadata:
+  title: SENSOR BRANCH HARNESS
+options:
+  fontname: arial
+connectors:
+  P1:
+    type: DE-9
+    subtype: plug, male, solder cup
+    pn: 5-747904-2
+    manufacturer: TE
+    pins:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    pinlabels:
+    - GND
+    - +5V
+    - SCL
+    - SDA
+    - MISO
+    - MOSI
+    - SCK
+    - SHLD
+    - NC
+    hide_disconnected_pins: false
+    show_pincount: false
+  J1:
+    type: KK 254
+    subtype: female 4-pin
+    pn: 22-01-3047
+    manufacturer: Molex
+    pins:
+    - 1
+    - 2
+    - 3
+    - 4
+    pinlabels:
+    - GND
+    - +5V
+    - SCL
+    - SDA
+    hide_disconnected_pins: false
+    show_pincount: false
+  J2:
+    type: KK 254
+    subtype: female 4-pin
+    pn: 22-01-3047
+    manufacturer: Molex
+    pins:
+    - 1
+    - 2
+    - 3
+    - 4
+    pinlabels:
+    - GND
+    - +5V
+    - SCL
+    - SDA
+    hide_disconnected_pins: false
+    show_pincount: false
+  J3:
+    type: KK 254
+    subtype: female 5-pin
+    pn: 22-01-3057
+    manufacturer: Molex
+    pins:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    pinlabels:
+    - GND
+    - +5V
+    - MISO
+    - MOSI
+    - SCK
+    hide_disconnected_pins: false
+    show_pincount: false
+  E1:
+    type: Ring lug
+    subtype: '#6 stud, vinyl insulated, 22-18 AWG'
+    pn: PV18-6R-CY
+    manufacturer: Panduit
+    pins:
+    - 1
+    pinlabels:
+    - SHLD
+    hide_disconnected_pins: false
+    show_pincount: false
+  SP1:
+    style: simple
+    type: Splice
+    show_name: true
+  SP2:
+    style: simple
+    type: Splice
+    show_name: true
+  SP3:
+    style: simple
+    type: Splice
+    show_name: true
+  SP4:
+    style: simple
+    type: Splice
+    show_name: true
+cables:
+  B1:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W1
+    colors:
+    - BK
+    gauge: 20 AWG
+    length: 0.36
+  B2:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W2
+    colors:
+    - BK
+    gauge: 24 AWG
+    length: 0.49
+  B3:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W3
+    colors:
+    - BK
+    gauge: 24 AWG
+    length: 0.54
+  B4:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W4
+    colors:
+    - BK
+    gauge: 24 AWG
+    length: 0.77
+  B5:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W5
+    colors:
+    - RD
+    gauge: 20 AWG
+    length: 0.38
+  B6:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W6
+    colors:
+    - RD
+    gauge: 24 AWG
+    length: 0.47
+  B7:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W7
+    colors:
+    - RD
+    gauge: 24 AWG
+    length: 0.52
+  B8:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W8
+    colors:
+    - YE
+    gauge: 20 AWG
+    length: 0.4
+  B9:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W9
+    colors:
+    - GN
+    gauge: 20 AWG
+    length: 0.42
+  B10:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W10
+    - W11
+    - W12
+    colors:
+    - BU
+    - OG
+    - VT
+    gauge: 24 AWG
+    length: 1.11
+  B11:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W13
+    colors:
+    - GNYE
+    gauge: 22 AWG
+    length: 0.47
+  B12:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W14
+    colors:
+    - YE
+    gauge: 24 AWG
+    length: 0.45
+  B13:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W15
+    colors:
+    - YE
+    gauge: 24 AWG
+    length: 0.5
+  B14:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W16
+    colors:
+    - GN
+    gauge: 24 AWG
+    length: 0.43
+  B15:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W17
+    colors:
+    - GN
+    gauge: 24 AWG
+    length: 0.48
+  B16:
+    category: bundle
+    show_name: false
+    wirelabels:
+    - W18
+    colors:
+    - RD
+    gauge: 24 AWG
+    length: 0.75
+connections:
+- - P1:
+    - 1
+  - B1:
+    - 1
+  - SP1
+- - SP1
+  - B2:
+    - 1
+  - J1:
+    - 1
+- - SP1
+  - B3:
+    - 1
+  - J2:
+    - 1
+- - SP1
+  - B4:
+    - 1
+  - J3:
+    - 1
+- - P1:
+    - 2
+  - B5:
+    - 1
+  - SP2
+- - SP2
+  - B6:
+    - 1
+  - J1:
+    - 2
+- - SP2
+  - B7:
+    - 1
+  - J2:
+    - 2
+- - P1:
+    - 3
+  - B8:
+    - 1
+  - SP3
+- - P1:
+    - 4
+  - B9:
+    - 1
+  - SP4
+- - P1:
+    - 5
+    - 6
+    - 7
+  - B10:
+    - 1
+    - 2
+    - 3
+  - J3:
+    - 3
+    - 4
+    - 5
+- - P1:
+    - 8
+  - B11:
+    - 1
+  - E1:
+    - 1
+- - SP3
+  - B12:
+    - 1
+  - J1:
+    - 3
+- - SP3
+  - B13:
+    - 1
+  - J2:
+    - 3
+- - SP4
+  - B14:
+    - 1
+  - J1:
+    - 4
+- - SP4
+  - B15:
+    - 1
+  - J2:
+    - 4
+- - SP2
+  - B16:
+    - 1
+  - J3:
+    - 2

@@ -47,7 +47,7 @@ python3 scripts/harnessgen.py example/example.yaml --check-only
 python3 scripts/harnessgen.py example/example.yaml -o out/
 ```
 
-The example leaves two pins unwired on purpose, so the check reports two errors and exits 1.
+The example passes every check, so the check prints `OK     no findings` and exits 0.
 
 ## Tests
 

@@ -1,0 +1,121 @@
+"""Reject source values the generator cannot compute with, before anything is computed."""
+import re
+
+from harness.source import Findings, HarnessSource, format_length, is_number, unit_conventions
+
+
+# Reject each value the rest of the generator cannot compute with, and remove it from the
+# source so that everything downstream can trust what is left. Every rejection is an ERROR,
+# so a package built from what is left is marked not for release.
+def validate_source(source: HarnessSource, findings: Findings) -> None:
+    """Report and remove values in the source that are the wrong kind of thing."""
+    validate_drawing(source["drawing"], findings)
+    validate_connectors(source["connectors"], findings)
+    validate_wires(source, findings)
+    validate_layout(source["layout"], findings)
+
+
+def segment_ends(segment: list | dict) -> tuple:
+    """A layout segment's two nodes, from either its list or its mapping form."""
+    return (segment[0], segment[1]) if isinstance(segment, list) else (segment.get("from"), segment.get("to"))
+
+
+def segment_length_value(segment: list | dict):
+    """A layout segment's length as written, from either form; None when it has none."""
+    if isinstance(segment, list):
+        return segment[2] if len(segment) > 2 else None
+    return segment.get("length")
+
+
+def covered_segment_ends(covered: str | list) -> list:
+    """The two nodes of a segment a covering names, as 'A-B' or [A, B]."""
+    return covered.split("-") if isinstance(covered, str) else list(covered)
+
+
+def covered_segment_name(covered: str | list) -> str:
+    return covered if isinstance(covered, str) else "-".join(map(str, covered))
+
+
+# Drawing-wide values fall back to the unit's default when rejected.
+def validate_drawing(drawing: dict, findings: Findings) -> None:
+    """Check the units, the drawing-wide lengths, the twist take-up and the tolerance table."""
+    units = drawing.get("units", "mm")
+    if units not in unit_conventions:
+        findings.error(f"drawing.units '{units}' is not one of {', '.join(unit_conventions)}; lengths were read as mm")
+    if "round_to" in drawing and not (is_number(drawing["round_to"]) and drawing["round_to"] > 0):
+        findings.error(f"drawing.round_to must be a number greater than 0, not '{drawing.pop('round_to')}'")
+    for key in ("extra_per_wire", "loopback_length"):
+        if key in drawing and not is_number(drawing[key]):
+            findings.error(f"drawing.{key} must be a number, not '{drawing.pop(key)}'")
+    if "twist_takeup" in drawing and not re.fullmatch(r"\d+(\.\d+)?%", str(drawing["twist_takeup"])):
+        findings.error(f"drawing.twist_takeup must be a percentage such as 3%, not '{drawing.pop('twist_takeup')}'")
+    tolerance_rows = drawing.get("tolerance")
+    if tolerance_rows and all(row.get("upto") is not None for row in tolerance_rows):
+        largest = max(row["upto"] for row in tolerance_rows)
+        findings.error(f"drawing.tolerance has no row with upto: null; lengths over {format_length(largest)} have no tolerance")
+
+
+def validate_connectors(connectors: dict, findings: Findings) -> None:
+    """Check each connector's wire allowance."""
+    for designator, connector in connectors.items():
+        if "wire_allowance" in connector and not is_number(connector["wire_allowance"]):
+            findings.error(f"{designator}: wire_allowance must be a number, not '{connector.pop('wire_allowance')}'")
+
+
+# Give every wire an id first, so each later finding can name the wire it is about. A wire
+# without both ends cannot be routed, cut or tabled, so it is reported and dropped.
+def validate_wires(source: HarnessSource, findings: Findings) -> None:
+    """Name every wire, then check its ends, gauge and length override."""
+    for position, wire in enumerate(source["wires"], 1):
+        if not wire.get("id"):
+            wire["id"] = f"W{position}"
+            findings.info(f"wire #{position} has no id; using {wire['id']}")
+    complete_wires = []
+    for wire in source["wires"]:
+        missing_ends = [end for end in ("from", "to") if end not in wire]
+        for end in missing_ends:
+            findings.error(f"{wire['id']}: missing '{end}'")
+        if "gauge" in wire and (is_number(wire["gauge"]) or str(wire["gauge"]).strip().isdigit()):
+            findings.error(f"{wire['id']}: gauge '{wire['gauge']}' has no unit; write '{wire['gauge']} AWG' or the size in mm²")
+            wire["gauge"] = str(wire["gauge"])
+        if "length" in wire and not is_number(wire["length"]):
+            findings.error(f"{wire['id']}: length '{wire.pop('length')}' must be a number")
+        if not missing_ends:
+            complete_wires.append(wire)
+    source["wires"] = complete_wires
+
+
+# A segment with an unusable length is kept with its length TBD, so the layout stays whole.
+# A label needs a place; a covering keeps only the segments the layout has.
+def validate_layout(layout: dict, findings: Findings) -> None:
+    """Check segment lengths, label places and distances, and the segments each covering names."""
+    segments = layout.get("segments") or []
+    for index, segment in enumerate(segments):
+        length = segment_length_value(segment)
+        if length is None or length == "TBD" or (is_number(length) and length >= 0):
+            continue
+        start, end = segment_ends(segment)
+        if is_number(length):
+            findings.error(f"layout segment {start}-{end}: length {format_length(length)} is negative")
+        else:
+            findings.error(f"layout segment {start}-{end}: length '{length}' must be a number or TBD")
+        segments[index] = [start, end, "TBD"]
+    placed_labels = []
+    for label in layout.get("labels") or []:
+        name = label.get("text", label.get("at", "?"))
+        if "at" not in label:
+            findings.error(f"label {name}: missing 'at'")
+            continue
+        if "distance" in label and not is_number(label["distance"]):
+            findings.error(f"label {name}: distance '{label.pop('distance')}' must be a number")
+        placed_labels.append(label)
+    layout["labels"] = placed_labels
+    declared = {frozenset(segment_ends(segment)) for segment in segments}
+    for covering in layout.get("coverings") or []:
+        kept = []
+        for covered in covering.get("segments") or []:
+            if frozenset(covered_segment_ends(covered)) in declared:
+                kept.append(covered)
+            else:
+                findings.error(f"covering {covering.get('item', '?')}: segment {covered_segment_name(covered)} is not in layout.segments")
+        covering["segments"] = kept

@@ -12,8 +12,6 @@ drawing:
   round_to: 5
   extra_per_wire: 20          # service/strip allowance added to every cut length
   wire_type: UL1007 hook-up wire
-  notes:
-    - STRIP 3 mm FOR CRIMP CONTACTS, 8 mm FOR RING LUG.
 
 connectors:
   P1:
@@ -35,6 +33,7 @@ connectors:
     pincount: 4
     pinlabels: [GND, +5V, SCL, SDA]
     contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
+    strip: 3
     awg: [22, 30]
   J2:
     label: SENSOR B
@@ -45,6 +44,7 @@ connectors:
     pincount: 4
     pinlabels: [GND, +5V, SCL, SDA]
     contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
+    strip: 3
   J3:
     label: SPI DEVICE
     type: KK 254
@@ -52,14 +52,16 @@ connectors:
     pn: 22-01-3057
     manufacturer: Molex
     pincount: 5
-    pinlabels: [GND, +12V, MISO, MOSI, SCK]
+    pinlabels: [GND, +5V, MISO, MOSI, SCK]
     contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
+    strip: 3
   E1:
     label: CHASSIS GND
     type: Ring lug
     subtype: "#6 stud, vinyl insulated, 22-18 AWG"
     pn: PV18-6R-CY
     manufacturer: Panduit
+    strip: 8
     awg: [18, 22]
     pincount: 1
     pinlabels: [SHLD]
@@ -75,6 +77,18 @@ connectors:
     pn: D-436-52
     manufacturer: TE
     awg: [16, 24]          # one wire 20-16 AWG, two 24-20 AWG, three 24-22 AWG per the TE drawing
+  SP3:
+    type: splice
+    desc: "MiniSeal sealed crimp splice, 2 or 3 wires to 1"
+    pn: D-436-52
+    manufacturer: TE
+    awg: [16, 24]          # one wire 20-16 AWG, two 24-20 AWG, three 24-22 AWG per the TE drawing
+  SP4:
+    type: splice
+    desc: "MiniSeal sealed crimp splice, 2 or 3 wires to 1"
+    pn: D-436-52
+    manufacturer: TE
+    awg: [16, 24]          # one wire 20-16 AWG, two 24-20 AWG, three 24-22 AWG per the TE drawing
 
 wires:
   - {id: W1,  from: P1:1, to: SP1,  signal: GND,  gauge: 20 AWG, color: BK}
@@ -84,13 +98,17 @@ wires:
   - {id: W5,  from: P1:2, to: SP2,  signal: +5V,  gauge: 20 AWG, color: RD}
   - {id: W6,  from: SP2,  to: J1:2, signal: +5V,  gauge: 24 AWG, color: RD}
   - {id: W7,  from: SP2,  to: J2:2, signal: +5V,  gauge: 24 AWG, color: RD}
-  - {id: W8,  from: P1:3, to: J1:3, signal: SCL,  gauge: 24 AWG, color: YE}
-  - {id: W9,  from: P1:4, to: J1:4, signal: SDA,  gauge: 24 AWG, color: GN}
-  - {id: W10, from: P1:5, to: J3:3, signal: MISO, gauge: 24 AWG, color: BU, twist: T1}
-  - {id: W11, from: P1:6, to: J3:4, signal: MOSI, gauge: 24 AWG, color: OG, twist: T1}
+  - {id: W8,  from: P1:3, to: SP3,  signal: SCL,  gauge: 20 AWG, color: YE}
+  - {id: W9,  from: P1:4, to: SP4,  signal: SDA,  gauge: 20 AWG, color: GN}
+  - {id: W10, from: P1:5, to: J3:3, signal: MISO, gauge: 24 AWG, color: BU}
+  - {id: W11, from: P1:6, to: J3:4, signal: MOSI, gauge: 24 AWG, color: OG}
   - {id: W12, from: P1:7, to: J3:5, signal: SCK,  gauge: 24 AWG, color: VT}
   - {id: W13, from: P1:8, to: E1,   signal: SHLD, gauge: 22 AWG, color: GNYE}
-# J2 SCL/SDA intentionally left off to show the checker; J3:2 (+12V) supplied elsewhere.
+  - {id: W14, from: SP3,  to: J1:3, signal: SCL,  gauge: 24 AWG, color: YE}
+  - {id: W15, from: SP3,  to: J2:3, signal: SCL,  gauge: 24 AWG, color: YE}
+  - {id: W16, from: SP4,  to: J1:4, signal: SDA,  gauge: 24 AWG, color: GN}
+  - {id: W17, from: SP4,  to: J2:4, signal: SDA,  gauge: 24 AWG, color: GN}
+  - {id: W18, from: SP2,  to: J3:2, signal: +5V,  gauge: 24 AWG, color: RD}
 
 layout:
   root: P1
@@ -99,13 +117,15 @@ layout:
     - [B1, E1, 150]
     - [B1, SP1, 40]
     - [SP1, SP2, 20]
-    - [SP2, B2, 200]
+    - [SP2, SP3, 20]
+    - [SP3, SP4, 20]
+    - [SP4, B2, 160]
     - [B2, J1, 250]
     - [B2, B3, 180]
     - [B3, J2, 120]
     - [B3, J3, 350]
   coverings:
-    - {item: SLV1, segments: [P1-B1, B1-SP1, SP1-SP2, SP2-B2]}
+    - {item: SLV1, segments: [P1-B1, B1-SP1, SP1-SP2, SP2-SP3, SP3-SP4, SP4-B2]}
   labels:
     - {at: P1, text: "P1 CTRL", distance: 50, item: LBL}
     - {at: J1, text: "J1 SNS-A", distance: 50, item: LBL}
@@ -120,7 +140,7 @@ items:
 expect:
   nets:
     GND:  [P1:1, J1:1, J2:1, J3:1]
-    +5V:  [P1:2, J1:2, J2:2]
+    +5V:  [P1:2, J1:2, J2:2, J3:2]
     SCL:  [P1:3, J1:3, J2:3]
     SDA:  [P1:4, J1:4, J2:4]
     MISO: [P1:5, J3:3]
