@@ -20,12 +20,12 @@ connectors:
     label: TO CONTROLLER
     type: DE-9
     subtype: plug, male, solder cup
-    pn: 1-1658526-1
+    pn: 5-747904-2
     manufacturer: TE
     pincount: 9
     pinlabels: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, SHLD, NC]
-    accessories: [{desc: "Backshell, DE-9, metal, 4-40 screws", pn: 5745833-1, manufacturer: TE}]
-    awg: [20, 28]
+    accessories: [{desc: "Cable clamp kit, DE-9, zinc, 4-40, 9.4 mm max", pn: 5745171-5, manufacturer: TE}]
+    awg: [20, 28]          # TE states 20 AWG maximum for the solder cup and no minimum; 28 is this drawing's floor
   J1:
     label: SENSOR A
     type: KK 254
@@ -57,26 +57,31 @@ connectors:
   E1:
     label: CHASSIS GND
     type: Ring lug
-    subtype: "#6, 22-18 AWG"
-    pn: 19070-0003
-    manufacturer: Molex
+    subtype: "#6 stud, vinyl insulated, 22-18 AWG"
+    pn: PV18-6R-CY
+    manufacturer: Panduit
+    awg: [18, 22]
     pincount: 1
     pinlabels: [SHLD]
   SP1:
     type: splice
-    desc: Butt splice, 22-26 AWG, heat-shrink
-    pn: BSV-26
+    desc: "MiniSeal sealed crimp splice, 2 or 3 wires to 1"
+    pn: D-436-52
+    manufacturer: TE
+    awg: [16, 24]          # one wire 20-16 AWG, two 24-20 AWG, three 24-22 AWG per the TE drawing
   SP2:
     type: splice
-    desc: Butt splice, 22-26 AWG, heat-shrink
-    pn: BSV-26
+    desc: "MiniSeal sealed crimp splice, 2 or 3 wires to 1"
+    pn: D-436-52
+    manufacturer: TE
+    awg: [16, 24]          # one wire 20-16 AWG, two 24-20 AWG, three 24-22 AWG per the TE drawing
 
 wires:
-  - {id: W1,  from: P1:1, to: SP1,  signal: GND,  gauge: 22 AWG, color: BK}
+  - {id: W1,  from: P1:1, to: SP1,  signal: GND,  gauge: 20 AWG, color: BK}
   - {id: W2,  from: SP1,  to: J1:1, signal: GND,  gauge: 24 AWG, color: BK}
   - {id: W3,  from: SP1,  to: J2:1, signal: GND,  gauge: 24 AWG, color: BK}
   - {id: W4,  from: SP1,  to: J3:1, signal: GND,  gauge: 24 AWG, color: BK}
-  - {id: W5,  from: P1:2, to: SP2,  signal: +5V,  gauge: 22 AWG, color: RD}
+  - {id: W5,  from: P1:2, to: SP2,  signal: +5V,  gauge: 20 AWG, color: RD}
   - {id: W6,  from: SP2,  to: J1:2, signal: +5V,  gauge: 24 AWG, color: RD}
   - {id: W7,  from: SP2,  to: J2:2, signal: +5V,  gauge: 24 AWG, color: RD}
   - {id: W8,  from: P1:3, to: J1:3, signal: SCL,  gauge: 24 AWG, color: YE}
@@ -109,7 +114,7 @@ layout:
 
 items:
   - {id: SLV1, desc: "Expandable braided sleeving, PET, 6 mm", pn: PTN0.25BK, manufacturer: Techflex, qty: AR, unit: m}
-  - {id: LBL,  desc: "Heat-shrink marker sleeve, white, 3:1", pn: HX-SCE-1/4, manufacturer: Brady, qty: 4}
+  - {id: LBL,  desc: "Marker sleeve, HX-SCE, white, size to bundle", manufacturer: TE, qty: 4}
   - {id: HS1,  desc: "Heat-shrink 3:1, 6 mm, at breakouts", qty: AR, unit: m}
 
 expect:

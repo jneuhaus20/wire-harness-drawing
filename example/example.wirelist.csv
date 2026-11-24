@@ -1,9 +1,9 @@
 wire,from,from_pin,to,to_pin,signal,gauge,color,cut_length,twist,cable,strip_a,strip_b,path
-W1,P1,1,SP1,1,GND,22 AWG,BK,360,,,,,P1 > B1 > SP1
+W1,P1,1,SP1,1,GND,20 AWG,BK,360,,,,,P1 > B1 > SP1
 W2,SP1,1,J1,1,GND,24 AWG,BK,490,,,,,SP1 > SP2 > B2 > J1
 W3,SP1,1,J2,1,GND,24 AWG,BK,540,,,,,SP1 > SP2 > B2 > B3 > J2
 W4,SP1,1,J3,1,GND,24 AWG,BK,770,,,,,SP1 > SP2 > B2 > B3 > J3
-W5,P1,2,SP2,1,+5V,22 AWG,RD,380,,,,,P1 > B1 > SP1 > SP2
+W5,P1,2,SP2,1,+5V,20 AWG,RD,380,,,,,P1 > B1 > SP1 > SP2
 W6,SP2,1,J1,2,+5V,24 AWG,RD,470,,,,,SP2 > B2 > J1
 W7,SP2,1,J2,2,+5V,24 AWG,RD,520,,,,,SP2 > B2 > B3 > J2
 W8,P1,3,J1,3,SCL,24 AWG,YE,830,,,,,P1 > B1 > SP1 > SP2 > B2 > J1
