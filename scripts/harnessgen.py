@@ -8,7 +8,7 @@ Usage:  python3 harnessgen.py harness.yaml [-o outdir] [--check-only] [--no-wire
 Needs:  pyyaml.  Optional: wireviz + graphviz (wiring diagram sheet),
         cairosvg + pypdf (combined PDF).
 """
-import argparse, csv, html, math, os, re, shutil, subprocess, sys, tempfile, base64
+import argparse, csv, html, math, os, re, shutil, subprocess, sys, textwrap, base64
 from collections import defaultdict, OrderedDict
 
 import yaml
@@ -485,7 +485,7 @@ def hdim(x1, x2, y, label, ext_from=None):
 
 
 def balloon(x, y, n, tx, ty, qty=None, r=11):
-    out = [line(x, y, tx, ty, 0.7), f'<circle cx="{tx:.1f}" cy="{ty:.1f}" r="2" fill="{INK}"/>' if False else "",
+    out = [line(x, y, tx, ty, 0.7),
            arrowhead(tx, ty, math.atan2(ty - y, tx - x)),
            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r}" fill="white" stroke="{INK}" stroke-width="1"/>',
            text(x, y + 4, n, 11, "middle")]
@@ -634,7 +634,8 @@ def layout_xy(d, T, seg_wires, box):
     def sety(n):
         if not order[n]:
             return ys[n]
-        cy = [sety(c) for c in order[n]]
+        for c in order[n]:
+            sety(c)
         ys[n] = ys[T["trunk"][n]]
         return ys[n]
 
@@ -680,7 +681,6 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
     box = (170, 150, W - 230, max(bottom, 420))
     xs, ys = layout_xy(d, T, seg_wires, box)
     root = T["root"]
-    trunk = T.get("trunk", {})
     # coverings first (under bundle)
     cov_marks = []
     for cv in d["layout"].get("coverings", []):
@@ -699,7 +699,7 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
     for n in T["order"][1:]:
         p = T["parent"][n]
         nw = len(seg_wires.get(frozenset((n, p)), []))
-        pth, run = seg_path(xs[p], ys[p], xs[n], ys[n])
+        pth, _ = seg_path(xs[p], ys[p], xs[n], ys[n])
         out.append(f'<path d="{pth}" fill="none" stroke="#333" stroke-width="{3 + 1.6 * math.sqrt(max(nw, 1)):.1f}" stroke-linecap="round"/>')
         out.append(f'<path d="{pth}" fill="none" stroke="#9a9a9a" stroke-width="{1 + 1.6 * math.sqrt(max(nw, 1)):.1f}" stroke-linecap="round"/>')
     # segment (chain) dimensions
@@ -707,9 +707,7 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
         p = T["parent"][n]
         L = T["seglen"][frozenset((n, p))]
         lab = f"{fmt_len(L)} ±{fmt_len(tol_for(dr, L))}" if L is not None else "TBD"
-        is_trunk = trunk.get(p) == n
-        above = (ys[n] < ys[p]) or (not is_trunk and ys[n] == ys[p] and False)
-        dy = -30 if above else 34
+        dy = -30 if ys[n] < ys[p] else 34
         yd = ys[n] + dy
         if abs(ys[p] - ys[n]) < 0.5:
             out.append(hdim(xs[p], xs[n], yd, lab, (ys[p], ys[n])))
@@ -727,7 +725,6 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
         out.append(f'<circle cx="{xs[n]:.1f}" cy="{ys[n]:.1f}" r="4" fill="white" stroke="{INK}" stroke-width="1.2"/>')
         out.append(text(xs[n] - 6, ys[n] - 10, n, 9, "end", fill="#555"))
     # connectors
-    qtys_global = {}
     for c, cd in C.items():
         if c not in xs:
             continue
@@ -755,7 +752,7 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
             col = hexcolor(w.get("color"))
             x0_ = x - sgn * fan
             out.append(f'<path d="M{x0_:.1f},{y:.1f} C{x - sgn * fan * .5:.1f},{y:.1f} {x - sgn * fan * .5:.1f},{yy:.1f} {x:.1f},{yy:.1f}" fill="none" stroke="{col}" stroke-width="2"/>')
-        out.append(rect(bx if not left else bx, y - bh / 2, bw, bh, fill="#e4e4e4", sw=1.2, extra='rx="3"'))
+        out.append(rect(bx, y - bh / 2, bw, bh, fill="#e4e4e4", sw=1.2, extra='rx="3"'))
         mate_x = bx + bw if not left else bx
         out.append(rect(mate_x - (6 if not left else 0), y - bh / 2 + 6, 6, bh - 12, fill="#bdbdbd", sw=0.8))
         # designator, description
@@ -782,8 +779,7 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
             continue
         dist = float(lb.get("distance", 50))
         segL = drawn_len(T, frozenset((c, nb)))
-        frac = min(dist / segL, 0.6)
-        x = xs[c] + (xs[nb] - xs[c]) * min(frac, 0.6)
+        x = xs[c] + (xs[nb] - xs[c]) * min(dist / segL, 0.6)
         x = xs[c] + math.copysign(max(abs(x - xs[c]), 60), xs[nb] - xs[c])
         y = ys[c]
         txt = lb["text"]
@@ -795,9 +791,7 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
         seg_above = ys[seg_child] < ys[seg_par]
         ly = y + 26 if seg_above else y - 26
         out.append(hdim(min(xs[c], x), max(xs[c], x), ly, fmt_len(dist), (y, y + (9 if seg_above else -9))))
-        nums = find_no(bom, "itm", lb.get("item")) if lb.get("item") else []
-        if lb.get("item"):
-            nums = [e["find"] for e in bom if e["key"] == ("itm", lb["item"])]
+        nums = [e["find"] for e in bom if e["key"] == ("itm", lb["item"])] if lb.get("item") else []
         if nums:
             out.append(balloons(x + 30, y + 50, nums, x + 10, y + 9))
     for cv, x, y in cov_marks:
@@ -849,7 +843,6 @@ def default_notes(d):
     if any(len(s) > 2 and s[2] in (None, "TBD") for s in d["layout"].get("segments", []) if isinstance(s, list)):
         n.append("LENGTHS MARKED TBD ARE NOT YET SET; SEGMENTS SO MARKED ARE DRAWN AT A STAND-IN LENGTH. DO NOT CUT FROM THIS REVISION.")
     n += dr.get("notes", [])
-    import textwrap
     return [textwrap.fill(x, 150, subsequent_indent="     ") for x in n]
 
 
@@ -857,7 +850,7 @@ def default_notes(d):
 # Sheets 2+: tables
 # ----------------------------------------------------------------------------
 
-def table_sheets(d, bom, start_sheet, nsheets_hint):
+def table_sheets(d, bom):
     C = d["connectors"]
     tabs = []
     tabs.append(("BILL OF MATERIALS", [("FIND", 40, "c"), ("QTY", 55, "c"), ("UNIT", 40, "c"), ("PART NUMBER", 150, "l"),
@@ -890,7 +883,6 @@ def table_sheets(d, bom, start_sheet, nsheets_hint):
     sheets = []
     area = (40, 150, W - 40, H - 170)
     cur, cx, cy, colw = [], area[0], area[1], 0
-    sheet_no = start_sheet
 
     def new_sheet():
         nonlocal cur, cx, cy, colw
@@ -971,17 +963,13 @@ def wireviz_yaml(d):
         if Ls:
             cab["length"] = round(max(Ls) / 1000, 3)
         wv["cables"][name] = cab
-        conn = []
         is_sa = C.get(ca, {}).get("type", "").lower() == "splice"
         is_sb = C.get(cb, {}).get("type", "").lower() == "splice"
-        conn.append({ca: [pa for _, pa, _ in ws]} if not is_sa else ca)
-        conn.append({name: list(range(1, len(ws) + 1))})
-        conn.append({cb: [pb for _, _, pb in ws]} if not is_sb else cb)
         if is_sa or is_sb:  # simple connectors take one wire per connection set
             for j, (w, pa, pb) in enumerate(ws, 1):
                 wv["connections"].append([ca if is_sa else {ca: [pa]}, {name: [j]}, cb if is_sb else {cb: [pb]}])
         else:
-            wv["connections"].append(conn)
+            wv["connections"].append([{ca: [pa for _, pa, _ in ws]}, {name: list(range(1, len(ws) + 1))}, {cb: [pb for _, _, pb in ws]}])
     return wv
 
 
@@ -1002,8 +990,9 @@ def run_wireviz(d, outdir, base):
 def sheet_wiring(d, svgpath, sheet, nsheets):
     fr, _ = frame(d, sheet, nsheets, "WIRING DIAGRAM")
     with open(svgpath, "rb") as f:
-        data = base64.b64encode(f.read()).decode()
-    m = re.search(rb'viewBox="([\d. -]+)"', open(svgpath, "rb").read())
+        raw = f.read()
+    data = base64.b64encode(raw).decode()
+    m = re.search(rb'viewBox="([\d. -]+)"', raw)
     vw, vh = (float(v) for v in m.group(1).split()[2:]) if m else (1000, 700)
     ax, ay, aw, ah = 40, 150, W - 80, H - 150 - 160
     s = min(aw / vw, ah / vh)
@@ -1056,7 +1045,7 @@ def main():
     wv_svg, wv_err = (None, "skipped (--no-wireviz)") if a.no_wireviz else run_wireviz(d, outdir, base)
     if wv_err:
         print("NOTE  ", wv_err)
-    tsheets = table_sheets(d, bom, 2, 0)
+    tsheets = table_sheets(d, bom)
     n = 1 + len(tsheets) + (1 if wv_svg else 0)
     svgs = [sheet_drawing(d, T, seg_wires, bom, n)] + finish_table_sheets(d, tsheets, 2, n)
     if wv_svg:
