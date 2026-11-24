@@ -18,4 +18,4 @@ find,qty,unit,pn,description,manufacturer,refs
 17,0.47,m,,"UL1007 hook-up wire, 22 AWG, GNYE",,W13
 18,0.56,m,PTN0.25BK,"Expandable braided sleeving, PET, 6 mm",Techflex,P1-B1 B1-SP1 SP1-SP2 SP2-B2
 19,4,EA,,"Marker sleeve, HX-SCE, white, size to bundle",TE,
-20,0,m,,"Heat-shrink 3:1, 6 mm, at breakouts",,
+20,AR,m,,"Heat-shrink 3:1, 6 mm, at breakouts",,

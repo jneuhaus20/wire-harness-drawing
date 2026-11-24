@@ -56,6 +56,23 @@ class Err:
         return sum(1 for s, _ in self.items if s == "ERROR")
 
 
+# Every default that is a length depends on the drawing's unit, and so does how wire and
+# covering is bought. Keep them together so an inch drawing never inherits a millimetre default.
+unit_conventions = {
+    "mm": dict(tolerance=[{"upto": 300, "tol": 5}, {"upto": 1000, "tol": 10}, {"upto": None, "tol": "1%"}],
+               round_to=5, loopback_length=100, label_distance=50, stand_in_length=300,
+               purchase_unit="m", lengths_per_purchase_unit=1000),
+    "in": dict(tolerance=[{"upto": 12, "tol": 0.25}, {"upto": 40, "tol": 0.5}, {"upto": None, "tol": "1%"}],
+               round_to=0.25, loopback_length=4, label_distance=2, stand_in_length=12,
+               purchase_unit="ft", lengths_per_purchase_unit=12),
+}
+
+
+def conventions(drawing: dict) -> dict:
+    """The unit conventions for a drawing; an unknown unit falls back to mm and is reported by check()."""
+    return unit_conventions.get(drawing.get("units", "mm"), unit_conventions["mm"])
+
+
 def parse_end(s):
     """'P1:3' -> ('P1', '3'); 'SP1' -> ('SP1', '1')."""
     s = str(s)
@@ -65,22 +82,33 @@ def parse_end(s):
     return s.strip(), "1"
 
 
+# YAML 1.1 reads yes/no/on/off as booleans, which turns a relay contact "NO" or a
+# signal "OFF" into false. Harness sources follow YAML 1.2 here: only true/false are booleans.
+class HarnessLoader(yaml.SafeLoader):
+    """A safe YAML loader whose only boolean words are true and false."""
+
+
+HarnessLoader.yaml_implicit_resolvers = {
+    first_character: [(tag, pattern) for tag, pattern in resolvers if tag != "tag:yaml.org,2002:bool"]
+    for first_character, resolvers in yaml.SafeLoader.yaml_implicit_resolvers.items()
+}
+HarnessLoader.add_implicit_resolver("tag:yaml.org,2002:bool", re.compile(r"^(?:true|True|TRUE|false|False|FALSE)$"), list("tTfF"))
+
+
 def load(path):
     with open(path) as f:
-        d = yaml.safe_load(f)
-    d.setdefault("drawing", {})
-    d.setdefault("connectors", {})
-    d.setdefault("wires", [])
-    d.setdefault("layout", {})
-    d.setdefault("items", [])
-    d.setdefault("cables", {})
+        d = yaml.load(f, Loader=HarnessLoader)
+    # A section left empty ("items:") loads as None; treat it as absent.
+    for section, empty in (("drawing", {}), ("connectors", {}), ("wires", []), ("layout", {}), ("items", []), ("cables", {})):
+        if d.get(section) is None:
+            d[section] = empty
     return d
 
 
 def tol_for(dr, length):
     if length is None:
         return None
-    for row in dr.get("tolerance", [{"upto": 300, "tol": 5}, {"upto": 1000, "tol": 10}, {"upto": None, "tol": "1%"}]):
+    for row in dr.get("tolerance", conventions(dr)["tolerance"]):
         if row.get("upto") is None or length <= row["upto"]:
             t = row["tol"]
             if isinstance(t, str) and t.endswith("%"):
@@ -155,7 +183,8 @@ def build_tree(d, E):
     for n in order[1:]:
         L, dp = seglen[frozenset((n, parent[n]))], depth[parent[n]]
         depth[n] = None if L is None or dp is None else dp + L
-    return dict(root=root, parent=parent, children=children, seglen=seglen, depth=depth, order=order, nodes=seen)
+    return dict(root=root, parent=parent, children=children, seglen=seglen, depth=depth, order=order, nodes=seen,
+                stand_in_length=conventions(d["drawing"])["stand_in_length"])
 
 
 def path(T, a, b):
@@ -176,7 +205,7 @@ def path(T, a, b):
 
 def compute_lengths(d, T, E):
     dr = d["drawing"]
-    rnd = float(dr.get("round_to", 5))
+    rnd = float(dr.get("round_to", conventions(dr)["round_to"]))
     extra = float(dr.get("extra_per_wire", 0))
     seg_wires = defaultdict(list)
     for w in d["wires"]:
@@ -192,7 +221,7 @@ def compute_lengths(d, T, E):
             p = path(T, ca, cb)
             L = sum(T["seglen"][frozenset(s)] for s in p)
             if not p:
-                L = float(dr.get("loopback_length", 100))
+                L = float(dr.get("loopback_length", conventions(dr)["loopback_length"]))
             L += extra
             L += float(d["connectors"].get(ca, {}).get("wire_allowance", 0))
             L += float(d["connectors"].get(cb, {}).get("wire_allowance", 0))
@@ -209,6 +238,9 @@ def compute_lengths(d, T, E):
 
 def check(d, T, E):
     C = d["connectors"]
+    units = d["drawing"].get("units", "mm")
+    if units not in unit_conventions:
+        E.error(f"drawing.units '{units}' is not one of {', '.join(unit_conventions)}; lengths were read as mm")
     ids = [w.get("id") for w in d["wires"]]
     for i in {x for x in ids if ids.count(x) > 1}:
         E.error(f"duplicate wire id {i}")
@@ -364,8 +396,12 @@ def build_bom(d, T):
     bom = OrderedDict()  # key -> dict
 
     def add(key, desc, pn="", mfr="", qty=0, unit="EA", refs=None, ar=False):
-        e = bom.setdefault(key, dict(desc=desc, pn=pn, mfr=mfr, qty=0, unit=unit, refs=[], ar=ar))
-        e["qty"] += qty
+        """Add qty to a BOM line; a qty of None is a length still TBD, which makes the whole line TBD."""
+        e = bom.setdefault(key, dict(desc=desc, pn=pn, mfr=mfr, qty=0, unit=unit, refs=[], ar=ar, tbd=False))
+        if qty is None:
+            e["tbd"] = True
+        else:
+            e["qty"] += qty
         if refs:
             e["refs"] += refs
         return e
@@ -388,17 +424,26 @@ def build_bom(d, T):
             add(("ctc", ct.get("pn", ct.get("desc"))), ct.get("desc", "Contact"), ct.get("pn", ""), ct.get("manufacturer", ""), len(used[c]) + spare, refs=[c])
         for acc in cd.get("accessories", []):
             add(("acc", acc.get("pn", acc.get("desc"))), acc.get("desc", ""), acc.get("pn", ""), acc.get("manufacturer", ""), acc.get("qty", 1), refs=[c])
+    drawing_units = conventions(d["drawing"])
+    purchase_unit, per_purchase_unit = drawing_units["purchase_unit"], drawing_units["lengths_per_purchase_unit"]
+
+    def purchased(length):
+        """A drawing length in the unit it is bought in; None (TBD) stays None."""
+        return None if length is None else length / per_purchase_unit
+
     for cid, cab in d["cables"].items():
-        ws = [w for w in d["wires"] if w.get("cable") == cid and w.get("_len")]
-        L = max([w["_len"] for w in ws] or [0])
-        add(("cab", cab.get("pn", cid)), cab.get("desc", "Cable"), cab.get("pn", ""), cab.get("manufacturer", ""), L / 1000, "m", [cid], ar=True)
+        cable_lengths = [w.get("_len") for w in d["wires"] if w.get("cable") == cid]
+        longest = None if None in cable_lengths else max(cable_lengths or [0])
+        add(("cab", cab.get("pn", cid)), cab.get("desc", "Cable"), cab.get("pn", ""), cab.get("manufacturer", ""),
+            purchased(longest), purchase_unit, [cid], ar=True)
     for w in d["wires"]:
         if w.get("cable"):
             continue
-        g, col = w.get("gauge", ""), w.get("color", "")
-        wt = d["drawing"].get("wire_type", "Hook-up wire")
+        g, col = str(w.get("gauge", "")), w.get("color", "")
+        wire_type = w.get("type", d["drawing"].get("wire_type", "Hook-up wire"))
         pn = w.get("pn") or ""
-        add(("wir", g, col, pn), ", ".join(x for x in (w.get('type', wt), g, col) if x), pn, w.get("manufacturer", ""), (w.get("_len") or 0) / 1000, "m", [w["id"]], ar=True)
+        add(("wir", wire_type, g, col, pn), ", ".join(x for x in (wire_type, g, col) if x), pn, w.get("manufacturer", ""),
+            purchased(w.get("_len")), purchase_unit, [w["id"]], ar=True)
     lay = d["layout"]
     for it in d["items"]:
         iid = it.get("id") or it.get("pn") or it["desc"]
@@ -409,24 +454,45 @@ def build_bom(d, T):
         covs = [cv for cv in lay.get("coverings", []) if cv.get("item") == iid]
         labs = [lb for lb in lay.get("labels", []) if lb.get("item") == iid]
         if ar and covs:  # length of covered segments
-            tot = 0.0
+            covered = []
             for cv in covs:
                 for s in cv["segments"]:
                     a, b = s.split("-") if isinstance(s, str) else s
-                    tot += T["seglen"].get(frozenset((a, b))) or 0
+                    covered.append(T["seglen"].get(frozenset((a, b))))
                 refs += [s if isinstance(s, str) else "-".join(s) for s in cv["segments"]]
-            q, unit = tot / 1000, "m"
+            q, unit = purchased(None if None in covered else sum(covered)), purchase_unit
         elif q is None and labs:
             q, ar = len(labs), False
             refs += [lb["at"] for lb in labs]
         add(("itm", iid), it["desc"], it.get("pn", ""), it.get("manufacturer", ""),
-            q if isinstance(q, (int, float)) else 0, unit, refs, ar=ar)
+            q if isinstance(q, (int, float)) or (ar and covs) else 0, unit, refs, ar=ar)
     rows = []
     for i, (k, e) in enumerate(bom.items(), 1):
         e["find"] = i
         e["key"] = k
         rows.append(e)
     return rows
+
+
+# The QTY cell on the BOM sheet: "AR" lines show the computed length in brackets, and a
+# length that runs through a TBD segment shows TBD rather than a total that leaves it out.
+def bom_sheet_quantity(entry: dict) -> str:
+    """The text of a BOM line's QTY cell on the drawing."""
+    if entry["ar"]:
+        if entry["tbd"]:
+            return "AR (TBD)"
+        return f"AR ({entry['qty']:.2f})" if entry["qty"] else "AR"
+    return "TBD" if entry["tbd"] else fmt_len(round(entry["qty"], 3))
+
+
+# The qty column of bom.csv: a number purchasing can use, or a word when there is none yet.
+def bom_csv_quantity(entry: dict) -> str:
+    """The text of a BOM line's qty in bom.csv."""
+    if entry["tbd"]:
+        return "TBD"
+    if entry["ar"] and not entry["qty"]:
+        return "AR"
+    return fmt_len(round(entry["qty"], 3))
 
 
 def find_no(bom, kind, ref):
@@ -440,6 +506,55 @@ def find_no(bom, kind, ref):
 W, H = 1600, 1131  # A3 landscape proportions; 1 unit ~ 0.2625 mm on A3
 FONT = "Arial, Helvetica, sans-serif"
 INK = "#111"
+
+
+# Advance widths of Helvetica and Helvetica-Bold (Adobe AFM, 1/1000 em) for printable ASCII.
+# Arial, which the sheets name first, shares these metrics.
+helvetica_widths = dict(zip(
+    [chr(code) for code in range(32, 127)],
+    [278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556,
+     556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556, 1015, 667, 667, 722, 722, 667, 611, 778,
+     722, 278, 500, 667, 556, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 278,
+     278, 278, 469, 556, 333, 556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556,
+     556, 556, 333, 500, 278, 556, 500, 722, 500, 500, 500, 334, 260, 334, 584]))
+helvetica_bold_widths = dict(zip(
+    [chr(code) for code in range(32, 127)],
+    [278, 333, 474, 556, 556, 889, 722, 238, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556,
+     556, 556, 556, 556, 556, 556, 333, 333, 584, 584, 584, 611, 975, 722, 722, 722, 722, 667, 611, 778,
+     722, 278, 556, 722, 611, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 333,
+     278, 333, 584, 556, 333, 556, 611, 556, 611, 556, 333, 611, 611, 278, 278, 556, 278, 889, 611, 611,
+     611, 611, 389, 556, 333, 611, 556, 778, 556, 556, 500, 389, 280, 389, 584]))
+# The few non-ASCII characters the sheets use; anything else is measured as a full em so
+# that an unknown glyph errs toward too much room.
+symbol_widths = {"–": 556, "—": 1000, "±": 584, "≤": 549, "≥": 549, "°": 400, "×": 584, "µ": 556}
+
+
+def text_width(content: str, size: float, bold: bool) -> float:
+    """The rendered width of a line of sheet text at a font size."""
+    widths = helvetica_bold_widths if bold else helvetica_widths
+    return sum(widths.get(character, symbol_widths.get(character, 1000)) for character in content) * size / 1000
+
+
+# Break text into lines no wider than width, at spaces where it can and inside a word only
+# when the word alone is wider than the line. Nothing is dropped.
+def wrap_to_width(content: str, width: float, size: float, bold: bool) -> list[str]:
+    """Lines of content that each fit in width at the given font."""
+    lines = []
+    current = ""
+    for word in content.split():
+        candidate = f"{current} {word}" if current else word
+        if text_width(candidate, size, bold) <= width:
+            current = candidate
+            continue
+        if current:
+            lines.append(current)
+        current = ""
+        for character in word:
+            if current and text_width(current + character, size, bold) > width:
+                lines.append(current)
+                current = ""
+            current += character
+    return lines + [current] if current or not lines else lines
 
 
 def esc(s):
@@ -508,41 +623,74 @@ def balloons(x, y, nums, tx, ty, qtys=None):
     return "".join(out)
 
 
+cell_padding = 3
+
+
 def table(x, y, cols, rows, title=None, size=9.5, rowh=15, max_h=None):
-    """cols: [(header, width, align)]. Returns (svg, height, rows_used)."""
+    """cols: [(header, width, align)]. Returns (svg, height, rows_used).
+
+    Text that is wider than its cell wraps onto more lines and the row grows to hold them."""
     out = []
     tw = sum(c[1] for c in cols)
+    line_pitch = round(size * 1.2, 1)
+
+    def wrapped_row(cells, cell_size, bold):
+        """Each cell's lines and the height of a row that holds the tallest."""
+        lines = [wrap_to_width(str(v), w_ - 2 * cell_padding, cell_size, bold) for (_, w_, _), v in zip(cols, cells)]
+        return lines, rowh + line_pitch * (max(len(cell) for cell in lines) - 1)
+
+    def cell_text(cx, cy, w_, a, lines, cell_size, weight):
+        """The lines of one cell, the first on the row's usual baseline."""
+        tx = cx + cell_padding if a == "l" else cx + w_ / 2
+        return "".join(text(tx, cy + rowh - 4 + k * line_pitch, ln, cell_size, "start" if a == "l" else "middle", weight)
+                       for k, ln in enumerate(lines))
+
     yy = y
     if title:
-        out.append(rect(x, yy, tw, rowh + 2, fill="#e8e8e8"))
-        out.append(text(x + tw / 2, yy + rowh - 2, title, size + 1, "middle", "bold"))
-        yy += rowh + 2
-    out.append(rect(x, yy, tw, rowh, fill="#f3f3f3"))
+        title_lines = wrap_to_width(title, tw - 2 * cell_padding, size + 1, True)
+        title_h = rowh + 2 + line_pitch * (len(title_lines) - 1)
+        out.append(rect(x, yy, tw, title_h, fill="#e8e8e8"))
+        out.append(cell_text(x, yy + 2, tw, "c", title_lines, size + 1, "bold"))
+        yy += title_h
+    header_lines, header_h = wrapped_row([h_ for h_, _, _ in cols], size, True)
+    out.append(rect(x, yy, tw, header_h, fill="#f3f3f3"))
     cx = x
-    for h_, w_, a in cols:
-        out.append(rect(cx, yy, w_, rowh))
-        out.append(text(cx + 3 if a == "l" else cx + w_ / 2, yy + rowh - 4, h_, size, "start" if a == "l" else "middle", "bold"))
+    for (h_, w_, a), lines in zip(cols, header_lines):
+        out.append(rect(cx, yy, w_, header_h))
+        out.append(cell_text(cx, yy, w_, a, lines, size, "bold"))
         cx += w_
-    yy += rowh
+    yy += header_h
     used = 0
     for r in rows:
-        if max_h and yy + rowh > y + max_h:
+        lines_per_cell, row_h = wrapped_row(r, size, False)
+        if max_h and yy + row_h > y + max_h:
             break
         cx = x
-        for (h_, w_, a), v in zip(cols, r):
-            out.append(rect(cx, yy, w_, rowh, sw=0.6))
-            s = str(v)
-            maxc = int(w_ / (size * 0.55))
-            if len(s) > maxc:
-                s = s[:max(1, maxc - 1)] + "…"
-            out.append(text(cx + 3 if a == "l" else cx + w_ / 2, yy + rowh - 4, s, size, "start" if a == "l" else "middle"))
+        for (h_, w_, a), lines in zip(cols, lines_per_cell):
+            out.append(rect(cx, yy, w_, row_h, sw=0.6))
+            out.append(cell_text(cx, yy, w_, a, lines, size, "normal"))
             cx += w_
-        yy += rowh
+        yy += row_h
         used += 1
     return "".join(out), yy - y, used
 
 
-def frame(d, sheet, nsheets, sheet_title):
+release_mark_box = (40, 38, 640, 76)  # x0, y0, x1, y1, inside the border at top left
+
+
+# A package that fails its checks must not pass for a releasable drawing, so every sheet
+# of it carries this mark where a reader looks first.
+def release_mark(check_errors: int) -> str:
+    """The NOT FOR RELEASE mark for a package with check errors."""
+    x0, y0, x1, y1 = release_mark_box
+    plural = "S" if check_errors != 1 else ""
+    return (rect(x0, y0, x1 - x0, y1 - y0, fill="white", stroke="#c00000", sw=2.5)
+            + text((x0 + x1) / 2, y0 + 24, f"NOT FOR RELEASE: {check_errors} CHECK ERROR{plural}, SEE CHECKS REPORT",
+                   15, "middle", "bold", fill="#c00000"))
+
+
+def frame(d, sheet, nsheets, sheet_title, check_errors):
+    """The border, zones, title and revision blocks of a sheet, and the boxes the blocks take up."""
     dr = d["drawing"]
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
            f'viewBox="0 0 {W} {H}" width="420mm" height="297mm">',
@@ -579,9 +727,13 @@ def frame(d, sheet, nsheets, sheet_title):
     # revision block (top right)
     revs = dr.get("revisions") or [{"rev": dr.get("rev", "A"), "desc": "Initial release", "date": dr.get("date", ""), "by": dr.get("drawn_by", "")}]
     cols = [("REV", 40, "c"), ("DESCRIPTION", 300, "l"), ("DATE", 90, "c"), ("BY", 60, "c")]
-    s, _, _ = table(W - 20 - 490, 20, cols, [[r.get("rev", ""), r.get("desc", ""), r.get("date", ""), r.get("by", "")] for r in revs], "REVISIONS")
+    s, revision_h, _ = table(W - 20 - 490, 20, cols, [[r.get("rev", ""), r.get("desc", ""), r.get("date", ""), r.get("by", "")] for r in revs], "REVISIONS")
     out.append(s)
-    return out, (tx, ty)
+    if check_errors:
+        out.append(release_mark(check_errors))
+    regions = {"title block": (tx, ty, tx + tw_, ty + th), "revision block": (W - 20 - 490, 20, W - 20, 20 + revision_h),
+               "release mark area": release_mark_box}
+    return out, regions
 
 
 # ----------------------------------------------------------------------------
@@ -594,7 +746,7 @@ def drawn_len(T, s):
     if L is not None:
         return L
     known = sorted(v for v in T["seglen"].values() if v is not None)
-    return known[len(known) // 2] if known else 300.0
+    return known[len(known) // 2] if known else float(T["stand_in_length"])
 
 
 def layout_xy(d, T, seg_wires, box):
@@ -670,10 +822,44 @@ def seg_path(px, py, cx, cy):
             f"L{cx:.1f},{cy:.1f}"), (px + bend, cx)
 
 
-def sheet_drawing(d, T, seg_wires, bom, nsheets):
+def balloon_stack_box(x, y, nums, qtys=None):
+    """The box a column of balloons drawn by balloons() takes up."""
+    widest_quantity = max([text_width(q, 10, False) + 3 for q in (qtys or {}).values()] or [0])
+    return (x - 11, y - 11, x + 11 + widest_quantity, y + 23 * (len(nums) - 1) + 11)
+
+
+def hdim_box(x1, x2, y, label):
+    """The box a horizontal dimension drawn by hdim() takes up, its label included."""
+    label_w = text_width(label, 11, False) + 8
+    xm = (x1 + x2) / 2
+    top = y - 7 if x2 - x1 > label_w + 20 else y - 16
+    return (min(x1, xm - label_w / 2), top, max(x2, xm + label_w / 2), y + 7)
+
+
+# Name every part of the drawing that lies outside the sheet border or on top of a block
+# the frame or the notes occupy, so a drawing too big for its sheet is reported, never shipped.
+def sheet_misfits(placed, regions):
+    """For each place a drawn item must not be, the items that are there: one line per place."""
+    trespassers = defaultdict(list)
+    for what, (x0, y0, x1, y1) in placed:
+        if x0 < 20 or y0 < 20 or x1 > W - 20 or y1 > H - 20:
+            trespassers["off the sheet"].append(what)
+        for region, (rx0, ry0, rx1, ry1) in regions.items():
+            if x0 < rx1 and rx0 < x1 and y0 < ry1 and ry0 < y1:
+                trespassers[f"on the {region}"].append(what)
+    return [f"{place}: {', '.join(dict.fromkeys(whats))}" for place, whats in trespassers.items()]
+
+
+def sheet_drawing(d, T, seg_wires, bom, nsheets, check_errors):
+    """Sheet 1's SVG and the list of what on it does not fit the sheet."""
     dr = d["drawing"]
     C = d["connectors"]
-    out, (tbx, tby) = frame(d, 1, nsheets, "HARNESS DRAWING")
+    out, regions = frame(d, 1, nsheets, "HARNESS DRAWING", check_errors)
+    placed = []
+
+    def occupy(what, box_):
+        placed.append((what, box_))
+
     nleaf = sum(1 for n in T["order"] if n in C and n != T["root"] and not T["children"].get(n))
     notes_top = H - 20 - 20 - 15 * sum(x.count("\n") + 1 for x in default_notes(d)) - 50
     dims_h = 24 * nleaf + 40
@@ -691,8 +877,9 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
             p, c = (a, b) if T["parent"].get(b) == a else (b, a)
             pth, _ = seg_path(xs[p], ys[p], xs[c], ys[c])
             out.append(f'<path d="{pth}" fill="none" stroke="{cv.get("display_color", "#9aa7b8")}" stroke-width="{cv.get("display_width", 16)}" stroke-linecap="butt" opacity="0.55"/>')
-        if segs:
-            a, b = segs[0]
+        drawn_segs = [(a, b) for a, b in segs if frozenset((a, b)) in T["seglen"]]
+        if drawn_segs:
+            a, b = drawn_segs[0]
             p, c = (a, b) if T["parent"].get(b) == a else (b, a)
             cov_marks.append((cv, (xs[p] + xs[c]) / 2, ys[c]))
     # bundles
@@ -711,11 +898,13 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
         yd = ys[n] + dy
         if abs(ys[p] - ys[n]) < 0.5:
             out.append(hdim(xs[p], xs[n], yd, lab, (ys[p], ys[n])))
+            occupy(f"dimension {p}–{n}", hdim_box(xs[p], xs[n], yd, lab))
         else:  # bent branch: length called out along its run, as on NTS drawings
             _, (rx0, rx1) = seg_path(xs[p], ys[p], xs[n], ys[n])
             tw = len(lab) * 6.2 + 8
             xm = xs[p] + (rx0 - xs[p]) * 0.5 + 8 + tw / 2
             ym = (ys[p] + ys[n]) / 2
+            occupy(f"dimension {p}–{n}", (xm - tw / 2, ym - 7, xm + tw / 2, ym + 7))
             out.append(rect(xm - tw / 2, ym - 7, tw, 14, fill="white", stroke="none"))
             out.append(text(xm, ym + 4, lab, 11, "middle"))
     # breakout nodes
@@ -724,6 +913,7 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
             continue
         out.append(f'<circle cx="{xs[n]:.1f}" cy="{ys[n]:.1f}" r="4" fill="white" stroke="{INK}" stroke-width="1.2"/>')
         out.append(text(xs[n] - 6, ys[n] - 10, n, 9, "end", fill="#555"))
+        occupy(f"breakout {n}", (xs[n] - 6 - text_width(n, 9, False), ys[n] - 19, xs[n] + 4, ys[n] + 4))
     # connectors
     for c, cd in C.items():
         if c not in xs:
@@ -735,9 +925,11 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
         if splice:
             out.append(f'<rect x="{x - 9:.1f}" y="{y - 7:.1f}" width="18" height="14" fill="#d9d9d9" stroke="{INK}" transform="rotate(45 {x:.1f} {y:.1f})"/>')
             out.append(text(x, y - 16, c, 12, "middle", "bold"))
+            occupy(f"splice {c}", (x - 13, y - 28, x + 13, y + 13))
             nums = find_no(bom, "spl", c)
             if nums:
                 out.append(balloons(x + 30, y - 45, nums, x + 6, y - 6))
+                occupy(f"{c} balloons", balloon_stack_box(x + 30, y - 45, nums))
             continue
         npin = len(pins_of(cd))
         bh = min(110, max(44, 8 + npin * 3.2))
@@ -760,6 +952,9 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
         out.append(text(cxm, y + bh / 2 + 18, c, 14, "middle", "bold", extra='text-decoration="underline"'))
         sub = cd.get("label") or cd.get("type", "")
         out.append(text(cxm, y + bh / 2 + 32, sub, 9.5, "middle", fill="#333"))
+        caption_w = max(text_width(c, 14, True), text_width(sub, 9.5, False))
+        occupy(f"connector {c}", (min(bx, cxm - caption_w / 2) - (fan if left else 0), y - bh / 2,
+                                  max(bx + bw, cxm + caption_w / 2) + (0 if left else fan), y + bh / 2 + 35))
         # balloons: housing, contacts, accessories
         nums = find_no(bom, "con", c) + find_no(bom, "ctc", c) + find_no(bom, "acc", c)
         qtys = {}
@@ -769,6 +964,7 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
             qtys[ct[0]] = f"{len(pins)}X"  # one contact per pin used, as in the BOM
         bx_ = bx - 40 if left else bx + bw + 40
         out.append(balloons(bx_, y - bh / 2 - 40, nums, bx + (bw * 0.3 if left else bw * 0.7), y - bh / 2, qtys))
+        occupy(f"{c} balloons", balloon_stack_box(bx_, y - bh / 2 - 40, nums, qtys))
     # labels / markers
     for lb in d["layout"].get("labels", []):
         c = lb["at"]
@@ -777,7 +973,7 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
         nb = T["parent"].get(c) if c != root else next(iter(T["children"][root]), None)
         if nb is None:
             continue
-        dist = float(lb.get("distance", 50))
+        dist = float(lb.get("distance", conventions(dr)["label_distance"]))
         segL = drawn_len(T, frozenset((c, nb)))
         x = xs[c] + (xs[nb] - xs[c]) * min(dist / segL, 0.6)
         x = xs[c] + math.copysign(max(abs(x - xs[c]), 60), xs[nb] - xs[c])
@@ -786,26 +982,33 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
         tw = max(46, len(txt) * 6.4 + 10)
         out.append(rect(x - tw / 2, y - 9, tw, 18, fill="white", sw=1))
         out.append(text(x, y + 4, txt, 10, "middle"))
+        occupy(f"label {txt}", (x - tw / 2, y - 9, x + tw / 2, y + 9))
         seg_child = c if c != root else nb
         seg_par = T["parent"][seg_child]
         seg_above = ys[seg_child] < ys[seg_par]
         ly = y + 26 if seg_above else y - 26
         out.append(hdim(min(xs[c], x), max(xs[c], x), ly, fmt_len(dist), (y, y + (9 if seg_above else -9))))
+        occupy(f"label {txt} dimension", hdim_box(min(xs[c], x), max(xs[c], x), ly, fmt_len(dist)))
         nums = [e["find"] for e in bom if e["key"] == ("itm", lb["item"])] if lb.get("item") else []
         if nums:
             out.append(balloons(x + 30, y + 50, nums, x + 10, y + 9))
+            occupy(f"label {txt} balloon", balloon_stack_box(x + 30, y + 50, nums))
     for cv, x, y in cov_marks:
         nums = [e["find"] for e in bom if e["key"] == ("itm", cv.get("item"))]
         if nums:
             out.append(balloons(x + 25, y + 70, nums, x, y + 8, {nums[0]: "AR"}))
-    # baseline (overall) dimensions from root datum to each leaf connector
+            occupy(f"{cv.get('item')} balloon", balloon_stack_box(x + 25, y + 70, nums, {nums[0]: "AR"}))
+    # Overall dimensions from the root datum to each leaf connector. The segment dimensions
+    # above already fix these lengths, each with its own tolerance, so an overall tolerance
+    # would contradict their stack-up: the overall lengths are reference only.
     leaves = [n for n in T["order"] if n in C and n != root and not T["children"].get(n)]
     leaves.sort(key=lambda n: xs[n])
     yb = max(max(ys.values()) + 100, box[3] + 60)
     for i, n in enumerate(leaves):
         L = T["depth"][n]
-        lab = f"{fmt_len(L)} ±{fmt_len(tol_for(dr, L))}" if L is not None else "TBD"
+        lab = f"{fmt_len(L)} REF" if L is not None else "TBD REF"
         out.append(hdim(xs[root], xs[n], yb + i * 24, f"{lab}  ({root}–{n})", (None, None)))
+        occupy(f"overall dimension {root}–{n}", hdim_box(xs[root], xs[n], yb + i * 24, f"{lab}  ({root}–{n})"))
         out.append(line(xs[n], ys[n] + 20, xs[n], yb + i * 24 + 4, 0.5, "#777", 'stroke-dasharray="4 3"'))
     if leaves:
         out.append(line(xs[root], ys[root] + 20, xs[root], yb + (len(leaves) - 1) * 24 + 4, 0.5, "#777", 'stroke-dasharray="4 3"'))
@@ -820,19 +1023,20 @@ def sheet_drawing(d, T, seg_wires, bom, nsheets):
     out.append(text(40, ny - 8, "NOTES:", 12, weight="bold", extra='text-decoration="underline"'))
     for k, ln in enumerate(lines):
         out.append(text(40, ny + 12 + k * 15, ln, 10.5, extra='xml:space="preserve"'))
+    regions["notes"] = (40, ny - 51, 40 + max(text_width(ln, 10.5, False) for ln in lines), H - 20)
     out.append("</svg>")
-    return "\n".join(out)
+    return "\n".join(out), sheet_misfits(placed, regions)
 
 
 def default_notes(d):
     dr = d["drawing"]
     datum = dr.get("datum", "connector rear face")
-    tol = dr.get("tolerance", [{"upto": 300, "tol": 5}, {"upto": 1000, "tol": 10}, {"upto": None, "tol": "1%"}])
+    tol = dr.get("tolerance", conventions(dr)["tolerance"])
     tols = ", ".join((f"≤{r['upto']}: ±{r['tol']}" if r.get("upto") else f"over: ±{r['tol']}") for r in tol)
     n = [
         f"FABRICATE, INSPECT AND TEST PER IPC/WHMA-A-620, CLASS {dr.get('ipc_class', 2)}.",
         f"ALL DIMENSIONS IN {dr.get('units', 'mm').upper()}. LENGTHS ARE MEASURED FROM {datum.upper()} TO BREAKOUT CENTRE OR TO THE NEXT {datum.upper()}.",
-        f"LENGTH TOLERANCES UNLESS OTHERWISE SPECIFIED: {tols}.",
+        f"LENGTH TOLERANCES UNLESS OTHERWISE SPECIFIED: {tols}. SEGMENT DIMENSIONS GOVERN; OVERALL DIMENSIONS ARE REFERENCE.",
         "DRAWING NOT TO SCALE. WIRE CUT LENGTHS PER WIRE LIST; CONNECTIONS PER CONNECTOR TABLES AND WIRING DIAGRAM.",
     ]
     if any(w.get("twist") for w in d["wires"]):
@@ -855,7 +1059,7 @@ def table_sheets(d, bom):
     tabs = []
     tabs.append(("BILL OF MATERIALS", [("FIND", 40, "c"), ("QTY", 55, "c"), ("UNIT", 40, "c"), ("PART NUMBER", 150, "l"),
                                        ("DESCRIPTION", 260, "l"), ("MFR", 90, "l"), ("REF", 140, "l")],
-                 [[e["find"], ("AR" if e["ar"] else "") + (f" ({e['qty']:.2f})" if e["ar"] and e["qty"] else ("" if e["ar"] else fmt_len(round(e["qty"], 3)))),
+                 [[e["find"], bom_sheet_quantity(e),
                    e["unit"], e["pn"], e["desc"], e["mfr"], ", ".join(dict.fromkeys(str(r) for r in e["refs"]))] for e in bom]))
     rows = []
     for w in d["wires"]:
@@ -920,10 +1124,10 @@ def table_sheets(d, bom):
     return sheets
 
 
-def finish_table_sheets(d, sheets, first, nsheets):
+def finish_table_sheets(d, sheets, first, nsheets, check_errors):
     out = []
     for i, body in enumerate(sheets):
-        fr, _ = frame(d, first + i, nsheets, "BOM / WIRE LIST / CONNECTORS")
+        fr, _ = frame(d, first + i, nsheets, "BOM / WIRE LIST / CONNECTORS", check_errors)
         out.append("\n".join(fr + body + ["</svg>"]))
     return out
 
@@ -987,8 +1191,8 @@ def run_wireviz(d, outdir, base):
     return svg, None
 
 
-def sheet_wiring(d, svgpath, sheet, nsheets):
-    fr, _ = frame(d, sheet, nsheets, "WIRING DIAGRAM")
+def sheet_wiring(d, svgpath, sheet, nsheets, check_errors):
+    fr, _ = frame(d, sheet, nsheets, "WIRING DIAGRAM", check_errors)
     with open(svgpath, "rb") as f:
         raw = f.read()
     data = base64.b64encode(raw).decode()
@@ -1021,6 +1225,13 @@ def main():
     T = build_tree(d, E)
     seg_wires = compute_lengths(d, T, E)
     check(d, T, E)
+    # Whether the drawing fits its sheet is a check too, so lay sheet 1 out before reporting.
+    bom = build_bom(d, T) if T else None
+    if T:
+        _, misfits = sheet_drawing(d, T, seg_wires, bom, 1, 0)
+        if misfits:
+            E.error("harness drawing does not fit sheet 1: " + "; ".join(misfits)
+                    + ". Split the harness into sub-harnesses or shorten its text")
     rep = "\n".join(f"{s:5}  {m}" for s, m in E.items) or "OK     no findings"
     print(rep)
     with open(os.path.join(outdir, f"{base}.checks.txt"), "w") as f:
@@ -1029,12 +1240,11 @@ def main():
         sys.exit(1 if E.n_errors else 0)
     if T is None:
         print("cannot draw: layout is broken"); sys.exit(1)
-    bom = build_bom(d, T)
     # CSVs
     with open(os.path.join(outdir, f"{base}.bom.csv"), "w", newline="") as f:
         w = csv.writer(f); w.writerow(["find", "qty", "unit", "pn", "description", "manufacturer", "refs"])
         for e in bom:
-            w.writerow([e["find"], round(e["qty"], 3), e["unit"], e["pn"], e["desc"], e["mfr"], " ".join(map(str, dict.fromkeys(e["refs"])))])
+            w.writerow([e["find"], bom_csv_quantity(e), e["unit"], e["pn"], e["desc"], e["mfr"], " ".join(map(str, dict.fromkeys(e["refs"])))])
     with open(os.path.join(outdir, f"{base}.wirelist.csv"), "w", newline="") as f:
         w = csv.writer(f); w.writerow(["wire", "from", "from_pin", "to", "to_pin", "signal", "gauge", "color", "cut_length", "twist", "cable", "strip_a", "strip_b", "path"])
         for x in d["wires"]:
@@ -1047,9 +1257,10 @@ def main():
         print("NOTE  ", wv_err)
     tsheets = table_sheets(d, bom)
     n = 1 + len(tsheets) + (1 if wv_svg else 0)
-    svgs = [sheet_drawing(d, T, seg_wires, bom, n)] + finish_table_sheets(d, tsheets, 2, n)
+    drawing, _ = sheet_drawing(d, T, seg_wires, bom, n, E.n_errors)
+    svgs = [drawing] + finish_table_sheets(d, tsheets, 2, n, E.n_errors)
     if wv_svg:
-        svgs.append(sheet_wiring(d, wv_svg, n, n))
+        svgs.append(sheet_wiring(d, wv_svg, n, n, E.n_errors))
     paths = []
     for i, s in enumerate(svgs, 1):
         p = os.path.join(outdir, f"{base}.sheet{i}.svg")
