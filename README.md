@@ -17,6 +17,10 @@ A Claude skill that turns one YAML description of a wire harness into the drawin
 
 [`SKILL.md`](SKILL.md) holds the input schema, the checks, the drafting conventions the drawing follows, and the limits.
 
+## Why a generator
+
+[WireViz](https://github.com/wireviz/WireViz) is the established open-source tool for the wiring diagram and its BOM. It draws no physical layout: no branch lengths, breakouts or formboard view. The tools that do draw one are commercial GUI packages (RapidHarness, Altium Harness Design, Zuken E3.series, Siemens Capital), which a script cannot drive. This generator draws the layout itself, hands the wiring diagram to WireViz, and builds every sheet and table from the same source file so they cannot disagree.
+
 ## Install as a skill
 
 ```bash
