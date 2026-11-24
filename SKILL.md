@@ -14,9 +14,9 @@ From one `harness.yaml`, `scripts/harnessgen.py` (in this skill's directory) wri
 | Output | What it is |
 |---|---|
 | `*.checks.txt` | Findings: ERROR / WARN / INFO. Exit code 1 on any ERROR, and every sheet then carries a red NOT FOR RELEASE mark. |
-| `*.sheet1.svg` | Harness drawing: datum-to-breakout segment dimensions with tolerances, overall reference dimensions (REF, untoleranced) from the root connector to each leaf, bundle thickness by wire count, wire-colour fan at each connector, splices (diamond), breakouts (circle), coverings (shaded, ballooned "AR"), labels with their position dimension, balloons with find numbers and contact quantities ("4X"), notes, revision block, title block, zone grid. Not to scale. |
-| `*.sheet2.svg` and up | BOM (find no., qty or AR with computed length, TBD where a length runs through a TBD segment, unit, P/N, description, mfr, refs), wire list (from-to, signal, gauge, colour, cut length, twist/cable), one table per connector (every cavity, empty ones marked). Flows onto extra sheets as needed. |
-| last sheet | WireViz wiring diagram (connector pin tables, wires coloured and labelled), embedded. |
+| `*.sheet1.svg` | Harness drawing: datum-to-breakout segment dimensions with tolerances, overall reference dimensions (REF, untoleranced) from the root connector to each leaf, bundle thickness by wire count, wire-colour fan at each connector (striped wires dashed in their stripe colour), splices (diamond), breakouts (circle), coverings (shaded, ballooned "AR"), labels with their position dimension, balloons with find numbers and contact quantities ("4X"), notes, revision block, title block, zone grid. Not to scale. |
+| `*.sheet2.svg` and up | BOM (find no., qty or AR with computed length, TBD where a length runs through a TBD segment, unit, P/N, description, mfr, refs), wire list (from-to, BOM find number, strip length at each end, signal, gauge, colour, cut length, twist/cable), one table per connector (every cavity, empty ones marked). Flows onto extra sheets as needed. |
+| last sheet | WireViz wiring diagram (connector pin tables, wires coloured and labelled; each twist group a named bundle, each harness cable drawn as that cable with its P/N and shield), embedded. |
 | `*.pdf` | All sheets combined. |
 | `*.bom.csv`, `*.wirelist.csv` | Same data for purchasing and cut/strip/crimp work (wire list includes routing path). |
 | `*.wireviz.yaml`, `*.wiring.svg`, `*.wiring.png` | The generated WireViz input and WireViz's own render of it, in case someone wants to tweak the diagram by hand. |
@@ -45,7 +45,7 @@ Setup (once per machine): `pip install pyyaml wireviz cairosvg pypdf` and Graphv
 - **Balloons / find numbers** (external, L3Harris): every BOM item is ballooned, referenced in a note, or listed in the wiring tables. Contacts carry an "nX" quantity at the connector; length items show "AR" (as required) with the computed length in brackets in the BOM.
 - **Reference designators** (external, common practice/aerospace): P = plug (free connector), J = jack/receptacle (fixed), SP or BS = splice (don't mix), E = unterminated end/lug, W = wire, T = twist group.
 - **Labels** (external, IPC/WHMA-A-620 §12.4 as cited by L3 60102381): at most 12 in (300 mm) from the end of a breakout or the rear of the connector accessory; text reads toward the connector; position dimensioned from datum to label centre.
-- **Twists** (external): "TWIST INDICATED WIRES PER IPC/WHMA-A-620"; L3Harris examples are ≥4 twists/inch pairs, 3 triples, 2.5 quads. The default note cites the standard without a rate; add a rate in notes when the signal needs one.
+- **Twists** (external): "TWIST INDICATED WIRES PER IPC/WHMA-A-620"; L3Harris examples are ≥4 twists/inch pairs, 3 triples, 2.5 quads. The default note cites the standard without a rate; add a rate in notes when the signal needs one. Twisting shortens a wire's reach, so cut lengths add `drawing.twist_takeup` (default 3 %, a shop convention; set it from your twist rate) over the segments the group runs through together, and a note states it.
 - **Pinout view**: state whether a connector table is mating face or wire-insertion side (`view:`), because the two are mirror images.
 - **Sealed connectors**: `sealed: true` makes empty cavities show "(seal)" and adds an INFO line for sealing plugs.
 - **Not to scale**: harness drawings are normally NTS; dimensions govern. A 1:1 nailboard print is a separate step this tool does not do (see Limits).
@@ -64,6 +64,7 @@ drawing:
   datum: "connector rear face"           # printed in note 2
   tolerance: [{upto: 300, tol: 5}, {upto: 1000, tol: 10}, {upto: null, tol: "1%"}]
   round_to: 5           extra_per_wire: 0      loopback_length: 100   # mm defaults; in: 0.25, 0, 4
+  twist_takeup: "3%"    # added to twisted wires over their shared run
   wire_type: "UL1007 hook-up wire"       # BOM description prefix
   notes: [str, ...]                      # appended after the standard notes
   revisions: [{rev, desc, date, by}]

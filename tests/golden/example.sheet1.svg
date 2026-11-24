@@ -1,191 +1,218 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 1131" width="420mm" height="297mm">
 <rect x="0.0" y="0.0" width="1600.0" height="1131.0" fill="white" stroke="none" stroke-width="1" />
-<rect x="20.0" y="20.0" width="1560.0" height="1091.0" fill="none" stroke="#111" stroke-width="2" />
-<line x1="215.0" y1="20.0" x2="215.0" y2="30.0" stroke="#111" stroke-width="1" />
-<line x1="215.0" y1="1101.0" x2="215.0" y2="1111.0" stroke="#111" stroke-width="1" />
-<line x1="410.0" y1="20.0" x2="410.0" y2="30.0" stroke="#111" stroke-width="1" />
-<line x1="410.0" y1="1101.0" x2="410.0" y2="1111.0" stroke="#111" stroke-width="1" />
-<line x1="605.0" y1="20.0" x2="605.0" y2="30.0" stroke="#111" stroke-width="1" />
-<line x1="605.0" y1="1101.0" x2="605.0" y2="1111.0" stroke="#111" stroke-width="1" />
-<line x1="800.0" y1="20.0" x2="800.0" y2="30.0" stroke="#111" stroke-width="1" />
-<line x1="800.0" y1="1101.0" x2="800.0" y2="1111.0" stroke="#111" stroke-width="1" />
-<line x1="995.0" y1="20.0" x2="995.0" y2="30.0" stroke="#111" stroke-width="1" />
-<line x1="995.0" y1="1101.0" x2="995.0" y2="1111.0" stroke="#111" stroke-width="1" />
-<line x1="1190.0" y1="20.0" x2="1190.0" y2="30.0" stroke="#111" stroke-width="1" />
-<line x1="1190.0" y1="1101.0" x2="1190.0" y2="1111.0" stroke="#111" stroke-width="1" />
-<line x1="1385.0" y1="20.0" x2="1385.0" y2="30.0" stroke="#111" stroke-width="1" />
-<line x1="1385.0" y1="1101.0" x2="1385.0" y2="1111.0" stroke="#111" stroke-width="1" />
-<text x="117.5" y="29.0" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >8</text>
-<text x="312.5" y="29.0" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >7</text>
-<text x="507.5" y="29.0" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >6</text>
-<text x="702.5" y="29.0" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >5</text>
-<text x="897.5" y="29.0" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >4</text>
-<text x="1092.5" y="29.0" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >3</text>
-<text x="1287.5" y="29.0" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >2</text>
-<text x="1482.5" y="29.0" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >1</text>
-<text x="25.0" y="110.9" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >F</text>
-<text x="25.0" y="292.8" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >E</text>
-<text x="25.0" y="474.6" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >D</text>
-<text x="25.0" y="656.4" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >C</text>
-<text x="25.0" y="838.2" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >B</text>
-<text x="25.0" y="1020.1" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >A</text>
-<rect x="1020.0" y="991.0" width="560.0" height="120.0" fill="white" stroke="#111" stroke-width="1.5" />
-<rect x="1020.0" y="991.0" width="560.0" height="34.0" fill="none" stroke="#111" stroke-width="0.8" />
-<text x="1024.0" y="1001.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >TITLE</text>
-<text x="1028.0" y="1018.0" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start" font-weight="bold" fill="#111" >SENSOR BRANCH HARNESS</text>
-<rect x="1020.0" y="1025.0" width="300.0" height="30.0" fill="none" stroke="#111" stroke-width="0.8" />
-<text x="1024.0" y="1035.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >DWG NO.</text>
-<text x="1028.0" y="1048.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111" >EX-0001</text>
-<rect x="1320.0" y="1025.0" width="80.0" height="30.0" fill="none" stroke="#111" stroke-width="0.8" />
-<text x="1324.0" y="1035.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >REV</text>
-<text x="1328.0" y="1048.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111" >A</text>
-<rect x="1400.0" y="1025.0" width="180.0" height="30.0" fill="none" stroke="#111" stroke-width="0.8" />
-<text x="1404.0" y="1035.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >SHEET</text>
-<text x="1408.0" y="1048.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >1 OF 2</text>
-<rect x="1020.0" y="1055.0" width="140.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
-<text x="1024.0" y="1065.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >DRAWN</text>
-<text x="1028.0" y="1076.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >CLAUDE</text>
-<rect x="1160.0" y="1055.0" width="120.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
-<text x="1164.0" y="1065.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >DATE</text>
-<text x="1168.0" y="1076.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >2026-11-19</text>
-<rect x="1280.0" y="1055.0" width="120.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
-<text x="1284.0" y="1065.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >CHECKED</text>
-<text x="1288.0" y="1076.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" ></text>
-<rect x="1400.0" y="1055.0" width="180.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
-<text x="1404.0" y="1065.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >SCALE</text>
-<text x="1408.0" y="1076.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >NONE (NTS)</text>
-<rect x="1020.0" y="1083.0" width="260.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
-<text x="1024.0" y="1093.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >UNITS</text>
-<text x="1028.0" y="1104.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >mm</text>
-<rect x="1280.0" y="1083.0" width="300.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
-<text x="1284.0" y="1093.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >THIS SHEET</text>
-<text x="1288.0" y="1104.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >HARNESS DRAWING</text>
-<rect x="1090.0" y="20.0" width="490.0" height="17.0" fill="#e8e8e8" stroke="#111" stroke-width="1" /><text x="1335.0" y="33.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#111" >REVISIONS</text><rect x="1090.0" y="37.0" width="490.0" height="15.0" fill="#f3f3f3" stroke="#111" stroke-width="1" /><rect x="1090.0" y="37.0" width="40.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1110.0" y="48.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="bold" fill="#111" >REV</text><rect x="1130.0" y="37.0" width="300.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1133.0" y="48.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="start" font-weight="bold" fill="#111" >DESCRIPTION</text><rect x="1430.0" y="37.0" width="90.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1475.0" y="48.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="bold" fill="#111" >DATE</text><rect x="1520.0" y="37.0" width="60.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1550.0" y="48.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="bold" fill="#111" >BY</text><rect x="1090.0" y="52.0" width="40.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1110.0" y="63.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111" >A</text><rect x="1130.0" y="52.0" width="300.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1133.0" y="63.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="start" font-weight="normal" fill="#111" >Initial release</text><rect x="1430.0" y="52.0" width="90.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1475.0" y="63.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111" >2026-11-19</text><rect x="1520.0" y="52.0" width="60.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1550.0" y="63.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111" >CLAUDE</text>
-<rect x="40.0" y="38.0" width="600.0" height="38.0" fill="white" stroke="#c00000" stroke-width="2.5" /><text x="340.0" y="62.0" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="middle" font-weight="bold" fill="#c00000" >NOT FOR RELEASE: 2 CHECK ERRORS, SEE CHECKS REPORT</text>
-<path d="M170.0,361.9 L462.7,361.9" fill="none" stroke="#9aa7b8" stroke-width="16" stroke-linecap="butt" opacity="0.55"/>
-<path d="M462.7,361.9 L560.2,361.9" fill="none" stroke="#9aa7b8" stroke-width="16" stroke-linecap="butt" opacity="0.55"/>
-<path d="M560.2,361.9 L657.7,361.9" fill="none" stroke="#9aa7b8" stroke-width="16" stroke-linecap="butt" opacity="0.55"/>
-<path d="M657.7,361.9 L852.9,361.9" fill="none" stroke="#9aa7b8" stroke-width="16" stroke-linecap="butt" opacity="0.55"/>
-<path d="M170.0,361.9 L462.7,361.9" fill="none" stroke="#333" stroke-width="7.5" stroke-linecap="round"/>
-<path d="M170.0,361.9 L462.7,361.9" fill="none" stroke="#9a9a9a" stroke-width="5.5" stroke-linecap="round"/>
-<path d="M462.7,361.9 C503.0,361.9 503.0,644.4 543.2,644.4 L609.1,644.4" fill="none" stroke="#333" stroke-width="4.6" stroke-linecap="round"/>
-<path d="M462.7,361.9 C503.0,361.9 503.0,644.4 543.2,644.4 L609.1,644.4" fill="none" stroke="#9a9a9a" stroke-width="2.6" stroke-linecap="round"/>
-<path d="M462.7,361.9 L560.2,361.9" fill="none" stroke="#333" stroke-width="7.2" stroke-linecap="round"/>
-<path d="M462.7,361.9 L560.2,361.9" fill="none" stroke="#9a9a9a" stroke-width="5.2" stroke-linecap="round"/>
-<path d="M560.2,361.9 L657.7,361.9" fill="none" stroke="#333" stroke-width="7.8" stroke-linecap="round"/>
-<path d="M560.2,361.9 L657.7,361.9" fill="none" stroke="#9a9a9a" stroke-width="5.8" stroke-linecap="round"/>
-<path d="M657.7,361.9 L852.9,361.9" fill="none" stroke="#333" stroke-width="8.1" stroke-linecap="round"/>
-<path d="M657.7,361.9 L852.9,361.9" fill="none" stroke="#9a9a9a" stroke-width="6.1" stroke-linecap="round"/>
-<path d="M852.9,361.9 C916.4,361.9 916.4,220.6 980.0,220.6 L1096.8,220.6" fill="none" stroke="#333" stroke-width="6.2" stroke-linecap="round"/>
-<path d="M852.9,361.9 C916.4,361.9 916.4,220.6 980.0,220.6 L1096.8,220.6" fill="none" stroke="#9a9a9a" stroke-width="4.2" stroke-linecap="round"/>
-<path d="M852.9,361.9 L1028.5,361.9" fill="none" stroke="#333" stroke-width="6.9" stroke-linecap="round"/>
-<path d="M852.9,361.9 L1028.5,361.9" fill="none" stroke="#9a9a9a" stroke-width="4.9" stroke-linecap="round"/>
-<path d="M1028.5,361.9 C1060.7,361.9 1060.7,503.1 1092.9,503.1 L1145.6,503.1" fill="none" stroke="#333" stroke-width="5.3" stroke-linecap="round"/>
-<path d="M1028.5,361.9 C1060.7,361.9 1060.7,503.1 1092.9,503.1 L1145.6,503.1" fill="none" stroke="#9a9a9a" stroke-width="3.3" stroke-linecap="round"/>
-<path d="M1028.5,361.9 L1370.0,361.9" fill="none" stroke="#333" stroke-width="6.2" stroke-linecap="round"/>
-<path d="M1028.5,361.9 L1370.0,361.9" fill="none" stroke="#9a9a9a" stroke-width="4.2" stroke-linecap="round"/>
-<line x1="170.0" y1="361.9" x2="170.0" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="462.7" y1="361.9" x2="462.7" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="170.0" y1="395.9" x2="462.7" y2="395.9" stroke="#111" stroke-width="0.8" /><polygon points="170.0,395.9 178.5,392.8 178.5,399.0" fill="#111"/><polygon points="462.7,395.9 454.3,399.0 454.3,392.8" fill="#111"/><rect x="293.8" y="388.9" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="316.4" y="399.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >300 ±5</text>
-<rect x="511.0" y="496.1" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" />
-<text x="533.6" y="507.1" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >150 ±5</text>
-<line x1="462.7" y1="361.9" x2="462.7" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="560.2" y1="361.9" x2="560.2" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="462.7" y1="395.9" x2="560.2" y2="395.9" stroke="#111" stroke-width="0.8" /><polygon points="462.7,395.9 471.2,392.8 471.2,399.0" fill="#111"/><polygon points="560.2,395.9 551.8,399.0 551.8,392.8" fill="#111"/><rect x="492.0" y="388.9" width="39.0" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="511.5" y="399.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >40 ±5</text>
-<line x1="560.2" y1="361.9" x2="560.2" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="657.7" y1="361.9" x2="657.7" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="560.2" y1="395.9" x2="657.7" y2="395.9" stroke="#111" stroke-width="0.8" /><polygon points="560.2,395.9 568.7,392.8 568.7,399.0" fill="#111"/><polygon points="657.7,395.9 649.3,399.0 649.3,392.8" fill="#111"/><rect x="589.5" y="388.9" width="39.0" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="609.0" y="399.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >20 ±5</text>
-<line x1="657.7" y1="361.9" x2="657.7" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="852.9" y1="361.9" x2="852.9" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="657.7" y1="395.9" x2="852.9" y2="395.9" stroke="#111" stroke-width="0.8" /><polygon points="657.7,395.9 666.2,392.8 666.2,399.0" fill="#111"/><polygon points="852.9,395.9 844.4,399.0 844.4,392.8" fill="#111"/><rect x="732.7" y="388.9" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="755.3" y="399.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >200 ±5</text>
-<rect x="924.4" y="284.2" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" />
-<text x="947.0" y="295.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >250 ±5</text>
-<line x1="852.9" y1="361.9" x2="852.9" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="1028.5" y1="361.9" x2="1028.5" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="852.9" y1="395.9" x2="1028.5" y2="395.9" stroke="#111" stroke-width="0.8" /><polygon points="852.9,395.9 861.3,392.8 861.3,399.0" fill="#111"/><polygon points="1028.5,395.9 1020.0,399.0 1020.0,392.8" fill="#111"/><rect x="918.1" y="388.9" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="940.7" y="399.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >180 ±5</text>
-<rect x="1068.7" y="425.5" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" />
-<text x="1091.3" y="436.5" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >120 ±5</text>
-<line x1="1028.5" y1="361.9" x2="1028.5" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="1370.0" y1="361.9" x2="1370.0" y2="399.9" stroke="#555" stroke-width="0.6" /><line x1="1028.5" y1="395.9" x2="1370.0" y2="395.9" stroke="#111" stroke-width="0.8" /><polygon points="1028.5,395.9 1036.9,392.8 1036.9,399.0" fill="#111"/><polygon points="1370.0,395.9 1361.5,399.0 1361.5,392.8" fill="#111"/><rect x="1173.5" y="388.9" width="51.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="1199.2" y="399.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >350 ±10</text>
-<circle cx="462.7" cy="361.9" r="4" fill="white" stroke="#111" stroke-width="1.2"/>
-<text x="456.7" y="351.9" font-family="Arial, Helvetica, sans-serif" font-size="9" text-anchor="end" font-weight="normal" fill="#555" >B1</text>
-<circle cx="852.9" cy="361.9" r="4" fill="white" stroke="#111" stroke-width="1.2"/>
-<text x="846.9" y="351.9" font-family="Arial, Helvetica, sans-serif" font-size="9" text-anchor="end" font-weight="normal" fill="#555" >B2</text>
-<circle cx="1028.5" cy="361.9" r="4" fill="white" stroke="#111" stroke-width="1.2"/>
-<text x="1022.5" y="351.9" font-family="Arial, Helvetica, sans-serif" font-size="9" text-anchor="end" font-weight="normal" fill="#555" >B3</text>
-<path d="M196.0,361.9 C183.0,361.9 183.0,347.0 170.0,347.0" fill="none" stroke="#1a1a1a" stroke-width="2"/>
-<path d="M196.0,361.9 C183.0,361.9 183.0,351.2 170.0,351.2" fill="none" stroke="#e01e1e" stroke-width="2"/>
-<path d="M196.0,361.9 C183.0,361.9 183.0,355.5 170.0,355.5" fill="none" stroke="#f2d600" stroke-width="2"/>
-<path d="M196.0,361.9 C183.0,361.9 183.0,359.8 170.0,359.8" fill="none" stroke="#14a33a" stroke-width="2"/>
-<path d="M196.0,361.9 C183.0,361.9 183.0,364.0 170.0,364.0" fill="none" stroke="#1f5fd6" stroke-width="2"/>
-<path d="M196.0,361.9 C183.0,361.9 183.0,368.2 170.0,368.2" fill="none" stroke="#ff8c00" stroke-width="2"/>
-<path d="M196.0,361.9 C183.0,361.9 183.0,372.5 170.0,372.5" fill="none" stroke="#8a2be2" stroke-width="2"/>
-<path d="M196.0,361.9 C183.0,361.9 183.0,376.8 170.0,376.8" fill="none" stroke="#14a33a" stroke-width="2"/>
-<rect x="106.0" y="339.9" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
-<rect x="106.0" y="345.9" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
-<text x="138.0" y="401.9" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">P1</text>
-<text x="138.0" y="415.9" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >TO CONTROLLER</text>
-<line x1="66.0" y1="299.9" x2="125.2" y2="339.9" stroke="#111" stroke-width="0.7" /><polygon points="125.2,339.9 116.5,337.7 119.9,332.6" fill="#111"/><circle cx="66.0" cy="299.9" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="66.0" y="303.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >1</text><circle cx="66.0" cy="322.9" r="11" fill="white" stroke="#111"/><text x="66.0" y="326.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >2</text>
-<path d="M1070.8,220.6 C1083.8,220.6 1083.8,213.1 1096.8,213.1" fill="none" stroke="#1a1a1a" stroke-width="2"/>
-<path d="M1070.8,220.6 C1083.8,220.6 1083.8,218.1 1096.8,218.1" fill="none" stroke="#e01e1e" stroke-width="2"/>
-<path d="M1070.8,220.6 C1083.8,220.6 1083.8,223.1 1096.8,223.1" fill="none" stroke="#f2d600" stroke-width="2"/>
-<path d="M1070.8,220.6 C1083.8,220.6 1083.8,228.1 1096.8,228.1" fill="none" stroke="#14a33a" stroke-width="2"/>
-<rect x="1096.8" y="198.6" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
-<rect x="1154.8" y="204.6" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
-<text x="1128.8" y="260.6" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">J1</text>
-<text x="1128.8" y="274.6" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >SENSOR A</text>
-<line x1="1200.8" y1="158.6" x2="1141.6" y2="198.6" stroke="#111" stroke-width="0.7" /><polygon points="1141.6,198.6 1146.9,191.3 1150.3,196.4" fill="#111"/><circle cx="1200.8" cy="158.6" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1200.8" y="162.6" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >3</text><circle cx="1200.8" cy="181.6" r="11" fill="white" stroke="#111"/><text x="1200.8" y="185.6" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >4</text><text x="1214.8" y="185.6" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >4X</text>
-<path d="M1119.6,503.1 C1132.6,503.1 1132.6,500.6 1145.6,500.6" fill="none" stroke="#1a1a1a" stroke-width="2"/>
-<path d="M1119.6,503.1 C1132.6,503.1 1132.6,505.6 1145.6,505.6" fill="none" stroke="#e01e1e" stroke-width="2"/>
-<rect x="1145.6" y="481.1" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
-<rect x="1203.6" y="487.1" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
-<text x="1177.6" y="543.1" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">J2</text>
-<text x="1177.6" y="557.1" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >SENSOR B</text>
-<line x1="1249.6" y1="441.1" x2="1190.4" y2="481.1" stroke="#111" stroke-width="0.7" /><polygon points="1190.4,481.1 1195.7,473.8 1199.1,478.9" fill="#111"/><circle cx="1249.6" cy="441.1" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1249.6" y="445.1" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >3</text><circle cx="1249.6" cy="464.1" r="11" fill="white" stroke="#111"/><text x="1249.6" y="468.1" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >4</text><text x="1263.6" y="468.1" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >2X</text>
-<path d="M1344.0,361.9 C1357.0,361.9 1357.0,354.4 1370.0,354.4" fill="none" stroke="#1a1a1a" stroke-width="2"/>
-<path d="M1344.0,361.9 C1357.0,361.9 1357.0,359.4 1370.0,359.4" fill="none" stroke="#1f5fd6" stroke-width="2"/>
-<path d="M1344.0,361.9 C1357.0,361.9 1357.0,364.4 1370.0,364.4" fill="none" stroke="#ff8c00" stroke-width="2"/>
-<path d="M1344.0,361.9 C1357.0,361.9 1357.0,369.4 1370.0,369.4" fill="none" stroke="#8a2be2" stroke-width="2"/>
-<rect x="1370.0" y="339.9" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
-<rect x="1428.0" y="345.9" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
-<text x="1402.0" y="401.9" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">J3</text>
-<text x="1402.0" y="415.9" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >SPI DEVICE</text>
-<line x1="1474.0" y1="299.9" x2="1414.8" y2="339.9" stroke="#111" stroke-width="0.7" /><polygon points="1414.8,339.9 1420.1,332.6 1423.5,337.7" fill="#111"/><circle cx="1474.0" cy="299.9" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1474.0" y="303.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >5</text><circle cx="1474.0" cy="322.9" r="11" fill="white" stroke="#111"/><text x="1474.0" y="326.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >4</text><text x="1488.0" y="326.9" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >4X</text>
-<path d="M583.1,644.4 C596.1,644.4 596.1,644.4 609.1,644.4" fill="none" stroke="#14a33a" stroke-width="2"/>
-<rect x="609.1" y="622.4" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
-<rect x="667.1" y="628.4" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
-<text x="641.1" y="684.4" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">E1</text>
-<text x="641.1" y="698.4" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >CHASSIS GND</text>
-<line x1="713.1" y1="582.4" x2="653.9" y2="622.4" stroke="#111" stroke-width="0.7" /><polygon points="653.9,622.4 659.2,615.1 662.6,620.2" fill="#111"/><circle cx="713.1" cy="582.4" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="713.1" y="586.4" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >6</text>
-<rect x="551.2" y="354.9" width="18" height="14" fill="#d9d9d9" stroke="#111" transform="rotate(45 560.2 361.9)"/>
-<text x="560.2" y="345.9" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="middle" font-weight="bold" fill="#111" >SP1</text>
-<line x1="590.2" y1="316.9" x2="566.2" y2="355.9" stroke="#111" stroke-width="0.7" /><polygon points="566.2,355.9 568.0,347.1 573.3,350.3" fill="#111"/><circle cx="590.2" cy="316.9" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="590.2" y="320.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >7</text>
-<rect x="648.7" y="354.9" width="18" height="14" fill="#d9d9d9" stroke="#111" transform="rotate(45 657.7 361.9)"/>
-<text x="657.7" y="345.9" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="middle" font-weight="bold" fill="#111" >SP2</text>
-<line x1="687.7" y1="316.9" x2="663.7" y2="355.9" stroke="#111" stroke-width="0.7" /><polygon points="663.7,355.9 665.5,347.1 670.8,350.3" fill="#111"/><circle cx="687.7" cy="316.9" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="687.7" y="320.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >7</text>
-<rect x="202.6" y="352.9" width="54.8" height="18.0" fill="white" stroke="#111" stroke-width="1" />
-<text x="230.0" y="365.9" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="middle" font-weight="normal" fill="#111" >P1 CTRL</text>
-<line x1="170.0" y1="361.9" x2="170.0" y2="331.9" stroke="#555" stroke-width="0.6" /><line x1="230.0" y1="352.9" x2="230.0" y2="331.9" stroke="#555" stroke-width="0.6" /><line x1="170.0" y1="335.9" x2="230.0" y2="335.9" stroke="#111" stroke-width="0.8" /><polygon points="170.0,335.9 178.5,332.8 178.5,339.0" fill="#111"/><polygon points="230.0,335.9 221.5,339.0 221.5,332.8" fill="#111"/><rect x="189.8" y="328.9" width="20.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="200.0" y="339.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >50</text>
-<line x1="260.0" y1="411.9" x2="240.0" y2="370.9" stroke="#111" stroke-width="0.7" /><polygon points="240.0,370.9 246.5,377.1 240.9,379.8" fill="#111"/><circle cx="260.0" cy="411.9" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="260.0" y="415.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >19</text>
-<rect x="1006.2" y="211.6" width="61.2" height="18.0" fill="white" stroke="#111" stroke-width="1" />
-<text x="1036.8" y="224.6" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="middle" font-weight="normal" fill="#111" >J1 SNS-A</text>
-<line x1="1036.8" y1="220.6" x2="1036.8" y2="250.6" stroke="#555" stroke-width="0.6" /><line x1="1096.8" y1="229.6" x2="1096.8" y2="250.6" stroke="#555" stroke-width="0.6" /><line x1="1036.8" y1="246.6" x2="1096.8" y2="246.6" stroke="#111" stroke-width="0.8" /><polygon points="1036.8,246.6 1045.2,243.5 1045.2,249.7" fill="#111"/><polygon points="1096.8,246.6 1088.3,249.7 1088.3,243.5" fill="#111"/><rect x="1056.6" y="239.6" width="20.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="1066.8" y="250.6" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >50</text>
-<line x1="1066.8" y1="270.6" x2="1046.8" y2="229.6" stroke="#111" stroke-width="0.7" /><polygon points="1046.8,229.6 1053.3,235.9 1047.7,238.6" fill="#111"/><circle cx="1066.8" cy="270.6" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1066.8" y="274.6" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >19</text>
-<rect x="1055.0" y="494.1" width="61.2" height="18.0" fill="white" stroke="#111" stroke-width="1" />
-<text x="1085.6" y="507.1" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="middle" font-weight="normal" fill="#111" >J2 SNS-B</text>
-<line x1="1085.6" y1="503.1" x2="1085.6" y2="473.1" stroke="#555" stroke-width="0.6" /><line x1="1145.6" y1="494.1" x2="1145.6" y2="473.1" stroke="#555" stroke-width="0.6" /><line x1="1085.6" y1="477.1" x2="1145.6" y2="477.1" stroke="#111" stroke-width="0.8" /><polygon points="1085.6,477.1 1094.0,474.0 1094.0,480.2" fill="#111"/><polygon points="1145.6,477.1 1137.1,480.2 1137.1,474.0" fill="#111"/><rect x="1105.4" y="470.1" width="20.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="1115.6" y="481.1" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >50</text>
-<line x1="1115.6" y1="553.1" x2="1095.6" y2="512.1" stroke="#111" stroke-width="0.7" /><polygon points="1095.6,512.1 1102.1,518.4 1096.5,521.1" fill="#111"/><circle cx="1115.6" cy="553.1" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1115.6" y="557.1" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >19</text>
-<rect x="1285.8" y="352.9" width="48.4" height="18.0" fill="white" stroke="#111" stroke-width="1" />
-<text x="1310.0" y="365.9" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="middle" font-weight="normal" fill="#111" >J3 SPI</text>
-<line x1="1310.0" y1="361.9" x2="1310.0" y2="331.9" stroke="#555" stroke-width="0.6" /><line x1="1370.0" y1="352.9" x2="1370.0" y2="331.9" stroke="#555" stroke-width="0.6" /><line x1="1310.0" y1="335.9" x2="1370.0" y2="335.9" stroke="#111" stroke-width="0.8" /><polygon points="1310.0,335.9 1318.5,332.8 1318.5,339.0" fill="#111"/><polygon points="1370.0,335.9 1361.5,339.0 1361.5,332.8" fill="#111"/><rect x="1329.8" y="328.9" width="20.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="1340.0" y="339.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >50</text>
-<line x1="1340.0" y1="411.9" x2="1320.0" y2="370.9" stroke="#111" stroke-width="0.7" /><polygon points="1320.0,370.9 1326.5,377.1 1320.9,379.8" fill="#111"/><circle cx="1340.0" cy="411.9" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1340.0" y="415.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >19</text>
-<line x1="341.4" y1="431.9" x2="316.4" y2="369.9" stroke="#111" stroke-width="0.7" /><polygon points="316.4,369.9 322.4,376.6 316.7,378.9" fill="#111"/><circle cx="341.4" cy="431.9" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="341.4" y="435.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >18</text><text x="355.4" y="435.9" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >AR</text>
-<line x1="170.0" y1="775.0" x2="609.1" y2="775.0" stroke="#111" stroke-width="0.8" /><polygon points="170.0,775.0 178.5,771.9 178.5,778.1" fill="#111"/><polygon points="609.1,775.0 600.6,778.1 600.6,771.9" fill="#111"/><rect x="335.9" y="768.0" width="107.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="389.5" y="779.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >450 REF  (P1–E1)</text>
-<line x1="609.1" y1="664.4" x2="609.1" y2="779.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
-<line x1="170.0" y1="799.0" x2="1096.8" y2="799.0" stroke="#111" stroke-width="0.8" /><polygon points="170.0,799.0 178.5,795.9 178.5,802.1" fill="#111"/><polygon points="1096.8,799.0 1088.3,802.1 1088.3,795.9" fill="#111"/><rect x="579.8" y="792.0" width="107.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="633.4" y="803.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >810 REF  (P1–J1)</text>
-<line x1="1096.8" y1="240.6" x2="1096.8" y2="803.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
-<line x1="170.0" y1="823.0" x2="1145.6" y2="823.0" stroke="#111" stroke-width="0.8" /><polygon points="170.0,823.0 178.5,819.9 178.5,826.1" fill="#111"/><polygon points="1145.6,823.0 1137.1,826.1 1137.1,819.9" fill="#111"/><rect x="604.2" y="816.0" width="107.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="657.8" y="827.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >860 REF  (P1–J2)</text>
-<line x1="1145.6" y1="523.1" x2="1145.6" y2="827.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
-<line x1="170.0" y1="847.0" x2="1370.0" y2="847.0" stroke="#111" stroke-width="0.8" /><polygon points="170.0,847.0 178.5,843.9 178.5,850.1" fill="#111"/><polygon points="1370.0,847.0 1361.5,850.1 1361.5,843.9" fill="#111"/><rect x="713.3" y="840.0" width="113.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="770.0" y="851.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >1090 REF  (P1–J3)</text>
-<line x1="1370.0" y1="381.9" x2="1370.0" y2="851.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
-<line x1="170.0" y1="381.9" x2="170.0" y2="851.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
-<text x="40.0" y="931.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="start" font-weight="normal" fill="#555" >DRAWING NOT TO SCALE</text>
-<text x="40.0" y="963.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111" text-decoration="underline">NOTES:</text>
-<text x="40.0" y="983.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">1.  FABRICATE, INSPECT AND TEST PER IPC/WHMA-A-620, CLASS 2.</text>
-<text x="40.0" y="998.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">2.  ALL DIMENSIONS IN MM. LENGTHS ARE MEASURED FROM CONNECTOR REAR FACE TO BREAKOUT CENTRE OR TO THE NEXT CONNECTOR REAR FACE.</text>
-<text x="40.0" y="1013.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">3.  LENGTH TOLERANCES UNLESS OTHERWISE SPECIFIED: ≤300: ±5, ≤1000: ±10, over: ±1%. SEGMENT DIMENSIONS GOVERN; OVERALL DIMENSIONS ARE REFERENCE.</text>
-<text x="40.0" y="1028.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">4.  DRAWING NOT TO SCALE. WIRE CUT LENGTHS PER WIRE LIST; CONNECTIONS PER CONNECTOR TABLES AND WIRING DIAGRAM.</text>
-<text x="40.0" y="1043.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">5.  TWIST INDICATED WIRES PER IPC/WHMA-A-620.</text>
-<text x="40.0" y="1058.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">6.  LABELS READ TOWARD THE CONNECTOR; POSITION DIMENSIONED FROM DATUM TO LABEL CENTRE.</text>
-<text x="40.0" y="1073.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">7.  CONTINUITY-TEST 100% AGAINST THE WIRE LIST; NO SHORTS BETWEEN NETS.</text>
-<text x="40.0" y="1088.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">8.  STRIP 3 mm FOR CRIMP CONTACTS, 8 mm FOR RING LUG.</text>
+<rect x="20.0" y="20.0" width="1560.0" height="1091.0" fill="none" stroke="#111" stroke-width="0.8" />
+<rect x="32.0" y="32.0" width="1536.0" height="1067.0" fill="none" stroke="#111" stroke-width="2" />
+<line x1="224.0" y1="20.0" x2="224.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="224.0" y1="1099.0" x2="224.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="416.0" y1="20.0" x2="416.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="416.0" y1="1099.0" x2="416.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="608.0" y1="20.0" x2="608.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="608.0" y1="1099.0" x2="608.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="800.0" y1="20.0" x2="800.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="800.0" y1="1099.0" x2="800.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="992.0" y1="20.0" x2="992.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="992.0" y1="1099.0" x2="992.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="1184.0" y1="20.0" x2="1184.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="1184.0" y1="1099.0" x2="1184.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="1376.0" y1="20.0" x2="1376.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="1376.0" y1="1099.0" x2="1376.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="20.0" y1="209.8" x2="32.0" y2="209.8" stroke="#111" stroke-width="1" />
+<line x1="1568.0" y1="209.8" x2="1580.0" y2="209.8" stroke="#111" stroke-width="1" />
+<line x1="20.0" y1="387.7" x2="32.0" y2="387.7" stroke="#111" stroke-width="1" />
+<line x1="1568.0" y1="387.7" x2="1580.0" y2="387.7" stroke="#111" stroke-width="1" />
+<line x1="20.0" y1="565.5" x2="32.0" y2="565.5" stroke="#111" stroke-width="1" />
+<line x1="1568.0" y1="565.5" x2="1580.0" y2="565.5" stroke="#111" stroke-width="1" />
+<line x1="20.0" y1="743.3" x2="32.0" y2="743.3" stroke="#111" stroke-width="1" />
+<line x1="1568.0" y1="743.3" x2="1580.0" y2="743.3" stroke="#111" stroke-width="1" />
+<line x1="20.0" y1="921.2" x2="32.0" y2="921.2" stroke="#111" stroke-width="1" />
+<line x1="1568.0" y1="921.2" x2="1580.0" y2="921.2" stroke="#111" stroke-width="1" />
+<text x="128.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >8</text>
+<text x="128.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >8</text>
+<text x="320.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >7</text>
+<text x="320.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >7</text>
+<text x="512.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >6</text>
+<text x="512.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >6</text>
+<text x="704.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >5</text>
+<text x="704.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >5</text>
+<text x="896.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >4</text>
+<text x="896.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >4</text>
+<text x="1088.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >3</text>
+<text x="1088.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >3</text>
+<text x="1280.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >2</text>
+<text x="1280.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >2</text>
+<text x="1472.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >1</text>
+<text x="1472.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >1</text>
+<text x="26.0" y="123.9" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >F</text>
+<text x="1574.0" y="123.9" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >F</text>
+<text x="26.0" y="301.8" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >E</text>
+<text x="1574.0" y="301.8" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >E</text>
+<text x="26.0" y="479.6" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >D</text>
+<text x="1574.0" y="479.6" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >D</text>
+<text x="26.0" y="657.4" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >C</text>
+<text x="1574.0" y="657.4" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >C</text>
+<text x="26.0" y="835.2" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >B</text>
+<text x="1574.0" y="835.2" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >B</text>
+<text x="26.0" y="1013.1" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >A</text>
+<text x="1574.0" y="1013.1" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >A</text>
+<rect x="1008.0" y="979.0" width="560.0" height="120.0" fill="white" stroke="#111" stroke-width="1.5" />
+<rect x="1008.0" y="979.0" width="560.0" height="34.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1012.0" y="989.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >TITLE</text>
+<text x="1016.0" y="1006.0" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start" font-weight="bold" fill="#111" >SENSOR BRANCH HARNESS</text>
+<rect x="1008.0" y="1013.0" width="300.0" height="30.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1012.0" y="1023.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >DWG NO.</text>
+<text x="1016.0" y="1036.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111" >EX-0001</text>
+<rect x="1308.0" y="1013.0" width="80.0" height="30.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1312.0" y="1023.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >REV</text>
+<text x="1316.0" y="1036.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111" >A</text>
+<rect x="1388.0" y="1013.0" width="180.0" height="30.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1392.0" y="1023.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >SHEET</text>
+<text x="1396.0" y="1036.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >1 OF 2</text>
+<rect x="1008.0" y="1043.0" width="140.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1012.0" y="1053.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >DRAWN</text>
+<text x="1016.0" y="1064.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >CLAUDE</text>
+<rect x="1148.0" y="1043.0" width="120.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1152.0" y="1053.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >DATE</text>
+<text x="1156.0" y="1064.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >2026-11-19</text>
+<rect x="1268.0" y="1043.0" width="120.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1272.0" y="1053.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >CHECKED</text>
+<text x="1276.0" y="1064.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" ></text>
+<rect x="1388.0" y="1043.0" width="180.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1392.0" y="1053.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >SCALE</text>
+<text x="1396.0" y="1064.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >NONE (NTS)</text>
+<rect x="1008.0" y="1071.0" width="260.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1012.0" y="1081.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >UNITS</text>
+<text x="1016.0" y="1092.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >mm</text>
+<rect x="1268.0" y="1071.0" width="300.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1272.0" y="1081.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >THIS SHEET</text>
+<text x="1276.0" y="1092.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >HARNESS DRAWING</text>
+<rect x="1078.0" y="32.0" width="490.0" height="17.0" fill="#e8e8e8" stroke="#111" stroke-width="1" /><text x="1323.0" y="45.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#111" >REVISIONS</text><rect x="1078.0" y="49.0" width="490.0" height="15.0" fill="#f3f3f3" stroke="#111" stroke-width="1" /><rect x="1078.0" y="49.0" width="40.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1098.0" y="60.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="bold" fill="#111" >REV</text><rect x="1118.0" y="49.0" width="300.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1121.0" y="60.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="start" font-weight="bold" fill="#111" >DESCRIPTION</text><rect x="1418.0" y="49.0" width="90.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1463.0" y="60.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="bold" fill="#111" >DATE</text><rect x="1508.0" y="49.0" width="60.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1538.0" y="60.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="bold" fill="#111" >BY</text><rect x="1078.0" y="64.0" width="40.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1098.0" y="75.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111" >A</text><rect x="1118.0" y="64.0" width="300.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1121.0" y="75.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="start" font-weight="normal" fill="#111" >Initial release</text><rect x="1418.0" y="64.0" width="90.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1463.0" y="75.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111" >2026-11-19</text><rect x="1508.0" y="64.0" width="60.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1538.0" y="75.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111" >CLAUDE</text>
+<rect x="42.0" y="40.0" width="600.0" height="38.0" fill="white" stroke="#c00000" stroke-width="2.5" /><text x="342.0" y="64.0" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="middle" font-weight="bold" fill="#c00000" >NOT FOR RELEASE: 2 CHECK ERRORS, SEE CHECKS REPORT</text>
+<path d="M170.0,362.2 L462.7,362.2" fill="none" stroke="#9aa7b8" stroke-width="16" stroke-linecap="butt" opacity="0.55"/>
+<path d="M462.7,362.2 L560.2,362.2" fill="none" stroke="#9aa7b8" stroke-width="16" stroke-linecap="butt" opacity="0.55"/>
+<path d="M560.2,362.2 L657.7,362.2" fill="none" stroke="#9aa7b8" stroke-width="16" stroke-linecap="butt" opacity="0.55"/>
+<path d="M657.7,362.2 L852.9,362.2" fill="none" stroke="#9aa7b8" stroke-width="16" stroke-linecap="butt" opacity="0.55"/>
+<path d="M170.0,362.2 L462.7,362.2" fill="none" stroke="#333" stroke-width="7.5" stroke-linecap="round"/>
+<path d="M170.0,362.2 L462.7,362.2" fill="none" stroke="#9a9a9a" stroke-width="5.5" stroke-linecap="round"/>
+<path d="M462.7,362.2 C503.0,362.2 503.0,645.2 543.2,645.2 L609.1,645.2" fill="none" stroke="#333" stroke-width="4.6" stroke-linecap="round"/>
+<path d="M462.7,362.2 C503.0,362.2 503.0,645.2 543.2,645.2 L609.1,645.2" fill="none" stroke="#9a9a9a" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M462.7,362.2 L560.2,362.2" fill="none" stroke="#333" stroke-width="7.2" stroke-linecap="round"/>
+<path d="M462.7,362.2 L560.2,362.2" fill="none" stroke="#9a9a9a" stroke-width="5.2" stroke-linecap="round"/>
+<path d="M560.2,362.2 L657.7,362.2" fill="none" stroke="#333" stroke-width="7.8" stroke-linecap="round"/>
+<path d="M560.2,362.2 L657.7,362.2" fill="none" stroke="#9a9a9a" stroke-width="5.8" stroke-linecap="round"/>
+<path d="M657.7,362.2 L852.9,362.2" fill="none" stroke="#333" stroke-width="8.1" stroke-linecap="round"/>
+<path d="M657.7,362.2 L852.9,362.2" fill="none" stroke="#9a9a9a" stroke-width="6.1" stroke-linecap="round"/>
+<path d="M852.9,362.2 C916.5,362.2 916.5,220.8 980.2,220.8 L1096.8,220.8" fill="none" stroke="#333" stroke-width="6.2" stroke-linecap="round"/>
+<path d="M852.9,362.2 C916.5,362.2 916.5,220.8 980.2,220.8 L1096.8,220.8" fill="none" stroke="#9a9a9a" stroke-width="4.2" stroke-linecap="round"/>
+<path d="M852.9,362.2 L1028.5,362.2" fill="none" stroke="#333" stroke-width="6.9" stroke-linecap="round"/>
+<path d="M852.9,362.2 L1028.5,362.2" fill="none" stroke="#9a9a9a" stroke-width="4.9" stroke-linecap="round"/>
+<path d="M1028.5,362.2 C1060.7,362.2 1060.7,503.8 1092.9,503.8 L1145.6,503.8" fill="none" stroke="#333" stroke-width="5.3" stroke-linecap="round"/>
+<path d="M1028.5,362.2 C1060.7,362.2 1060.7,503.8 1092.9,503.8 L1145.6,503.8" fill="none" stroke="#9a9a9a" stroke-width="3.3" stroke-linecap="round"/>
+<path d="M1028.5,362.2 L1370.0,362.2" fill="none" stroke="#333" stroke-width="6.2" stroke-linecap="round"/>
+<path d="M1028.5,362.2 L1370.0,362.2" fill="none" stroke="#9a9a9a" stroke-width="4.2" stroke-linecap="round"/>
+<line x1="170.0" y1="362.2" x2="170.0" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="462.7" y1="362.2" x2="462.7" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="170.0" y1="396.2" x2="462.7" y2="396.2" stroke="#111" stroke-width="0.8" /><polygon points="170.0,396.2 178.5,393.2 178.5,399.3" fill="#111"/><polygon points="462.7,396.2 454.3,399.3 454.3,393.2" fill="#111"/><rect x="293.8" y="389.2" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="316.4" y="400.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >300 ±5</text>
+<rect x="511.0" y="496.8" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" />
+<text x="533.6" y="507.8" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >150 ±5</text>
+<line x1="462.7" y1="362.2" x2="462.7" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="560.2" y1="362.2" x2="560.2" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="462.7" y1="396.2" x2="560.2" y2="396.2" stroke="#111" stroke-width="0.8" /><polygon points="462.7,396.2 471.2,393.2 471.2,399.3" fill="#111"/><polygon points="560.2,396.2 551.8,399.3 551.8,393.2" fill="#111"/><rect x="492.0" y="389.2" width="39.0" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="511.5" y="400.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >40 ±5</text>
+<line x1="560.2" y1="362.2" x2="560.2" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="657.7" y1="362.2" x2="657.7" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="560.2" y1="396.2" x2="657.7" y2="396.2" stroke="#111" stroke-width="0.8" /><polygon points="560.2,396.2 568.7,393.2 568.7,399.3" fill="#111"/><polygon points="657.7,396.2 649.3,399.3 649.3,393.2" fill="#111"/><rect x="589.5" y="389.2" width="39.0" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="609.0" y="400.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >20 ±5</text>
+<line x1="657.7" y1="362.2" x2="657.7" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="852.9" y1="362.2" x2="852.9" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="657.7" y1="396.2" x2="852.9" y2="396.2" stroke="#111" stroke-width="0.8" /><polygon points="657.7,396.2 666.2,393.2 666.2,399.3" fill="#111"/><polygon points="852.9,396.2 844.4,399.3 844.4,393.2" fill="#111"/><rect x="732.7" y="389.2" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="755.3" y="400.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >200 ±5</text>
+<rect x="924.5" y="284.5" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" />
+<text x="947.1" y="295.5" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >250 ±5</text>
+<line x1="852.9" y1="362.2" x2="852.9" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="1028.5" y1="362.2" x2="1028.5" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="852.9" y1="396.2" x2="1028.5" y2="396.2" stroke="#111" stroke-width="0.8" /><polygon points="852.9,396.2 861.3,393.2 861.3,399.3" fill="#111"/><polygon points="1028.5,396.2 1020.0,399.3 1020.0,393.2" fill="#111"/><rect x="918.1" y="389.2" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="940.7" y="400.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >180 ±5</text>
+<rect x="1068.7" y="426.0" width="45.2" height="14.0" fill="white" stroke="none" stroke-width="1" />
+<text x="1091.3" y="437.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >120 ±5</text>
+<line x1="1028.5" y1="362.2" x2="1028.5" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="1370.0" y1="362.2" x2="1370.0" y2="400.2" stroke="#555" stroke-width="0.6" /><line x1="1028.5" y1="396.2" x2="1370.0" y2="396.2" stroke="#111" stroke-width="0.8" /><polygon points="1028.5,396.2 1036.9,393.2 1036.9,399.3" fill="#111"/><polygon points="1370.0,396.2 1361.5,399.3 1361.5,393.2" fill="#111"/><rect x="1173.5" y="389.2" width="51.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="1199.2" y="400.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >350 ±10</text>
+<circle cx="462.7" cy="362.2" r="4" fill="white" stroke="#111" stroke-width="1.2"/>
+<text x="456.7" y="352.2" font-family="Arial, Helvetica, sans-serif" font-size="9" text-anchor="end" font-weight="normal" fill="#555" >B1</text>
+<circle cx="852.9" cy="362.2" r="4" fill="white" stroke="#111" stroke-width="1.2"/>
+<text x="846.9" y="352.2" font-family="Arial, Helvetica, sans-serif" font-size="9" text-anchor="end" font-weight="normal" fill="#555" >B2</text>
+<circle cx="1028.5" cy="362.2" r="4" fill="white" stroke="#111" stroke-width="1.2"/>
+<text x="1022.5" y="352.2" font-family="Arial, Helvetica, sans-serif" font-size="9" text-anchor="end" font-weight="normal" fill="#555" >B3</text>
+<path d="M196.0,362.2 C183.0,362.2 183.0,347.4 170.0,347.4" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+<path d="M196.0,362.2 C183.0,362.2 183.0,351.6 170.0,351.6" fill="none" stroke="#e01e1e" stroke-width="2"/>
+<path d="M196.0,362.2 C183.0,362.2 183.0,355.9 170.0,355.9" fill="none" stroke="#f2d600" stroke-width="2"/>
+<path d="M196.0,362.2 C183.0,362.2 183.0,360.1 170.0,360.1" fill="none" stroke="#14a33a" stroke-width="2"/>
+<path d="M196.0,362.2 C183.0,362.2 183.0,364.4 170.0,364.4" fill="none" stroke="#1f5fd6" stroke-width="2"/>
+<path d="M196.0,362.2 C183.0,362.2 183.0,368.6 170.0,368.6" fill="none" stroke="#ff8c00" stroke-width="2"/>
+<path d="M196.0,362.2 C183.0,362.2 183.0,372.9 170.0,372.9" fill="none" stroke="#8a2be2" stroke-width="2"/>
+<path d="M196.0,362.2 C183.0,362.2 183.0,377.1 170.0,377.1" fill="none" stroke="#14a33a" stroke-width="2"/>
+<path d="M196.0,362.2 C183.0,362.2 183.0,377.1 170.0,377.1" fill="none" stroke="#f2d600" stroke-width="2" stroke-dasharray="3 3"/>
+<rect x="106.0" y="340.2" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
+<rect x="106.0" y="346.2" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<text x="125.6" y="402.2" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">P1</text>
+<text x="125.6" y="416.2" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >TO CONTROLLER</text>
+<line x1="66.0" y1="300.2" x2="125.2" y2="340.2" stroke="#111" stroke-width="0.7" /><polygon points="125.2,340.2 116.5,338.1 119.9,333.0" fill="#111"/><circle cx="66.0" cy="300.2" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="66.0" y="304.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >1</text><circle cx="66.0" cy="323.2" r="11" fill="white" stroke="#111"/><text x="66.0" y="327.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >2</text>
+<path d="M1070.8,220.8 C1083.8,220.8 1083.8,213.2 1096.8,213.2" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+<path d="M1070.8,220.8 C1083.8,220.8 1083.8,218.2 1096.8,218.2" fill="none" stroke="#e01e1e" stroke-width="2"/>
+<path d="M1070.8,220.8 C1083.8,220.8 1083.8,223.2 1096.8,223.2" fill="none" stroke="#f2d600" stroke-width="2"/>
+<path d="M1070.8,220.8 C1083.8,220.8 1083.8,228.2 1096.8,228.2" fill="none" stroke="#14a33a" stroke-width="2"/>
+<rect x="1096.8" y="198.8" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
+<rect x="1154.8" y="204.8" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<text x="1128.8" y="260.8" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">J1</text>
+<text x="1128.8" y="274.8" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >SENSOR A</text>
+<line x1="1200.8" y1="158.8" x2="1141.6" y2="198.8" stroke="#111" stroke-width="0.7" /><polygon points="1141.6,198.8 1146.9,191.5 1150.3,196.6" fill="#111"/><circle cx="1200.8" cy="158.8" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1200.8" y="162.8" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >3</text><circle cx="1200.8" cy="181.8" r="11" fill="white" stroke="#111"/><text x="1200.8" y="185.8" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >4</text><text x="1214.8" y="185.8" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >4X</text>
+<path d="M1119.6,503.8 C1132.6,503.8 1132.6,501.2 1145.6,501.2" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+<path d="M1119.6,503.8 C1132.6,503.8 1132.6,506.2 1145.6,506.2" fill="none" stroke="#e01e1e" stroke-width="2"/>
+<rect x="1145.6" y="481.8" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
+<rect x="1203.6" y="487.8" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<text x="1177.6" y="543.8" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">J2</text>
+<text x="1177.6" y="557.8" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >SENSOR B</text>
+<line x1="1249.6" y1="441.8" x2="1190.4" y2="481.8" stroke="#111" stroke-width="0.7" /><polygon points="1190.4,481.8 1195.7,474.5 1199.1,479.6" fill="#111"/><circle cx="1249.6" cy="441.8" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1249.6" y="445.8" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >3</text><circle cx="1249.6" cy="464.8" r="11" fill="white" stroke="#111"/><text x="1249.6" y="468.8" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >4</text><text x="1263.6" y="468.8" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >2X</text>
+<path d="M1344.0,362.2 C1357.0,362.2 1357.0,354.8 1370.0,354.8" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+<path d="M1344.0,362.2 C1357.0,362.2 1357.0,359.8 1370.0,359.8" fill="none" stroke="#1f5fd6" stroke-width="2"/>
+<path d="M1344.0,362.2 C1357.0,362.2 1357.0,364.8 1370.0,364.8" fill="none" stroke="#ff8c00" stroke-width="2"/>
+<path d="M1344.0,362.2 C1357.0,362.2 1357.0,369.8 1370.0,369.8" fill="none" stroke="#8a2be2" stroke-width="2"/>
+<rect x="1370.0" y="340.2" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
+<rect x="1428.0" y="346.2" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<text x="1402.0" y="402.2" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">J3</text>
+<text x="1402.0" y="416.2" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >SPI DEVICE</text>
+<line x1="1474.0" y1="300.2" x2="1414.8" y2="340.2" stroke="#111" stroke-width="0.7" /><polygon points="1414.8,340.2 1420.1,333.0 1423.5,338.1" fill="#111"/><circle cx="1474.0" cy="300.2" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1474.0" y="304.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >5</text><circle cx="1474.0" cy="323.2" r="11" fill="white" stroke="#111"/><text x="1474.0" y="327.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >4</text><text x="1488.0" y="327.2" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >4X</text>
+<path d="M583.1,645.2 C596.1,645.2 596.1,645.2 609.1,645.2" fill="none" stroke="#14a33a" stroke-width="2"/>
+<path d="M583.1,645.2 C596.1,645.2 596.1,645.2 609.1,645.2" fill="none" stroke="#f2d600" stroke-width="2" stroke-dasharray="3 3"/>
+<rect x="609.1" y="623.2" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
+<rect x="667.1" y="629.2" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<text x="645.8" y="685.2" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">E1</text>
+<text x="645.8" y="699.2" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >CHASSIS GND</text>
+<line x1="713.1" y1="583.2" x2="653.9" y2="623.2" stroke="#111" stroke-width="0.7" /><polygon points="653.9,623.2 659.2,616.0 662.6,621.1" fill="#111"/><circle cx="713.1" cy="583.2" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="713.1" y="587.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >6</text>
+<rect x="551.2" y="355.2" width="18" height="14" fill="#d9d9d9" stroke="#111" transform="rotate(45 560.2 362.2)"/>
+<text x="560.2" y="346.2" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="middle" font-weight="bold" fill="#111" >SP1</text>
+<line x1="590.2" y1="317.2" x2="569.2" y2="359.2" stroke="#111" stroke-width="0.7" /><polygon points="569.2,359.2 570.2,350.3 575.8,353.1" fill="#111"/><circle cx="590.2" cy="317.2" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="590.2" y="321.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >7</text>
+<rect x="648.7" y="355.2" width="18" height="14" fill="#d9d9d9" stroke="#111" transform="rotate(45 657.7 362.2)"/>
+<text x="657.7" y="346.2" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="middle" font-weight="bold" fill="#111" >SP2</text>
+<line x1="687.7" y1="317.2" x2="666.7" y2="359.2" stroke="#111" stroke-width="0.7" /><polygon points="666.7,359.2 667.7,350.3 673.2,353.1" fill="#111"/><circle cx="687.7" cy="317.2" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="687.7" y="321.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >7</text>
+<rect x="203.4" y="353.2" width="53.1" height="18.0" fill="white" stroke="#111" stroke-width="1" />
+<text x="230.0" y="366.2" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="middle" font-weight="normal" fill="#111" >P1 CTRL</text>
+<line x1="170.0" y1="362.2" x2="170.0" y2="332.2" stroke="#555" stroke-width="0.6" /><line x1="230.0" y1="353.2" x2="230.0" y2="332.2" stroke="#555" stroke-width="0.6" /><line x1="170.0" y1="336.2" x2="230.0" y2="336.2" stroke="#111" stroke-width="0.8" /><polygon points="170.0,336.2 178.5,333.2 178.5,339.3" fill="#111"/><polygon points="230.0,336.2 221.5,339.3 221.5,333.2" fill="#111"/><rect x="189.8" y="329.2" width="20.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="200.0" y="340.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >50</text>
+<line x1="278.6" y1="318.2" x2="250.6" y2="353.2" stroke="#111" stroke-width="0.7" /><polygon points="250.6,353.2 253.4,344.7 258.2,348.6" fill="#111"/><circle cx="278.6" cy="318.2" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="278.6" y="322.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >19</text>
+<rect x="1008.8" y="211.8" width="55.9" height="18.0" fill="white" stroke="#111" stroke-width="1" />
+<text x="1036.8" y="224.8" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="middle" font-weight="normal" fill="#111" >J1 SNS-A</text>
+<line x1="1036.8" y1="229.8" x2="1036.8" y2="250.8" stroke="#555" stroke-width="0.6" /><line x1="1096.8" y1="220.8" x2="1096.8" y2="250.8" stroke="#555" stroke-width="0.6" /><line x1="1036.8" y1="246.8" x2="1096.8" y2="246.8" stroke="#111" stroke-width="0.8" /><polygon points="1036.8,246.8 1045.2,243.7 1045.2,249.8" fill="#111"/><polygon points="1096.8,246.8 1088.3,249.8 1088.3,243.7" fill="#111"/><rect x="1056.6" y="239.8" width="20.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="1066.8" y="250.8" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >50</text>
+<line x1="986.8" y1="264.8" x2="1014.8" y2="229.8" stroke="#111" stroke-width="0.7" /><polygon points="1014.8,229.8 1012.0,238.3 1007.2,234.4" fill="#111"/><circle cx="986.8" cy="264.8" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="986.8" y="268.8" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >19</text>
+<rect x="1057.6" y="494.8" width="55.9" height="18.0" fill="white" stroke="#111" stroke-width="1" />
+<text x="1085.6" y="507.8" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="middle" font-weight="normal" fill="#111" >J2 SNS-B</text>
+<line x1="1085.6" y1="494.8" x2="1085.6" y2="473.8" stroke="#555" stroke-width="0.6" /><line x1="1145.6" y1="503.8" x2="1145.6" y2="473.8" stroke="#555" stroke-width="0.6" /><line x1="1085.6" y1="477.8" x2="1145.6" y2="477.8" stroke="#111" stroke-width="0.8" /><polygon points="1085.6,477.8 1094.0,474.7 1094.0,480.8" fill="#111"/><polygon points="1145.6,477.8 1137.1,480.8 1137.1,474.7" fill="#111"/><rect x="1105.4" y="470.8" width="20.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="1115.6" y="481.8" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >50</text>
+<line x1="1035.6" y1="459.8" x2="1063.6" y2="494.8" stroke="#111" stroke-width="0.7" /><polygon points="1063.6,494.8 1055.9,490.1 1060.7,486.2" fill="#111"/><circle cx="1035.6" cy="459.8" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1035.6" y="463.8" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >19</text>
+<rect x="1287.0" y="353.2" width="46.0" height="18.0" fill="white" stroke="#111" stroke-width="1" />
+<text x="1310.0" y="366.2" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="middle" font-weight="normal" fill="#111" >J3 SPI</text>
+<line x1="1310.0" y1="353.2" x2="1310.0" y2="332.2" stroke="#555" stroke-width="0.6" /><line x1="1370.0" y1="362.2" x2="1370.0" y2="332.2" stroke="#555" stroke-width="0.6" /><line x1="1310.0" y1="336.2" x2="1370.0" y2="336.2" stroke="#111" stroke-width="0.8" /><polygon points="1310.0,336.2 1318.5,333.2 1318.5,339.3" fill="#111"/><polygon points="1370.0,336.2 1361.5,339.3 1361.5,333.2" fill="#111"/><rect x="1329.8" y="329.2" width="20.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="1340.0" y="340.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >50</text>
+<line x1="1265.0" y1="318.2" x2="1293.0" y2="353.2" stroke="#111" stroke-width="0.7" /><polygon points="1293.0,353.2 1285.3,348.6 1290.1,344.7" fill="#111"/><circle cx="1265.0" cy="318.2" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1265.0" y="322.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >19</text>
+<line x1="341.4" y1="307.2" x2="316.4" y2="354.2" stroke="#111" stroke-width="0.7" /><polygon points="316.4,354.2 317.6,345.3 323.1,348.2" fill="#111"/><circle cx="341.4" cy="307.2" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="341.4" y="311.2" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >18</text><text x="355.4" y="311.2" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >AR</text>
+<line x1="170.0" y1="776.0" x2="609.1" y2="776.0" stroke="#111" stroke-width="0.8" /><polygon points="170.0,776.0 178.5,772.9 178.5,779.1" fill="#111"/><polygon points="609.1,776.0 600.6,779.1 600.6,772.9" fill="#111"/><rect x="335.9" y="769.0" width="107.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="389.5" y="780.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >450 REF  (P1–E1)</text>
+<line x1="609.1" y1="705.2" x2="609.1" y2="780.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
+<line x1="170.0" y1="800.0" x2="1096.8" y2="800.0" stroke="#111" stroke-width="0.8" /><polygon points="170.0,800.0 178.5,796.9 178.5,803.1" fill="#111"/><polygon points="1096.8,800.0 1088.3,803.1 1088.3,796.9" fill="#111"/><rect x="579.8" y="793.0" width="107.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="633.4" y="804.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >810 REF  (P1–J1)</text>
+<line x1="1096.8" y1="280.8" x2="1096.8" y2="423.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/><line x1="1096.8" y1="443.0" x2="1096.8" y2="491.8" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/><line x1="1096.8" y1="515.8" x2="1096.8" y2="804.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
+<line x1="170.0" y1="824.0" x2="1145.6" y2="824.0" stroke="#111" stroke-width="0.8" /><polygon points="170.0,824.0 178.5,820.9 178.5,827.1" fill="#111"/><polygon points="1145.6,824.0 1137.1,827.1 1137.1,820.9" fill="#111"/><rect x="604.2" y="817.0" width="107.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="657.8" y="828.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >860 REF  (P1–J2)</text>
+<line x1="1145.6" y1="563.8" x2="1145.6" y2="828.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
+<line x1="170.0" y1="848.0" x2="1370.0" y2="848.0" stroke="#111" stroke-width="0.8" /><polygon points="170.0,848.0 178.5,844.9 178.5,851.1" fill="#111"/><polygon points="1370.0,848.0 1361.5,851.1 1361.5,844.9" fill="#111"/><rect x="713.3" y="841.0" width="113.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="770.0" y="852.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >1090 REF  (P1–J3)</text>
+<line x1="1370.0" y1="422.2" x2="1370.0" y2="852.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
+<line x1="170.0" y1="422.2" x2="170.0" y2="852.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
+<text x="42.0" y="944.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111" text-decoration="underline">NOTES:</text>
+<text x="42.0" y="964.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">1.  FABRICATE, INSPECT AND TEST PER IPC/WHMA-A-620, CLASS 2.</text>
+<text x="42.0" y="979.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">2.  ALL DIMENSIONS IN MM. LENGTHS ARE MEASURED FROM CONNECTOR REAR FACE TO BREAKOUT CENTRE OR TO THE NEXT CONNECTOR REAR FACE.</text>
+<text x="42.0" y="994.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">3.  LENGTH TOLERANCES UNLESS OTHERWISE SPECIFIED: ≤300: ±5, ≤1000: ±10, over: ±1%. SEGMENT DIMENSIONS GOVERN; OVERALL DIMENSIONS ARE REFERENCE.</text>
+<text x="42.0" y="1009.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">4.  DRAWING NOT TO SCALE. WIRE CUT LENGTHS PER WIRE LIST; CONNECTIONS PER CONNECTOR TABLES AND WIRING DIAGRAM.</text>
+<text x="42.0" y="1024.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">5.  TWIST INDICATED WIRES PER IPC/WHMA-A-620.</text>
+<text x="42.0" y="1039.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">6.  TWISTED WIRE CUT LENGTHS INCLUDE 3% TAKE-UP OVER THE TWISTED RUN.</text>
+<text x="42.0" y="1054.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">7.  LABELS READ TOWARD THE CONNECTOR; POSITION DIMENSIONED FROM DATUM TO LABEL CENTRE.</text>
+<text x="42.0" y="1069.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">8.  CONTINUITY-TEST 100% AGAINST THE WIRE LIST; NO SHORTS BETWEEN NETS.</text>
+<text x="42.0" y="1084.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">9.  STRIP 3 mm FOR CRIMP CONTACTS, 8 mm FOR RING LUG.</text>
 </svg>

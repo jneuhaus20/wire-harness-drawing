@@ -1,10 +1,10 @@
 find,qty,unit,pn,description,manufacturer,refs
-1,1,EA,5-747904-2,"DE-9 plug, male, solder cup 9P",TE,P1
+1,1,EA,5-747904-2,"DE-9 plug, male, solder cup, 9 pos",TE,P1
 2,1,EA,5745171-5,"Cable clamp kit, DE-9, zinc, 4-40, 9.4 mm max",TE,P1
-3,2,EA,22-01-3047,KK 254 female 4-pin 4P,Molex,J1 J2
+3,2,EA,22-01-3047,KK 254 female 4-pin,Molex,J1 J2
 4,10,EA,08-50-0114,"KK 254 crimp, 22-30 AWG",Molex,J1 J2 J3
-5,1,EA,22-01-3057,KK 254 female 5-pin 5P,Molex,J3
-6,1,EA,PV18-6R-CY,"Ring lug #6 stud, vinyl insulated, 22-18 AWG 1P",Panduit,E1
+5,1,EA,22-01-3057,KK 254 female 5-pin,Molex,J3
+6,1,EA,PV18-6R-CY,"Ring lug #6 stud, vinyl insulated, 22-18 AWG",Panduit,E1
 7,2,EA,D-436-52,"MiniSeal sealed crimp splice, 2 or 3 wires to 1",TE,SP1 SP2
 8,0.36,m,,"UL1007 hook-up wire, 20 AWG, BK",,W1
 9,1.8,m,,"UL1007 hook-up wire, 24 AWG, BK",,W2 W3 W4
@@ -12,8 +12,8 @@ find,qty,unit,pn,description,manufacturer,refs
 11,0.99,m,,"UL1007 hook-up wire, 24 AWG, RD",,W6 W7
 12,0.83,m,,"UL1007 hook-up wire, 24 AWG, YE",,W8
 13,0.83,m,,"UL1007 hook-up wire, 24 AWG, GN",,W9
-14,1.11,m,,"UL1007 hook-up wire, 24 AWG, BU",,W10
-15,1.11,m,,"UL1007 hook-up wire, 24 AWG, OG",,W11
+14,1.145,m,,"UL1007 hook-up wire, 24 AWG, BU",,W10
+15,1.145,m,,"UL1007 hook-up wire, 24 AWG, OG",,W11
 16,1.11,m,,"UL1007 hook-up wire, 24 AWG, VT",,W12
 17,0.47,m,,"UL1007 hook-up wire, 22 AWG, GNYE",,W13
 18,0.56,m,PTN0.25BK,"Expandable braided sleeving, PET, 6 mm",Techflex,P1-B1 B1-SP1 SP1-SP2 SP2-B2
