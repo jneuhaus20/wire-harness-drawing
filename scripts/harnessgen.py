@@ -60,10 +60,10 @@ class Err:
 # covering is bought. Keep them together so an inch drawing never inherits a millimetre default.
 unit_conventions = {
     "mm": dict(tolerance=[{"upto": 300, "tol": 5}, {"upto": 1000, "tol": 10}, {"upto": None, "tol": "1%"}],
-               round_to=5, loopback_length=100, label_distance=50, stand_in_length=300,
+               round_to=5, loopback_length=100, label_distance=50, label_limit=300, stand_in_length=300,
                purchase_unit="m", lengths_per_purchase_unit=1000),
     "in": dict(tolerance=[{"upto": 12, "tol": 0.25}, {"upto": 40, "tol": 0.5}, {"upto": None, "tol": "1%"}],
-               round_to=0.25, loopback_length=4, label_distance=2, stand_in_length=12,
+               round_to=0.25, loopback_length=4, label_distance=2, label_limit=12, stand_in_length=12,
                purchase_unit="ft", lengths_per_purchase_unit=12),
 }
 
@@ -268,6 +268,10 @@ def validate_drawing_numbers(drawing: dict, findings: Err) -> None:
     for key in ("extra_per_wire", "loopback_length"):
         if key in drawing and not is_number(drawing[key]):
             findings.error(f"drawing.{key} must be a number, not '{drawing.pop(key)}'")
+    tolerance_rows = drawing.get("tolerance")
+    if tolerance_rows and all(row.get("upto") is not None for row in tolerance_rows):
+        largest = max(row["upto"] for row in tolerance_rows)
+        findings.error(f"drawing.tolerance has no row with upto: null; lengths over {fmt_len(largest)} have no tolerance")
 
 
 def validate_connectors(connectors: dict, findings: Err) -> None:
@@ -307,11 +311,24 @@ def validate_layout(layout: dict, findings: Err) -> None:
     segments = layout.get("segments") or []
     for index, segment in enumerate(segments):
         length = segment[2] if isinstance(segment, list) and len(segment) > 2 else (segment.get("length") if isinstance(segment, dict) else None)
-        if length is None or length == "TBD" or is_number(length):
+        if length is None or length == "TBD" or (is_number(length) and length >= 0):
             continue
         start, end = segment_ends(segment)
-        findings.error(f"layout segment {start}-{end}: length '{length}' must be a number or TBD")
+        if is_number(length):
+            findings.error(f"layout segment {start}-{end}: length {fmt_len(length)} is negative")
+        else:
+            findings.error(f"layout segment {start}-{end}: length '{length}' must be a number or TBD")
         segments[index] = [start, end, "TBD"]
+    placed_labels = []
+    for label in layout.get("labels") or []:
+        name = label.get("text", label.get("at", "?"))
+        if "at" not in label:
+            findings.error(f"label {name}: missing 'at'")
+            continue
+        if "distance" in label and not is_number(label["distance"]):
+            findings.error(f"label {name}: distance '{label.pop('distance')}' must be a number")
+        placed_labels.append(label)
+    layout["labels"] = placed_labels
     declared = {frozenset(segment_ends(segment)) for segment in segments}
     for covering in layout.get("coverings") or []:
         kept = []
@@ -336,6 +353,9 @@ def check(d, T, E):
             c, p = parse_end(w[end])
             if c not in C:
                 E.error(f"{w['id']}: {end} connector '{c}' is not defined"); continue
+            pin_count = len(pins_of(C[c]))
+            if ":" not in str(w[end]) and pin_count > 1 and C[c].get("type", "").lower() != "splice":
+                E.error(f"{w['id']}: {end} '{w[end]}' names no pin, and {c} has {pin_count}")
             if p not in pins_of(C[c]):
                 E.error(f"{w['id']}: {c} has no pin '{p}' (pins {pins_of(C[c])[0]}..{pins_of(C[c])[-1]})")
             use[(c, p)].append(w["id"])
@@ -350,6 +370,8 @@ def check(d, T, E):
             m = re.match(r"\s*(\d+)\s*AWG", g, re.I)
             if rng and m and not (min(rng) <= int(m.group(1)) <= max(rng)):
                 E.error(f"{w['id']}: {g} outside {c} contact range {min(rng)}-{max(rng)} AWG")
+            elif rng and not m and g.strip() and g.strip().upper() != "TBD":
+                E.warn(f"{w['id']}: gauge '{g}' is not in AWG, so it was not checked against {c}'s {min(rng)}-{max(rng)} AWG range")
         if parse_end(w["from"])[0] == parse_end(w["to"])[0]:
             E.info(f"{w['id']}: loopback on {parse_end(w['from'])[0]}")
     for (c, p), ws in use.items():
@@ -401,12 +423,49 @@ def check(d, T, E):
         for n in T["order"]:
             if n not in C and not T["children"].get(n) and n != T["root"]:
                 E.warn(f"layout leaf {n} is not a connector")
+    if T:
+        check_coverings_and_labels(d, T, E)
     # netlist
     nets_built = build_nets(d)
     exp = d.get("expect", {}).get("nets")
     if exp:
         compare_nets(nets_built, exp, d, E)
     return nets_built
+
+
+# Coverings and labels point at items and layout nodes by name; check that each name exists,
+# that every label sits where the standard and its own segment allow, and that an item
+# counted per label is bought in the number the labels use.
+def check_coverings_and_labels(d: dict, tree: dict, findings: Err) -> None:
+    """Report coverings and labels that name things the source lacks or sit where they cannot."""
+    item_ids = {item.get("id") for item in d["items"]}
+    layout = d["layout"]
+    units = d["drawing"].get("units", "mm")
+    label_limit = conventions(d["drawing"])["label_limit"]
+    for covering in layout.get("coverings") or []:
+        if covering.get("item") not in item_ids:
+            findings.error(f"covering {covering.get('item')}: item {covering.get('item')} is not in items")
+    labels = layout.get("labels") or []
+    for label in labels:
+        name, node = label.get("text", label.get("at")), label.get("at")
+        if label.get("item") and label["item"] not in item_ids:
+            findings.error(f"label {name}: item {label['item']} is not in items")
+        if node not in tree["nodes"]:
+            findings.error(f"label {name}: at {node}, which is not a layout node")
+            continue
+        distance = label.get("distance", conventions(d["drawing"])["label_distance"])
+        if distance > label_limit:
+            findings.warn(f"label {name}: {fmt_len(distance)} {units} from {node} exceeds the {fmt_len(label_limit)} {units} limit "
+                          "of IPC/WHMA-A-620 §12.4")
+        neighbour = tree["parent"].get(node) if node != tree["root"] else next(iter(tree["children"][node]), None)
+        segment_length = tree["seglen"].get(frozenset((node, neighbour))) if neighbour else None
+        if segment_length is not None and distance > segment_length:
+            findings.error(f"label {name}: {fmt_len(distance)} {units} from {node} is beyond the {fmt_len(segment_length)} {units} "
+                           f"segment {'-'.join(sorted((node, neighbour)))}")
+    for item in d["items"]:
+        users = [label for label in labels if label.get("item") == item.get("id")]
+        if users and is_number(item.get("qty")) and item["qty"] != len(users):
+            findings.error(f"item {item['id']}: qty {fmt_len(item['qty'])} but {len(users)} labels use it")
 
 
 def build_nets(d):
