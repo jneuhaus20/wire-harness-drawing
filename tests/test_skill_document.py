@@ -2,9 +2,9 @@
 import re
 import unittest
 
-from tests.generator import generator_script, repository
+from tests.generator import generator_script, skill_directory
 
-skill_document = (repository / "SKILL.md").read_text()
+skill_document = (skill_directory / "SKILL.md").read_text()
 
 
 class SkillDocumentTest(unittest.TestCase):

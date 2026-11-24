@@ -1,0 +1,33 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: sudo apt-get install -y graphviz
+      - run: pip install pyyaml cairosvg pypdf wireviz==0.4.1
+      - run: python -m unittest
+
+  # The tests need Python 3.11, but the skill itself supports 3.10: generate the example there.
+  oldest-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install pyyaml
+      - run: python skills/wire-harness-drawing/scripts/harnessgen.py example/example.yaml -o out --no-wireviz
+      - run: diff out/example.bom.csv example/example.bom.csv && diff out/example.wirelist.csv example/example.wirelist.csv

@@ -1,0 +1,12 @@
+{
+  "name": "wire-harness-drawing",
+  "owner": { "name": "John Neuhaus" },
+  "description": "The wire-harness-drawing skill for Claude.",
+  "plugins": [
+    {
+      "name": "wire-harness-drawing",
+      "source": "./",
+      "description": "Generate a wire harness manufacturing drawing package from one YAML source."
+    }
+  ]
+}

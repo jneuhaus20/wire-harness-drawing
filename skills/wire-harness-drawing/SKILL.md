@@ -1,6 +1,7 @@
 ---
 name: wire-harness-drawing
 description: "Use when asked for a wire harness diagram or drawing: a manufacturing/formboard drawing package with lengths, BOM, wire list and checks, not a schematic."
+license: MIT
 ---
 
 # Wire harness drawing

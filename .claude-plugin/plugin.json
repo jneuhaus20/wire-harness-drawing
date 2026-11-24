@@ -1,0 +1,10 @@
+{
+  "name": "wire-harness-drawing",
+  "version": "1.0.0",
+  "description": "Generate a wire harness manufacturing drawing package (formboard drawing, BOM, wire list, connector tables, wiring diagram and checks) from one YAML source.",
+  "author": { "name": "John Neuhaus" },
+  "homepage": "https://github.com/jneuhaus20/wire-harness-drawing",
+  "repository": "https://github.com/jneuhaus20/wire-harness-drawing",
+  "license": "MIT",
+  "keywords": ["wire harness", "cable assembly", "formboard", "BOM", "WireViz", "IPC/WHMA-A-620"]
+}

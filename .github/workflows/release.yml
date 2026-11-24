@@ -1,0 +1,26 @@
+name: Release
+
+# Push a tag vX.Y.Z whose version matches .claude-plugin/plugin.json to publish a release
+# with the skill zip attached.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: sudo apt-get install -y graphviz
+      - run: pip install pyyaml cairosvg pypdf wireviz==0.4.1
+      - run: python -m unittest
+      - run: python tools/build_release.py --output dist --tag "$GITHUB_REF_NAME"
+      - run: gh release create "$GITHUB_REF_NAME" dist/*.zip --verify-tag --generate-notes --title "$GITHUB_REF_NAME"
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -4,12 +4,13 @@ import sys
 from pathlib import Path
 
 repository = Path(__file__).resolve().parent.parent
-generator_script = repository / "scripts" / "harnessgen.py"
+skill_directory = repository / "skills" / "wire-harness-drawing"
+generator_script = skill_directory / "scripts" / "harnessgen.py"
 example_directory = repository / "example"
 example_source = example_directory / "example.yaml"
 
 # The tests reach the generator's modules the way scripts/harnessgen.py does.
-sys.path.insert(0, str(repository / "scripts"))
+sys.path.insert(0, str(skill_directory / "scripts"))
 
 
 # Run the generator the way a user does, as a subprocess, so the tests exercise the
