@@ -1,0 +1,124 @@
+# Example harness: one DE-9 controller plug fanning out to three device plugs and a ground lug.
+drawing:
+  title: SENSOR BRANCH HARNESS
+  number: EX-0001
+  rev: A
+  units: mm
+  drawn_by: CLAUDE
+  date: 2026-11-19
+  ipc_class: 2
+  datum: connector rear face
+  tolerance: [{upto: 300, tol: 5}, {upto: 1000, tol: 10}, {upto: null, tol: "1%"}]
+  round_to: 5
+  extra_per_wire: 20          # service/strip allowance added to every cut length
+  wire_type: UL1007 hook-up wire
+  notes:
+    - STRIP 3 mm FOR CRIMP CONTACTS, 8 mm FOR RING LUG.
+
+connectors:
+  P1:
+    label: TO CONTROLLER
+    type: DE-9
+    subtype: plug, male, solder cup
+    pn: 1-1658526-1
+    manufacturer: TE
+    pincount: 9
+    pinlabels: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, SHLD, NC]
+    accessories: [{desc: "Backshell, DE-9, metal, 4-40 screws", pn: 5745833-1, manufacturer: TE}]
+    awg: [20, 28]
+  J1:
+    label: SENSOR A
+    type: KK 254
+    subtype: female 4-pin
+    pn: 22-01-3047
+    manufacturer: Molex
+    pincount: 4
+    pinlabels: [GND, +5V, SCL, SDA]
+    contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
+    awg: [22, 30]
+  J2:
+    label: SENSOR B
+    type: KK 254
+    subtype: female 4-pin
+    pn: 22-01-3047
+    manufacturer: Molex
+    pincount: 4
+    pinlabels: [GND, +5V, SCL, SDA]
+    contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
+  J3:
+    label: SPI DEVICE
+    type: KK 254
+    subtype: female 5-pin
+    pn: 22-01-3057
+    manufacturer: Molex
+    pincount: 5
+    pinlabels: [GND, +12V, MISO, MOSI, SCK]
+    contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
+  E1:
+    label: CHASSIS GND
+    type: Ring lug
+    subtype: "#6, 22-18 AWG"
+    pn: 19070-0003
+    manufacturer: Molex
+    pincount: 1
+    pinlabels: [SHLD]
+  SP1:
+    type: splice
+    desc: Butt splice, 22-26 AWG, heat-shrink
+    pn: BSV-26
+  SP2:
+    type: splice
+    desc: Butt splice, 22-26 AWG, heat-shrink
+    pn: BSV-26
+
+wires:
+  - {id: W1,  from: P1:1, to: SP1,  signal: GND,  gauge: 22 AWG, color: BK}
+  - {id: W2,  from: SP1,  to: J1:1, signal: GND,  gauge: 24 AWG, color: BK}
+  - {id: W3,  from: SP1,  to: J2:1, signal: GND,  gauge: 24 AWG, color: BK}
+  - {id: W4,  from: SP1,  to: J3:1, signal: GND,  gauge: 24 AWG, color: BK}
+  - {id: W5,  from: P1:2, to: SP2,  signal: +5V,  gauge: 22 AWG, color: RD}
+  - {id: W6,  from: SP2,  to: J1:2, signal: +5V,  gauge: 24 AWG, color: RD}
+  - {id: W7,  from: SP2,  to: J2:2, signal: +5V,  gauge: 24 AWG, color: RD}
+  - {id: W8,  from: P1:3, to: J1:3, signal: SCL,  gauge: 24 AWG, color: YE}
+  - {id: W9,  from: P1:4, to: J1:4, signal: SDA,  gauge: 24 AWG, color: GN}
+  - {id: W10, from: P1:5, to: J3:3, signal: MISO, gauge: 24 AWG, color: BU, twist: T1}
+  - {id: W11, from: P1:6, to: J3:4, signal: MOSI, gauge: 24 AWG, color: OG, twist: T1}
+  - {id: W12, from: P1:7, to: J3:5, signal: SCK,  gauge: 24 AWG, color: VT}
+  - {id: W13, from: P1:8, to: E1,   signal: SHLD, gauge: 22 AWG, color: GNYE}
+# J2 SCL/SDA intentionally left off to show the checker; J3:2 (+12V) supplied elsewhere.
+
+layout:
+  root: P1
+  segments:                    # from, to, length (mm, datum to breakout centre / datum)
+    - [P1, B1, 300]
+    - [B1, E1, 150]
+    - [B1, SP1, 40]
+    - [SP1, SP2, 20]
+    - [SP2, B2, 200]
+    - [B2, J1, 250]
+    - [B2, B3, 180]
+    - [B3, J2, 120]
+    - [B3, J3, 350]
+  coverings:
+    - {item: SLV1, segments: [P1-B1, B1-SP1, SP1-SP2, SP2-B2]}
+  labels:
+    - {at: P1, text: "P1 CTRL", distance: 50, item: LBL}
+    - {at: J1, text: "J1 SNS-A", distance: 50, item: LBL}
+    - {at: J2, text: "J2 SNS-B", distance: 50, item: LBL}
+    - {at: J3, text: "J3 SPI", distance: 50, item: LBL}
+
+items:
+  - {id: SLV1, desc: "Expandable braided sleeving, PET, 6 mm", pn: PTN0.25BK, manufacturer: Techflex, qty: AR, unit: m}
+  - {id: LBL,  desc: "Heat-shrink marker sleeve, white, 3:1", pn: HX-SCE-1/4, manufacturer: Brady, qty: 4}
+  - {id: HS1,  desc: "Heat-shrink 3:1, 6 mm, at breakouts", qty: AR, unit: m}
+
+expect:
+  nets:
+    GND:  [P1:1, J1:1, J2:1, J3:1]
+    +5V:  [P1:2, J1:2, J2:2]
+    SCL:  [P1:3, J1:3, J2:3]
+    SDA:  [P1:4, J1:4, J2:4]
+    MISO: [P1:5, J3:3]
+    MOSI: [P1:6, J3:4]
+    SCK:  [P1:7, J3:5]
+    SHLD: [P1:8, E1:1]
