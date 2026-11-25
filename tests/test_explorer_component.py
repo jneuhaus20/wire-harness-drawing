@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tests.generator import repository
+from tests.generator import repository, example_text
 from tests.test_cables import split_cable_harness
 from tests.test_geometry import routed_harness
 
@@ -15,27 +15,7 @@ from harness.package import analyse
 from harness.source import load_source
 
 
-twisted_cable_harness = """
-drawing: {title: TWIST AND CABLE, number: T-7, rev: A}
-connectors:
-  P1: {type: KK 254, pn: A-1, pincount: 4}
-  J1: {type: KK 254, pn: A-2, pincount: 4}
-cables:
-  C1:
-    desc: 2-conductor shielded
-    pn: C-2
-    shield: true
-    gauge: 24 AWG
-    conductors:
-      - {color: RD, from: "P1:3", to: "J1:3"}
-      - {color: BK, from: "P1:4", to: "J1:4"}
-wires:
-  - {id: W1, from: "P1:1", to: "J1:1", gauge: 24 AWG, color: WH, twist: T1}
-  - {id: W2, from: "P1:2", to: "J1:2", gauge: 24 AWG, color: GN, twist: T1}
-layout:
-  root: P1
-  segments: [[P1, J1, 400]]
-"""
+twisted_cable_harness = example_text("twist-and-cable")
 
 
 # Two splices put at the same place on a routed harness: the one the explorer must stack.

@@ -1,0 +1,11 @@
+# The smallest useful harness: two wires between two 2-pin connectors.
+drawing: {title: TWO WIRE, number: T-1, rev: A}
+connectors:
+  P1: {type: KK 254, pincount: 2, pinlabels: [GND, VCC]}
+  J1: {type: KK 254, pincount: 2, pinlabels: [GND, VCC]}
+wires:
+  - {id: W1, from: "P1:1", to: "J1:1", signal: GND, gauge: 24 AWG, color: BK}
+  - {id: W2, from: "P1:2", to: "J1:2", signal: VCC, gauge: 24 AWG, color: RD}
+layout:
+  root: P1
+  segments: [[P1, J1, 500]]

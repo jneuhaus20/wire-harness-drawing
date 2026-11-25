@@ -64,7 +64,7 @@ class ModelFileTest(unittest.TestCase):
 
     def test_the_package_writes_the_model_beside_the_sheets(self) -> None:
         written = json.loads(generate(self, None).read("harness.json"))
-        self.assertEqual(written, json.loads((example_directory / "example.harness.json").read_text()))
+        self.assertEqual(written, json.loads((example_directory / "sensor-branch.harness.json").read_text()))
 
 
 if __name__ == "__main__":

@@ -3,22 +3,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tests.generator import run_generator_on_text
+from tests.generator import run_generator_on_text, example_text
 from tests.test_output_integrity import GeneratedPackage, svg_texts
 
-minimum_length_harness = """
-drawing: {title: MIN, number: T-4, rev: A}
-connectors:
-  P1: {type: KK 254, pincount: 2}
-  J1: {type: KK 254, pincount: 1}
-  J2: {type: KK 254, pincount: 1}
-wires:
-  - {id: W1, from: "P1:1", to: "J1:1", gauge: 24 AWG, color: BK}
-  - {id: W2, from: "P1:2", to: "J2:1", gauge: 24 AWG, color: RD}
-layout:
-  root: P1
-  segments: [[P1, B1, 300], [B1, J1, {min: 200}], [B1, J2, TBD]]
-"""
+minimum_length_harness = example_text("unknowns")
 
 
 class MinimumLengthTest(unittest.TestCase):

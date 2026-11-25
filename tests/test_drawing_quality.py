@@ -166,9 +166,15 @@ class WiringDiagramTest(unittest.TestCase):
 
     def test_lengths_are_given_in_the_unit_wire_is_bought_in(self) -> None:
         source = two_wire_harness.replace("rev: A}", "rev: A, units: in, round_to: 1}").replace("500]", "24]")
-        bundle = self.wireviz_source(source)["cables"]["B1"]
+        bundle = self.wireviz_source(source)["cables"]["P1-J1"]
         self.assertEqual((bundle["length"], bundle["length_unit"]), (2, "ft"))
-        self.assertEqual(self.wireviz_source(two_wire_harness)["cables"]["B1"]["length"], 0.5)
+        self.assertEqual(self.wireviz_source(two_wire_harness)["cables"]["P1-J1"]["length"], 0.5)
+
+    def test_bundle_names_never_reuse_a_layout_name(self) -> None:
+        names = set(self.wireviz_source(example_source.read_text())["cables"])
+        layout_names = {node for segment in load_source(example_source)["layout"]["segments"] for node in segment[:2]}
+        self.assertFalse(names & layout_names, names & layout_names)
+        self.assertIn("SP1-J1", names)
 
     def test_a_cable_is_drawn_as_that_cable(self) -> None:
         source = two_wire_harness.split("wires:")[0] + """cables:

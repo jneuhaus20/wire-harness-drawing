@@ -1,0 +1,867 @@
+{
+ "format": "wire-harness-explorer/1",
+ "title": "TAZ 6 Y-Z HARNESS",
+ "number": "EX-0002",
+ "rev": "A",
+ "units": "mm",
+ "geometry": "3d",
+ "root": "P1",
+ "connectors": [
+  {
+   "id": "P1",
+   "label": "TO CONTROL BOX",
+   "type": "Molex SL",
+   "part_number": "70107-0015",
+   "manufacturer": "Molex",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": "male",
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    },
+    {
+     "pin": "2",
+     "label": ""
+    },
+    {
+     "pin": "3",
+     "label": ""
+    },
+    {
+     "pin": "4",
+     "label": ""
+    },
+    {
+     "pin": "5",
+     "label": ""
+    },
+    {
+     "pin": "6",
+     "label": ""
+    },
+    {
+     "pin": "7",
+     "label": ""
+    },
+    {
+     "pin": "8",
+     "label": ""
+    },
+    {
+     "pin": "9",
+     "label": ""
+    },
+    {
+     "pin": "10",
+     "label": ""
+    },
+    {
+     "pin": "11",
+     "label": ""
+    },
+    {
+     "pin": "12",
+     "label": ""
+    },
+    {
+     "pin": "13",
+     "label": ""
+    },
+    {
+     "pin": "14",
+     "label": ""
+    },
+    {
+     "pin": "15",
+     "label": ""
+    },
+    {
+     "pin": "16",
+     "label": ""
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "J1",
+   "label": "Z LEFT MOTOR",
+   "type": "JST PH",
+   "part_number": "PHR-6",
+   "manufacturer": "JST",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": "female",
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    },
+    {
+     "pin": "2",
+     "label": ""
+    },
+    {
+     "pin": "3",
+     "label": ""
+    },
+    {
+     "pin": "4",
+     "label": ""
+    },
+    {
+     "pin": "5",
+     "label": ""
+    },
+    {
+     "pin": "6",
+     "label": ""
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "J2",
+   "label": "Y MOTOR",
+   "type": "JST PH",
+   "part_number": "PHR-6",
+   "manufacturer": "JST",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": "female",
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    },
+    {
+     "pin": "2",
+     "label": ""
+    },
+    {
+     "pin": "3",
+     "label": ""
+    },
+    {
+     "pin": "4",
+     "label": ""
+    },
+    {
+     "pin": "5",
+     "label": ""
+    },
+    {
+     "pin": "6",
+     "label": ""
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "J3",
+   "label": "Z RIGHT MOTOR",
+   "type": "JST PH",
+   "part_number": "PHR-6",
+   "manufacturer": "JST",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": "female",
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    },
+    {
+     "pin": "2",
+     "label": ""
+    },
+    {
+     "pin": "3",
+     "label": ""
+    },
+    {
+     "pin": "4",
+     "label": ""
+    },
+    {
+     "pin": "5",
+     "label": ""
+    },
+    {
+     "pin": "6",
+     "label": ""
+    }
+   ],
+   "face": null
+  }
+ ],
+ "wires": [
+  {
+   "id": "W1-RD",
+   "from": {
+    "connector": "P1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "4"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "RD",
+   "colors": [
+    "#c4453f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W1",
+   "route": [
+    "P1",
+    "B1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W1-WH",
+   "from": {
+    "connector": "P1",
+    "pin": "2"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "6"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "WH",
+   "colors": [
+    "#eeeeea"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W1",
+   "route": [
+    "P1",
+    "B1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W1-GN",
+   "from": {
+    "connector": "P1",
+    "pin": "3"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "3"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "GN",
+   "colors": [
+    "#4e9a5f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W1",
+   "route": [
+    "P1",
+    "B1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W1-BK",
+   "from": {
+    "connector": "P1",
+    "pin": "4"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "1"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "BK",
+   "colors": [
+    "#2f2f2f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W1",
+   "route": [
+    "P1",
+    "B1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W2-RD",
+   "from": {
+    "connector": "P1",
+    "pin": "6"
+   },
+   "to": {
+    "connector": "J2",
+    "pin": "4"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "RD",
+   "colors": [
+    "#c4453f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W2",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J2"
+   ]
+  },
+  {
+   "id": "W2-WH",
+   "from": {
+    "connector": "P1",
+    "pin": "7"
+   },
+   "to": {
+    "connector": "J2",
+    "pin": "6"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "WH",
+   "colors": [
+    "#eeeeea"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W2",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J2"
+   ]
+  },
+  {
+   "id": "W2-GN",
+   "from": {
+    "connector": "P1",
+    "pin": "8"
+   },
+   "to": {
+    "connector": "J2",
+    "pin": "3"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "GN",
+   "colors": [
+    "#4e9a5f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W2",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J2"
+   ]
+  },
+  {
+   "id": "W2-BK",
+   "from": {
+    "connector": "P1",
+    "pin": "9"
+   },
+   "to": {
+    "connector": "J2",
+    "pin": "1"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "BK",
+   "colors": [
+    "#2f2f2f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W2",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J2"
+   ]
+  },
+  {
+   "id": "W3-RD",
+   "from": {
+    "connector": "P1",
+    "pin": "11"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "4"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "RD",
+   "colors": [
+    "#c4453f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W3",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J3"
+   ]
+  },
+  {
+   "id": "W3-WH",
+   "from": {
+    "connector": "P1",
+    "pin": "12"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "6"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "WH",
+   "colors": [
+    "#eeeeea"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W3",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J3"
+   ]
+  },
+  {
+   "id": "W3-GN",
+   "from": {
+    "connector": "P1",
+    "pin": "13"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "3"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "GN",
+   "colors": [
+    "#4e9a5f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W3",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J3"
+   ]
+  },
+  {
+   "id": "W3-BK",
+   "from": {
+    "connector": "P1",
+    "pin": "14"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "1"
+   },
+   "signal": "",
+   "gauge": "22 AWG",
+   "color": "BK",
+   "colors": [
+    "#2f2f2f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W3",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J3"
+   ]
+  }
+ ],
+ "cables": [
+  {
+   "id": "W1",
+   "description": "4-conductor shielded, 22 AWG, grey",
+   "part_number": "EL-WR0099",
+   "conductors": 4,
+   "wires": [
+    "W1-RD",
+    "W1-WH",
+    "W1-GN",
+    "W1-BK"
+   ],
+   "color": "#9a9a96",
+   "run": [
+    "P1",
+    "B1",
+    "J1"
+   ],
+   "breakouts": {
+    "P1": 30,
+    "J1": 30
+   },
+   "cut_length": "240",
+   "jacket_length": "180",
+   "ends": [
+    {
+     "node": "P1",
+     "strip_back": "30",
+     "leads": {
+      "W1-RD": "30",
+      "W1-WH": "30",
+      "W1-GN": "30",
+      "W1-BK": "30"
+     }
+    },
+    {
+     "node": "J1",
+     "strip_back": "30",
+     "leads": {
+      "W1-RD": "30",
+      "W1-WH": "30",
+      "W1-GN": "30",
+      "W1-BK": "30"
+     }
+    }
+   ]
+  },
+  {
+   "id": "W2",
+   "description": "4-conductor shielded, 22 AWG, grey",
+   "part_number": "EL-WR0099",
+   "conductors": 4,
+   "wires": [
+    "W2-RD",
+    "W2-WH",
+    "W2-GN",
+    "W2-BK"
+   ],
+   "color": "#9a9a96",
+   "run": [
+    "P1",
+    "B1",
+    "B2",
+    "J2"
+   ],
+   "breakouts": {
+    "P1": 30,
+    "J2": 30
+   },
+   "cut_length": "430",
+   "jacket_length": "370",
+   "ends": [
+    {
+     "node": "P1",
+     "strip_back": "30",
+     "leads": {
+      "W2-RD": "30",
+      "W2-WH": "30",
+      "W2-GN": "30",
+      "W2-BK": "30"
+     }
+    },
+    {
+     "node": "J2",
+     "strip_back": "30",
+     "leads": {
+      "W2-RD": "30",
+      "W2-WH": "30",
+      "W2-GN": "30",
+      "W2-BK": "30"
+     }
+    }
+   ]
+  },
+  {
+   "id": "W3",
+   "description": "4-conductor shielded, 22 AWG, grey",
+   "part_number": "EL-WR0099",
+   "conductors": 4,
+   "wires": [
+    "W3-RD",
+    "W3-WH",
+    "W3-GN",
+    "W3-BK"
+   ],
+   "color": "#9a9a96",
+   "run": [
+    "P1",
+    "B1",
+    "B2",
+    "J3"
+   ],
+   "breakouts": {
+    "P1": 30,
+    "J3": 30
+   },
+   "cut_length": "615",
+   "jacket_length": "555",
+   "ends": [
+    {
+     "node": "P1",
+     "strip_back": "30",
+     "leads": {
+      "W3-RD": "30",
+      "W3-WH": "30",
+      "W3-GN": "30",
+      "W3-BK": "30"
+     }
+    },
+    {
+     "node": "J3",
+     "strip_back": "30",
+     "leads": {
+      "W3-RD": "30",
+      "W3-WH": "30",
+      "W3-GN": "30",
+      "W3-BK": "30"
+     }
+    }
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "P1",
+   "kind": "connector",
+   "x": 276.8,
+   "y": 445.0
+  },
+  {
+   "id": "B1",
+   "kind": "breakout",
+   "x": 423.2,
+   "y": 445.0
+  },
+  {
+   "id": "J1",
+   "kind": "connector",
+   "x": 745.1,
+   "y": 615.0
+  },
+  {
+   "id": "B2",
+   "kind": "breakout",
+   "x": 843.2,
+   "y": 445.0
+  },
+  {
+   "id": "J2",
+   "kind": "connector",
+   "x": 1057.8,
+   "y": 275.0
+  },
+  {
+   "id": "J3",
+   "kind": "connector",
+   "x": 1263.2,
+   "y": 445.0
+  }
+ ],
+ "segments": [
+  {
+   "nodes": [
+    "P1",
+    "B1"
+   ],
+   "known": true,
+   "length": "75 ±3",
+   "path": "M276.8,445.0 L423.2,445.0",
+   "wires": [
+    "W1-RD",
+    "W1-WH",
+    "W1-GN",
+    "W1-BK",
+    "W2-RD",
+    "W2-WH",
+    "W2-GN",
+    "W2-BK",
+    "W3-RD",
+    "W3-WH",
+    "W3-GN",
+    "W3-BK"
+   ],
+   "points": [
+    [
+     -30,
+     80,
+     40
+    ],
+    [
+     10,
+     20,
+     20
+    ]
+   ]
+  },
+  {
+   "nodes": [
+    "B1",
+    "J1"
+   ],
+   "known": true,
+   "length": "165 ±3",
+   "path": "M423.2,445.0 C499.7,445.0 499.7,615.0 576.2,615.0 L745.1,615.0",
+   "wires": [
+    "W1-RD",
+    "W1-WH",
+    "W1-GN",
+    "W1-BK"
+   ],
+   "points": [
+    [
+     10,
+     20,
+     20
+    ],
+    [
+     10,
+     20,
+     -20
+    ],
+    [
+     15,
+     80,
+     -35
+    ],
+    [
+     30,
+     105,
+     -25
+    ],
+    [
+     40,
+     75,
+     -10
+    ]
+   ]
+  },
+  {
+   "nodes": [
+    "B1",
+    "B2"
+   ],
+   "known": true,
+   "length": "245 ±3",
+   "path": "M423.2,445.0 L843.2,445.0",
+   "wires": [
+    "W2-RD",
+    "W2-WH",
+    "W2-GN",
+    "W2-BK",
+    "W3-RD",
+    "W3-WH",
+    "W3-GN",
+    "W3-BK"
+   ],
+   "points": [
+    [
+     10,
+     20,
+     20
+    ],
+    [
+     255,
+     20,
+     20
+    ]
+   ]
+  },
+  {
+   "nodes": [
+    "B2",
+    "J2"
+   ],
+   "known": true,
+   "length": "110 ±3",
+   "path": "M843.2,445.0 C902.2,445.0 902.2,275.0 961.2,275.0 L1057.8,275.0",
+   "wires": [
+    "W2-RD",
+    "W2-WH",
+    "W2-GN",
+    "W2-BK"
+   ],
+   "points": [
+    [
+     255,
+     20,
+     20
+    ],
+    [
+     255,
+     20,
+     70
+    ],
+    [
+     255,
+     50,
+     120
+    ]
+   ]
+  },
+  {
+   "nodes": [
+    "B2",
+    "J3"
+   ],
+   "known": true,
+   "length": "295 ±3",
+   "path": "M843.2,445.0 L1263.2,445.0",
+   "wires": [
+    "W3-RD",
+    "W3-WH",
+    "W3-GN",
+    "W3-BK"
+   ],
+   "points": [
+    [
+     255,
+     20,
+     20
+    ],
+    [
+     480,
+     20,
+     20
+    ],
+    [
+     470,
+     80,
+     -10
+    ]
+   ]
+  }
+ ]
+}

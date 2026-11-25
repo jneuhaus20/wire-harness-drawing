@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 1131" width="420mm" height="297mm">
+<rect x="0.0" y="0.0" width="1600.0" height="1131.0" fill="white" stroke="none" stroke-width="1" />
+<rect x="20.0" y="20.0" width="1560.0" height="1091.0" fill="none" stroke="#111" stroke-width="0.8" />
+<rect x="32.0" y="32.0" width="1536.0" height="1067.0" fill="none" stroke="#111" stroke-width="2" />
+<line x1="224.0" y1="20.0" x2="224.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="224.0" y1="1099.0" x2="224.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="416.0" y1="20.0" x2="416.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="416.0" y1="1099.0" x2="416.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="608.0" y1="20.0" x2="608.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="608.0" y1="1099.0" x2="608.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="800.0" y1="20.0" x2="800.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="800.0" y1="1099.0" x2="800.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="992.0" y1="20.0" x2="992.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="992.0" y1="1099.0" x2="992.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="1184.0" y1="20.0" x2="1184.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="1184.0" y1="1099.0" x2="1184.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="1376.0" y1="20.0" x2="1376.0" y2="32.0" stroke="#111" stroke-width="1" />
+<line x1="1376.0" y1="1099.0" x2="1376.0" y2="1111.0" stroke="#111" stroke-width="1" />
+<line x1="20.0" y1="209.8" x2="32.0" y2="209.8" stroke="#111" stroke-width="1" />
+<line x1="1568.0" y1="209.8" x2="1580.0" y2="209.8" stroke="#111" stroke-width="1" />
+<line x1="20.0" y1="387.7" x2="32.0" y2="387.7" stroke="#111" stroke-width="1" />
+<line x1="1568.0" y1="387.7" x2="1580.0" y2="387.7" stroke="#111" stroke-width="1" />
+<line x1="20.0" y1="565.5" x2="32.0" y2="565.5" stroke="#111" stroke-width="1" />
+<line x1="1568.0" y1="565.5" x2="1580.0" y2="565.5" stroke="#111" stroke-width="1" />
+<line x1="20.0" y1="743.3" x2="32.0" y2="743.3" stroke="#111" stroke-width="1" />
+<line x1="1568.0" y1="743.3" x2="1580.0" y2="743.3" stroke="#111" stroke-width="1" />
+<line x1="20.0" y1="921.2" x2="32.0" y2="921.2" stroke="#111" stroke-width="1" />
+<line x1="1568.0" y1="921.2" x2="1580.0" y2="921.2" stroke="#111" stroke-width="1" />
+<text x="128.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >8</text>
+<text x="128.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >8</text>
+<text x="320.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >7</text>
+<text x="320.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >7</text>
+<text x="512.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >6</text>
+<text x="512.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >6</text>
+<text x="704.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >5</text>
+<text x="704.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >5</text>
+<text x="896.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >4</text>
+<text x="896.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >4</text>
+<text x="1088.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >3</text>
+<text x="1088.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >3</text>
+<text x="1280.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >2</text>
+<text x="1280.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >2</text>
+<text x="1472.0" y="28.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >1</text>
+<text x="1472.0" y="1107.5" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >1</text>
+<text x="26.0" y="123.9" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >F</text>
+<text x="1574.0" y="123.9" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >F</text>
+<text x="26.0" y="301.8" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >E</text>
+<text x="1574.0" y="301.8" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >E</text>
+<text x="26.0" y="479.6" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >D</text>
+<text x="1574.0" y="479.6" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >D</text>
+<text x="26.0" y="657.4" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >C</text>
+<text x="1574.0" y="657.4" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >C</text>
+<text x="26.0" y="835.2" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >B</text>
+<text x="1574.0" y="835.2" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >B</text>
+<text x="26.0" y="1013.1" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >A</text>
+<text x="1574.0" y="1013.1" font-family="Arial, Helvetica, sans-serif" font-size="8" text-anchor="middle" font-weight="normal" fill="#111" >A</text>
+<rect x="1008.0" y="979.0" width="560.0" height="120.0" fill="white" stroke="#111" stroke-width="1.5" />
+<rect x="1008.0" y="979.0" width="560.0" height="34.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1012.0" y="989.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >TITLE</text>
+<text x="1016.0" y="1006.0" font-family="Arial, Helvetica, sans-serif" font-size="15" text-anchor="start" font-weight="bold" fill="#111" >TWIST AND CABLE</text>
+<rect x="1008.0" y="1013.0" width="300.0" height="30.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1012.0" y="1023.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >DWG NO.</text>
+<text x="1016.0" y="1036.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111" >T-7</text>
+<rect x="1308.0" y="1013.0" width="80.0" height="30.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1312.0" y="1023.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >REV</text>
+<text x="1316.0" y="1036.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111" >A</text>
+<rect x="1388.0" y="1013.0" width="180.0" height="30.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1392.0" y="1023.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >SHEET</text>
+<text x="1396.0" y="1036.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >1 OF 2</text>
+<rect x="1008.0" y="1043.0" width="140.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1012.0" y="1053.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >DRAWN</text>
+<text x="1016.0" y="1064.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" ></text>
+<rect x="1148.0" y="1043.0" width="120.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1152.0" y="1053.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >DATE</text>
+<text x="1156.0" y="1064.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" ></text>
+<rect x="1268.0" y="1043.0" width="120.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1272.0" y="1053.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >CHECKED</text>
+<text x="1276.0" y="1064.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" ></text>
+<rect x="1388.0" y="1043.0" width="180.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1392.0" y="1053.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >SCALE</text>
+<text x="1396.0" y="1064.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >NONE (NTS)</text>
+<rect x="1008.0" y="1071.0" width="260.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1012.0" y="1081.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >UNITS</text>
+<text x="1016.0" y="1092.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >mm</text>
+<rect x="1268.0" y="1071.0" width="300.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
+<text x="1272.0" y="1081.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >THIS SHEET</text>
+<text x="1276.0" y="1092.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >HARNESS DRAWING</text>
+<rect x="1078.0" y="32.0" width="490.0" height="17.0" fill="#e8e8e8" stroke="#111" stroke-width="1" /><text x="1323.0" y="45.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#111" >REVISIONS</text><rect x="1078.0" y="49.0" width="490.0" height="15.0" fill="#f3f3f3" stroke="#111" stroke-width="1" /><rect x="1078.0" y="49.0" width="40.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1098.0" y="60.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="bold" fill="#111" >REV</text><rect x="1118.0" y="49.0" width="300.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1121.0" y="60.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="start" font-weight="bold" fill="#111" >DESCRIPTION</text><rect x="1418.0" y="49.0" width="90.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1463.0" y="60.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="bold" fill="#111" >DATE</text><rect x="1508.0" y="49.0" width="60.0" height="15.0" fill="none" stroke="#111" stroke-width="1" /><text x="1538.0" y="60.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="bold" fill="#111" >BY</text><rect x="1078.0" y="64.0" width="40.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1098.0" y="75.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111" >A</text><rect x="1118.0" y="64.0" width="300.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1121.0" y="75.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="start" font-weight="normal" fill="#111" >Initial release</text><rect x="1418.0" y="64.0" width="90.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1463.0" y="75.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111" ></text><rect x="1508.0" y="64.0" width="60.0" height="15.0" fill="none" stroke="#111" stroke-width="0.6" /><text x="1538.0" y="75.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111" ></text>
+<path d="M560.0,484.0 L980.0,484.0" fill="none" stroke="#333" stroke-width="6.2" stroke-linecap="round"/>
+<path d="M560.0,484.0 L980.0,484.0" fill="none" stroke="#9a9a9a" stroke-width="4.2" stroke-linecap="round"/>
+<line x1="560.0" y1="484.0" x2="560.0" y2="522.0" stroke="#555" stroke-width="0.6" /><line x1="980.0" y1="484.0" x2="980.0" y2="522.0" stroke="#555" stroke-width="0.6" /><line x1="560.0" y1="518.0" x2="980.0" y2="518.0" stroke="#111" stroke-width="0.8" /><polygon points="560.0,518.0 568.5,514.9 568.5,521.1" fill="#111"/><polygon points="980.0,518.0 971.5,521.1 971.5,514.9" fill="#111"/><rect x="744.3" y="511.0" width="51.4" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="770.0" y="522.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >400 ±10</text>
+<path d="M586.0,484.0 C573.0,484.0 573.0,476.5 560.0,476.5" fill="none" stroke="#eeeeea" stroke-width="2"/>
+<path d="M586.0,484.0 C573.0,484.0 573.0,481.5 560.0,481.5" fill="none" stroke="#4e9a5f" stroke-width="2"/>
+<path d="M586.0,484.0 C573.0,484.0 573.0,486.5 560.0,486.5" fill="none" stroke="#c4453f" stroke-width="2"/>
+<path d="M586.0,484.0 C573.0,484.0 573.0,491.5 560.0,491.5" fill="none" stroke="#2f2f2f" stroke-width="2"/>
+<rect x="496.0" y="462.0" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3" class="connector-body rectangular"/>
+<rect x="496.0" y="468.0" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<text x="528.0" y="524.0" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">P1</text>
+<text x="528.0" y="538.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >KK 254</text>
+<line x1="456.0" y1="422.0" x2="515.2" y2="462.0" stroke="#111" stroke-width="0.7" /><polygon points="515.2,462.0 506.5,459.8 509.9,454.7" fill="#111"/><circle cx="456.0" cy="422.0" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="456.0" y="426.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >1</text>
+<path d="M954.0,484.0 C967.0,484.0 967.0,476.5 980.0,476.5" fill="none" stroke="#eeeeea" stroke-width="2"/>
+<path d="M954.0,484.0 C967.0,484.0 967.0,481.5 980.0,481.5" fill="none" stroke="#4e9a5f" stroke-width="2"/>
+<path d="M954.0,484.0 C967.0,484.0 967.0,486.5 980.0,486.5" fill="none" stroke="#c4453f" stroke-width="2"/>
+<path d="M954.0,484.0 C967.0,484.0 967.0,491.5 980.0,491.5" fill="none" stroke="#2f2f2f" stroke-width="2"/>
+<rect x="980.0" y="462.0" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3" class="connector-body rectangular"/>
+<rect x="1038.0" y="468.0" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<text x="1012.0" y="524.0" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">J1</text>
+<text x="1012.0" y="538.0" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >KK 254</text>
+<line x1="1084.0" y1="422.0" x2="1024.8" y2="462.0" stroke="#111" stroke-width="0.7" /><polygon points="1024.8,462.0 1030.1,454.7 1033.5,459.8" fill="#111"/><circle cx="1084.0" cy="422.0" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1084.0" y="426.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >2</text>
+<line x1="560.0" y1="878.0" x2="980.0" y2="878.0" stroke="#111" stroke-width="0.8" /><polygon points="560.0,878.0 568.5,874.9 568.5,881.1" fill="#111"/><polygon points="980.0,878.0 971.5,881.1 971.5,874.9" fill="#111"/><rect x="716.4" y="871.0" width="107.2" height="14.0" fill="white" stroke="none" stroke-width="1" /><text x="770.0" y="882.0" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >400 REF  (P1–J1)</text>
+<line x1="980.0" y1="544.0" x2="980.0" y2="882.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
+<line x1="560.0" y1="544.0" x2="560.0" y2="882.0" stroke="#777" stroke-width="0.5" stroke-dasharray="4 3"/>
+<text x="42.0" y="974.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111" text-decoration="underline">NOTES:</text>
+<text x="42.0" y="994.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">1.  FABRICATE, INSPECT AND TEST PER IPC/WHMA-A-620, CLASS 2.</text>
+<text x="42.0" y="1009.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">2.  ALL DIMENSIONS IN MM. LENGTHS ARE MEASURED FROM CONNECTOR REAR FACE TO BREAKOUT CENTRE OR TO THE NEXT CONNECTOR REAR FACE.</text>
+<text x="42.0" y="1024.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">3.  LENGTH TOLERANCES UNLESS OTHERWISE SPECIFIED: ≤300: ±5, ≤1000: ±10, over: ±1%. SEGMENT DIMENSIONS GOVERN; OVERALL DIMENSIONS ARE REFERENCE.</text>
+<text x="42.0" y="1039.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">4.  DRAWING NOT TO SCALE. WIRE CUT LENGTHS PER WIRE LIST; CONNECTIONS PER CONNECTOR TABLES AND WIRING DIAGRAM.</text>
+<text x="42.0" y="1054.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">5.  TWIST INDICATED WIRES PER IPC/WHMA-A-620.</text>
+<text x="42.0" y="1069.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">6.  TWISTED WIRE CUT LENGTHS INCLUDE 3% TAKE-UP OVER THE TWISTED RUN.</text>
+<text x="42.0" y="1084.0" font-family="Arial, Helvetica, sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#111" xml:space="preserve">7.  CONTINUITY-TEST 100% AGAINST THE WIRE LIST; NO SHORTS BETWEEN NETS.</text>
+</svg>

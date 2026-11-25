@@ -212,10 +212,39 @@ def pin_label(connector: dict, pin: str) -> str:
 display_colors = {
     "BK": "#2f2f2f", "BN": "#8a5a3b", "RD": "#c4453f", "OG": "#dd8a3c", "YE": "#e2c54b",
     "GN": "#4e9a5f", "BU": "#4c7cc4", "VT": "#8667b8", "GY": "#9a9a96", "WH": "#eeeeea",
-    "PK": "#e2a0b6", "TQ": "#4fb0ab", "SR": "#c3c3c0", "GD": "#c9a54a", "OR": "#dd8a3c",
-    "BL": "#4c7cc4", "VI": "#8667b8", "BR": "#8a5a3b", "GR": "#9a9a96",
+    "PK": "#e2a0b6", "TQ": "#4fb0ab", "SR": "#c3c3c0", "GD": "#c9a54a",
 }
 unknown_color = "#888888"
+
+
+# The other ways people write each colour: three-letter abbreviations, English names, and the
+# older two-letter forms. Each reads as its IEC code.
+color_aliases = {
+    "BK": ["BLK", "BLACK"], "BN": ["BRN", "BROWN", "BR"], "RD": ["RED"], "OG": ["ORN", "ORG", "ORANGE", "OR"],
+    "YE": ["YEL", "YLW", "YELLOW"], "GN": ["GRN", "GREEN"], "BU": ["BLU", "BLUE", "BL"],
+    "VT": ["VIO", "VLT", "VIOLET", "PUR", "PRP", "PURPLE", "VI"], "GY": ["GRY", "GRA", "GREY", "GRAY", "GR"],
+    "WH": ["WHT", "WHI", "WHITE"], "PK": ["PNK", "PINK"], "TQ": ["TRQ", "TUR", "TURQUOISE"],
+    "SR": ["SLV", "SILVER"], "GD": ["GLD", "GOLD"],
+}
+iec_codes = {"BK", "BN", "RD", "OG", "YE", "GN", "BU", "VT", "GY", "WH", "PK", "TQ", "SR", "GD"}
+code_for_word = {alias: code for code, aliases in color_aliases.items() for alias in aliases} | {code: code for code in iec_codes}
+# Words that join a base colour to its stripe: "white with blue stripe".
+color_joining_words = {"WITH", "AND", "STRIPE", "STRIPED", "TRACER"}
+
+
+# Base colour first, then any stripes: each word is a code, an alias, or IEC codes run together (GNYE).
+def iec_color_code(written: str) -> str | None:
+    """A colour as written, as its IEC 60757 code ('WHT/BLU' -> 'WHBU'); None if a part is not a colour."""
+    words = [word for word in re.split(r"[^A-Z]+", str(written).upper()) if word and word not in color_joining_words]
+    codes = []
+    for word in words:
+        if word in code_for_word:
+            codes.append(code_for_word[word])
+        elif len(word) % 2 == 0 and all(word[i:i + 2] in iec_codes for i in range(0, len(word), 2)):
+            codes.extend(word[i:i + 2] for i in range(0, len(word), 2))
+        else:
+            return None
+    return "".join(codes) or None
 
 
 def color_parts(code: str | None) -> list[str]:

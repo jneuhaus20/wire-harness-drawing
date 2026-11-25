@@ -29,5 +29,5 @@ jobs:
         with:
           python-version: "3.10"
       - run: pip install pyyaml
-      - run: python skills/wire-harness-drawing/scripts/harnessgen.py example/example.yaml -o out --no-wireviz
-      - run: diff out/example.bom.csv example/example.bom.csv && diff out/example.wirelist.csv example/example.wirelist.csv
+      - run: python skills/wire-harness-drawing/scripts/harnessgen.py examples/sensor-branch/sensor-branch.yaml -o out --no-wireviz
+      - run: diff out/sensor-branch.bom.csv examples/sensor-branch/sensor-branch.bom.csv && diff out/sensor-branch.wirelist.csv examples/sensor-branch/sensor-branch.wirelist.csv

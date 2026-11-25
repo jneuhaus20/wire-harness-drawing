@@ -1,0 +1,395 @@
+{
+ "format": "wire-harness-explorer/1",
+ "title": "SPLIT CABLE",
+ "number": "T-10",
+ "rev": "A",
+ "units": "mm",
+ "geometry": "schematic",
+ "root": "P1",
+ "connectors": [
+  {
+   "id": "P1",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "A-1",
+   "manufacturer": "",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": "PWR"
+    },
+    {
+     "pin": "2",
+     "label": "A+"
+    },
+    {
+     "pin": "3",
+     "label": "A-"
+    },
+    {
+     "pin": "4",
+     "label": "B+"
+    },
+    {
+     "pin": "5",
+     "label": "B-"
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "J1",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "A-2",
+   "manufacturer": "",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": "PWR"
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "J2",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "A-3",
+   "manufacturer": "",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": "A+"
+    },
+    {
+     "pin": "2",
+     "label": "A-"
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "J3",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "A-4",
+   "manufacturer": "",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": "B+"
+    },
+    {
+     "pin": "2",
+     "label": "B-"
+    }
+   ],
+   "face": null
+  }
+ ],
+ "wires": [
+  {
+   "id": "W1",
+   "from": {
+    "connector": "P1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "1"
+   },
+   "signal": "PWR",
+   "gauge": "22 AWG",
+   "color": "RD",
+   "colors": [
+    "#c4453f"
+   ],
+   "cut_length": "500",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W5-RD",
+   "from": {
+    "connector": "P1",
+    "pin": "2"
+   },
+   "to": {
+    "connector": "J2",
+    "pin": "1"
+   },
+   "signal": "A+",
+   "gauge": "24 AWG",
+   "color": "RD",
+   "colors": [
+    "#c4453f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W5",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J2"
+   ]
+  },
+  {
+   "id": "W5-BK",
+   "from": {
+    "connector": "P1",
+    "pin": "3"
+   },
+   "to": {
+    "connector": "J2",
+    "pin": "2"
+   },
+   "signal": "A-",
+   "gauge": "24 AWG",
+   "color": "BK",
+   "colors": [
+    "#2f2f2f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W5",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J2"
+   ]
+  },
+  {
+   "id": "W5-WH",
+   "from": {
+    "connector": "P1",
+    "pin": "4"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "1"
+   },
+   "signal": "B+",
+   "gauge": "24 AWG",
+   "color": "WH",
+   "colors": [
+    "#eeeeea"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W5",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J3"
+   ]
+  },
+  {
+   "id": "W5-GN",
+   "from": {
+    "connector": "P1",
+    "pin": "5"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "2"
+   },
+   "signal": "B-",
+   "gauge": "24 AWG",
+   "color": "GN",
+   "colors": [
+    "#4e9a5f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W5",
+   "route": [
+    "P1",
+    "B1",
+    "B2",
+    "J3"
+   ]
+  }
+ ],
+ "cables": [
+  {
+   "id": "W5",
+   "description": "4-conductor shielded, 24 AWG",
+   "part_number": "C-4",
+   "conductors": 4,
+   "wires": [
+    "W5-RD",
+    "W5-BK",
+    "W5-WH",
+    "W5-GN"
+   ],
+   "color": "#2f2f2f",
+   "run": [
+    "P1",
+    "B1",
+    "B2"
+   ],
+   "breakouts": {
+    "P1": 40,
+    "B2": 0
+   },
+   "cut_length": "650",
+   "jacket_length": "360",
+   "ends": [
+    {
+     "node": "P1",
+     "strip_back": "40",
+     "leads": {
+      "W5-RD": "40",
+      "W5-BK": "40",
+      "W5-WH": "40",
+      "W5-GN": "40"
+     }
+    },
+    {
+     "node": "B2",
+     "strip_back": "250",
+     "leads": {
+      "W5-RD": "150",
+      "W5-BK": "150",
+      "W5-WH": "250",
+      "W5-GN": "250"
+     }
+    }
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "P1",
+   "kind": "connector",
+   "x": 257.7,
+   "y": 474.5
+  },
+  {
+   "id": "B1",
+   "kind": "breakout",
+   "x": 677.7,
+   "y": 474.5
+  },
+  {
+   "id": "J1",
+   "kind": "connector",
+   "x": 1046.9,
+   "y": 644.5
+  },
+  {
+   "id": "B2",
+   "kind": "breakout",
+   "x": 862.3,
+   "y": 474.5
+  },
+  {
+   "id": "J2",
+   "kind": "connector",
+   "x": 1139.2,
+   "y": 304.5
+  },
+  {
+   "id": "J3",
+   "kind": "connector",
+   "x": 1282.3,
+   "y": 474.5
+  }
+ ],
+ "segments": [
+  {
+   "nodes": [
+    "P1",
+    "B1"
+   ],
+   "known": true,
+   "length": "300 ±5",
+   "path": "M257.7,474.5 L677.7,474.5",
+   "wires": [
+    "W1",
+    "W5-RD",
+    "W5-BK",
+    "W5-WH",
+    "W5-GN"
+   ]
+  },
+  {
+   "nodes": [
+    "B1",
+    "J1"
+   ],
+   "known": true,
+   "length": "200 ±5",
+   "path": "M677.7,474.5 C754.2,474.5 754.2,644.5 830.7,644.5 L1046.9,644.5",
+   "wires": [
+    "W1"
+   ]
+  },
+  {
+   "nodes": [
+    "B1",
+    "B2"
+   ],
+   "known": true,
+   "length": "100 ±5",
+   "path": "M677.7,474.5 L862.3,474.5",
+   "wires": [
+    "W5-RD",
+    "W5-BK",
+    "W5-WH",
+    "W5-GN"
+   ]
+  },
+  {
+   "nodes": [
+    "B2",
+    "J2"
+   ],
+   "known": true,
+   "length": "150 ±5",
+   "path": "M862.3,474.5 C938.5,474.5 938.5,304.5 1014.6,304.5 L1139.2,304.5",
+   "wires": [
+    "W5-RD",
+    "W5-BK"
+   ]
+  },
+  {
+   "nodes": [
+    "B2",
+    "J3"
+   ],
+   "known": true,
+   "length": "250 ±5",
+   "path": "M862.3,474.5 L1282.3,474.5",
+   "wires": [
+    "W5-WH",
+    "W5-GN"
+   ]
+  }
+ ]
+}

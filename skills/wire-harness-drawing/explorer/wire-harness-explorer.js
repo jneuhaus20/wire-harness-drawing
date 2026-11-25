@@ -809,6 +809,32 @@ svg.plan .bundle.lit path:nth-child(2) { stroke: var(--select); }
 .popover tbody tr[data-pick]:hover td { background: color-mix(in srgb, var(--select) 18%, transparent); }
 `;
 
+// ---------- Framing ----------
+
+const fieldOfView = (35 * Math.PI) / 180;
+
+// The camera's right, up and toward-the-camera directions for a yaw and pitch about the target.
+function viewBasis(yaw, pitch) {
+  const toward = [Math.cos(pitch) * Math.sin(yaw), Math.sin(pitch), Math.cos(pitch) * Math.cos(yaw)];
+  const right = normalize(cross([0, 1, 0], toward));
+  return [right, cross(toward, right), toward];
+}
+
+// How far from the centre of a bounding box the camera must stand, at a yaw and pitch, for
+// every corner of the box to be in a view of the given aspect, with a small margin.
+function fitDistance(bounds, yaw, pitch, aspect) {
+  const [right, up, toward] = viewBasis(yaw, pitch);
+  const centre = bounds.map(([low, high]) => (low + high) / 2);
+  const tangent = Math.tan(fieldOfView / 2);
+  let distance = 0;
+  for (let k = 0; k < 8; k++) {
+    const offset = bounds.map(([low, high], axis) => ((k >> axis) & 1 ? high : low) - centre[axis]);
+    const across = Math.max(Math.abs(dot(offset, right)) / aspect, Math.abs(dot(offset, up))) / tangent;
+    distance = Math.max(distance, dot(offset, toward) + across * 1.08);
+  }
+  return distance;
+}
+
 // ---------- The element ----------
 
 // Outside a browser (in tests) there is no HTMLElement; the element class still loads so the
@@ -957,9 +983,10 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     const bounds = this._scene.bounds;
     const minimum = bounds.map(([low]) => low), maximum = bounds.map(([, high]) => high);
     this._camera.target = scale(add(minimum, maximum), 0.5);
-    this._camera.distance = Math.max(length(subtract(maximum, minimum)), this._scene.sizes.bodyLength * 3) * 0.95;
     this._camera.yaw = -0.35;
     this._camera.pitch = 0.9;
+    const aspect = this._stage.clientWidth / Math.max(this._stage.clientHeight, 1) || 1.5;
+    this._camera.distance = Math.max(fitDistance(bounds, this._camera.yaw, this._camera.pitch, aspect), this._scene.sizes.bodyLength * 3);
   }
 
   _matrices() {
@@ -970,7 +997,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
       camera.distance * Math.sin(camera.pitch),
       camera.distance * Math.cos(camera.pitch) * Math.cos(camera.yaw),
     ]);
-    const projection = perspective((35 * Math.PI) / 180, width / Math.max(height, 1), camera.distance / 50, camera.distance * 6);
+    const projection = perspective(fieldOfView, width / Math.max(height, 1), camera.distance / 50, camera.distance * 6);
     return { eye, viewProjection: multiply(projection, lookAt(eye, camera.target, [0, 1, 0])), width, height };
   }
 
@@ -1129,7 +1156,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
       return `<tr data-pick="${escapeHtml(w.id)}"><td>${escapeHtml(w.id)}</td><td>${swatch(w)}</td><td>${escapeHtml(w.gauge)}</td>
         <td>${escapeHtml(other.connector)}:${escapeHtml(other.pin)}</td></tr>`;
     }).join("");
-    const heading = [connector.id, circuits.join(" / ") || "circuit not named", connector.part_number || "splice"].map(escapeHtml).join(" · ");
+    const heading = [connector.id, circuits.join(" / ") || "signal not named", connector.part_number || "splice"].map(escapeHtml).join(" · ");
     this._place(this._picking(this._popover("", `<h3>${heading}</h3>
       <table><thead><tr><th>Wire</th><th>Colour</th><th>Gauge</th><th>To</th></tr></thead><tbody>${rows}</tbody></table>`)), [x - 6, y - 6, x + 6, y + 6]);
   }
@@ -1157,7 +1184,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
       <td>${escapeHtml(w.signal)}</td><td>${escapeHtml(w.from.connector)}:${escapeHtml(w.from.pin)} → ${escapeHtml(w.to.connector)}:${escapeHtml(w.to.pin)}</td></tr>`).join("");
     this._place(this._picking(this._popover("", `<h3>${heading}</h3>${summary}
       <table><thead><tr><th>End</th><th>Strip</th><th>To</th><th>Conductors</th><th>Lead</th></tr></thead><tbody>${endRows}</tbody></table>
-      <table><thead><tr><th>Conductor</th><th>Colour</th><th>Circuit</th><th>From → to</th></tr></thead><tbody>${conductorRows}</tbody></table>`)),
+      <table><thead><tr><th>Conductor</th><th>Colour</th><th>Signal</th><th>From → to</th></tr></thead><tbody>${conductorRows}</tbody></table>`)),
       [x - 6, y - 6, x + 6, y + 6]);
   }
 
@@ -1168,7 +1195,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
       `<tr data-pick="${escapeHtml(w.id)}"><td>${escapeHtml(w.id)}</td><td>${swatch(w)}</td><td>${escapeHtml(w.signal)}</td>
         <td>${escapeHtml(w.from.connector)}:${escapeHtml(w.from.pin)} → ${escapeHtml(w.to.connector)}:${escapeHtml(w.to.pin)}</td></tr>`).join("");
     this._place(this._picking(this._popover("", `<h3>${escapeHtml(segment.nodes.join("–"))} · ${escapeHtml(segment.length)} · ${segment.wires.length} wires</h3>
-      <table><thead><tr><th>Wire</th><th>Colour</th><th>Circuit</th><th>From → to</th></tr></thead><tbody>${rows}</tbody></table>`)), [x - 6, y - 6, x + 6, y + 6]);
+      <table><thead><tr><th>Wire</th><th>Colour</th><th>Signal</th><th>From → to</th></tr></thead><tbody>${rows}</tbody></table>`)), [x - 6, y - 6, x + 6, y + 6]);
   }
 
   _picking(popover) {
@@ -1234,7 +1261,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     const heading = [connector.id, connector.label, connector.generic ? `generic ${connector.pins.length}-pin` : connector.part_number]
       .filter(Boolean).map(escapeHtml).join(" · ");
     this._place(this._popover("", `<h3>${heading}</h3>${pinoutSvg(connector, this._model, null)}
-      <table><thead><tr><th>Pin</th><th>Circuit</th><th>Wire</th><th>Colour</th><th>To</th></tr></thead><tbody>${rows}</tbody></table>`),
+      <table><thead><tr><th>Pin</th><th>Signal</th><th>Wire</th><th>Colour</th><th>To</th></tr></thead><tbody>${rows}</tbody></table>`),
       this._bodyBox((this.view === "2d" ? this._plan : this._scene).bodies.find((b) => b.connector.id === id)));
   }
 
@@ -1339,4 +1366,4 @@ if (globalThis.customElements && !customElements.get("wire-harness-explorer")) {
   customElements.define("wire-harness-explorer", WireHarnessExplorer);
 }
 
-export { WireHarnessExplorer, version, samplePath, buildScene, buildPlan, planSvg, pinoutSvg, boxMesh };
+export { WireHarnessExplorer, version, samplePath, buildScene, buildPlan, planSvg, pinoutSvg, boxMesh, fitDistance, viewBasis, fieldOfView };

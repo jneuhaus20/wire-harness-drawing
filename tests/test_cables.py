@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tests.generator import run_generator_on_text
+from tests.generator import run_generator_on_text, example_text
 from tests.test_output_integrity import GeneratedPackage, svg_texts
 
 from harness.explorer_model import harness_model  # noqa: E402  (tests.generator puts scripts/ on the path)
@@ -12,30 +12,7 @@ from harness.package import analyse
 from harness.source import load_source
 
 # W5 runs from P1 through B1 to B2, where it splits: two conductors to J2 (150 on), two to J3 (250 on).
-split_cable_harness = """
-drawing: {title: SPLIT CABLE, number: T-10, rev: A}
-connectors:
-  P1: {type: KK 254, pn: A-1, pincount: 5, pinlabels: [PWR, A+, A-, B+, B-]}
-  J1: {type: KK 254, pn: A-2, pincount: 1, pinlabels: [PWR]}
-  J2: {type: KK 254, pn: A-3, pincount: 2, pinlabels: [A+, A-]}
-  J3: {type: KK 254, pn: A-4, pincount: 2, pinlabels: [B+, B-]}
-cables:
-  W5:
-    desc: 4-conductor shielded, 24 AWG
-    pn: C-4
-    gauge: 24 AWG
-    color: BK
-    conductors:
-      - {color: RD, from: "P1:2", to: "J2:1", signal: A+}
-      - {color: BK, from: "P1:3", to: "J2:2", signal: A-}
-      - {color: WH, from: "P1:4", to: "J3:1", signal: B+}
-      - {color: GN, from: "P1:5", to: "J3:2", signal: B-}
-wires:
-  - {id: W1, from: "P1:1", to: "J1:1", signal: PWR, gauge: 22 AWG, color: RD}
-layout:
-  root: P1
-  segments: [[P1, B1, 300], [B1, J1, 200], [B1, B2, 100], [B2, J2, 150], [B2, J3, 250]]
-"""
+split_cable_harness = example_text("split-cable")
 
 
 class CableCutTest(unittest.TestCase):

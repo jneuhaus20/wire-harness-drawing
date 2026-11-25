@@ -1,0 +1,127 @@
+# The Y-Z motor harness of the LulzBot TAZ 6 3D printer: one 16-way plug at the control box,
+# three shielded 4-conductor cables to the left Z, Y and right Z stepper motors.
+#
+# Parts, pinout, cable lengths and strip lengths are from LulzBot drawing EL-HR0091 rev A,
+# "TAZ6 Y-Z Harness", (c) 2016 Aleph Objects, Inc., CC BY-SA 4.0:
+#   https://download.lulzbot.com/TAZ/6.0/production_parts/electronics/Wire_Harnesses/External_Cable_Harnesses/
+# The route follows LulzBot's assembly instructions (11_FinalMechanicalAssy_OHAI-T6): along the
+# lower frame cross member under the Y table to the Z motors at the foot of each upright, and to
+# the Y motor. Node positions are estimated from those photos and the frame's 20 x 510 mm
+# extrusions, to about 20 mm: x right along the cross member, y toward the back, z up.
+# This file and the package generated from it are licensed CC BY-SA 4.0 (see LICENSE here).
+drawing:
+  title: TAZ 6 Y-Z HARNESS
+  number: EX-0002
+  rev: A
+  units: mm
+  drawn_by: CLAUDE
+  date: 2026-11-25
+  round_to: 5
+  tolerance: [{upto: null, tol: 3}]
+  notes:
+    - "DERIVED FROM LULZBOT DRAWING EL-HR0091 REV A (ALEPH OBJECTS, INC., CC BY-SA 4.0)."
+    - "BARE SHIELD WIRE OF EACH CABLE TO P1 PINS 5, 10 AND 15; TRIM THE SHIELD AT THE MOTOR END."
+    - "BRAIDED SLEEVING OVER EACH CABLE, ENDING 10 MM SHORT OF EACH JACKET END."
+
+connectors:
+  P1:
+    label: TO CONTROL BOX
+    type: Molex SL
+    subtype: 16-way housing, single row
+    pn: 70107-0015
+    manufacturer: Molex
+    pincount: 16
+    gender: male
+    contact: {pn: 16-02-0107, desc: "SL crimp pin, male, 22-24 AWG", manufacturer: Molex}
+    strip: 4
+  J1:
+    label: Z LEFT MOTOR
+    type: JST PH
+    subtype: 6-way housing
+    pn: PHR-6
+    manufacturer: JST
+    pincount: 6
+    gender: female
+    contact: {pn: SPH-002T-P0.5S, desc: "PH crimp socket, 24-30 AWG", manufacturer: JST}
+    awg: [24, 30]          # JST PH catalogue: SPH-002T-P0.5S takes 30-24 AWG, insulation 0.9-1.5 mm
+    strip: 2.5
+  J2:
+    label: Y MOTOR
+    type: JST PH
+    subtype: 6-way housing
+    pn: PHR-6
+    manufacturer: JST
+    pincount: 6
+    gender: female
+    contact: {pn: SPH-002T-P0.5S, desc: "PH crimp socket, 24-30 AWG", manufacturer: JST}
+    awg: [24, 30]          # JST PH catalogue: SPH-002T-P0.5S takes 30-24 AWG, insulation 0.9-1.5 mm
+    strip: 2.5
+  J3:
+    label: Z RIGHT MOTOR
+    type: JST PH
+    subtype: 6-way housing
+    pn: PHR-6
+    manufacturer: JST
+    pincount: 6
+    gender: female
+    contact: {pn: SPH-002T-P0.5S, desc: "PH crimp socket, 24-30 AWG", manufacturer: JST}
+    awg: [24, 30]          # JST PH catalogue: SPH-002T-P0.5S takes 30-24 AWG, insulation 0.9-1.5 mm
+    strip: 2.5
+
+cables:
+  W1:
+    desc: 4-conductor shielded, 22 AWG, grey
+    pn: EL-WR0099
+    gauge: 22 AWG
+    color: GY
+    shield: true
+    breakout: 30
+    conductors:
+      - {color: RD, from: "P1:1", to: "J1:4"}
+      - {color: WH, from: "P1:2", to: "J1:6"}
+      - {color: GN, from: "P1:3", to: "J1:3"}
+      - {color: BK, from: "P1:4", to: "J1:1"}
+  W2:
+    desc: 4-conductor shielded, 22 AWG, grey
+    pn: EL-WR0099
+    gauge: 22 AWG
+    color: GY
+    shield: true
+    breakout: 30
+    conductors:
+      - {color: RD, from: "P1:6", to: "J2:4"}
+      - {color: WH, from: "P1:7", to: "J2:6"}
+      - {color: GN, from: "P1:8", to: "J2:3"}
+      - {color: BK, from: "P1:9", to: "J2:1"}
+  W3:
+    desc: 4-conductor shielded, 22 AWG, grey
+    pn: EL-WR0099
+    gauge: 22 AWG
+    color: GY
+    shield: true
+    breakout: 30
+    conductors:
+      - {color: RD, from: "P1:11", to: "J3:4"}
+      - {color: WH, from: "P1:12", to: "J3:6"}
+      - {color: GN, from: "P1:13", to: "J3:3"}
+      - {color: BK, from: "P1:14", to: "J3:1"}
+
+items:
+  - {id: SLV1, desc: "Braided sleeving, 1/4 in, black, 220 mm on W1, 410 mm on W2, 595 mm on W3", pn: EL-MS0073,
+     manufacturer: Panduit, qty: 1.225, unit: m, refs: [W1, W2, W3]}
+
+layout:
+  root: P1
+  nodes:
+    P1: [-30, 40, 80]
+    B1: [10, 20, 20]
+    B2: [255, 20, 20]
+    J1: [40, -10, 75]
+    J2: [255, 120, 50]
+    J3: [470, -10, 80]
+  segments:
+    - [P1, B1, 75]
+    - [B1, J1, 165, {via: [[10, -20, 20], [15, -35, 80], [30, -25, 105]]}]   # a loop up the upright for bend radius
+    - [B1, B2, 245]
+    - [B2, J2, 110, {via: [[255, 70, 20]]}]
+    - [B2, J3, 295, {via: [[480, 20, 20]]}]

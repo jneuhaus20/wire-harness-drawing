@@ -6,8 +6,15 @@ from pathlib import Path
 repository = Path(__file__).resolve().parent.parent
 skill_directory = repository / "skills" / "wire-harness-drawing"
 generator_script = skill_directory / "scripts" / "harnessgen.py"
-example_directory = repository / "example"
-example_source = example_directory / "example.yaml"
+examples_directory = repository / "examples"
+example_names = sorted(path.name for path in examples_directory.iterdir() if (path / f"{path.name}.yaml").exists())
+example_directory = examples_directory / "sensor-branch"
+example_source = example_directory / "sensor-branch.yaml"
+
+
+def example_text(name: str) -> str:
+    """The source of one of the examples in examples/, which the site shows and the tests use."""
+    return (examples_directory / name / f"{name}.yaml").read_text()
 
 # The tests reach the generator's modules the way scripts/harnessgen.py does.
 sys.path.insert(0, str(skill_directory / "scripts"))

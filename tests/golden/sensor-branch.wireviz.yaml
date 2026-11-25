@@ -111,7 +111,7 @@ connectors:
     type: Splice
     show_name: true
 cables:
-  B1:
+  P1-SP1:
     category: bundle
     show_name: false
     wirelabels:
@@ -120,7 +120,7 @@ cables:
     - BK
     gauge: 20 AWG
     length: 0.36
-  B2:
+  SP1-J1:
     category: bundle
     show_name: false
     wirelabels:
@@ -129,7 +129,7 @@ cables:
     - BK
     gauge: 24 AWG
     length: 0.49
-  B3:
+  SP1-J2:
     category: bundle
     show_name: false
     wirelabels:
@@ -138,7 +138,7 @@ cables:
     - BK
     gauge: 24 AWG
     length: 0.54
-  B4:
+  SP1-J3:
     category: bundle
     show_name: false
     wirelabels:
@@ -147,7 +147,7 @@ cables:
     - BK
     gauge: 24 AWG
     length: 0.77
-  B5:
+  P1-SP2:
     category: bundle
     show_name: false
     wirelabels:
@@ -156,7 +156,7 @@ cables:
     - RD
     gauge: 20 AWG
     length: 0.38
-  B6:
+  SP2-J1:
     category: bundle
     show_name: false
     wirelabels:
@@ -165,7 +165,7 @@ cables:
     - RD
     gauge: 24 AWG
     length: 0.47
-  B7:
+  SP2-J2:
     category: bundle
     show_name: false
     wirelabels:
@@ -174,7 +174,7 @@ cables:
     - RD
     gauge: 24 AWG
     length: 0.52
-  B8:
+  P1-SP3:
     category: bundle
     show_name: false
     wirelabels:
@@ -183,7 +183,7 @@ cables:
     - YE
     gauge: 20 AWG
     length: 0.4
-  B9:
+  P1-SP4:
     category: bundle
     show_name: false
     wirelabels:
@@ -192,7 +192,7 @@ cables:
     - GN
     gauge: 20 AWG
     length: 0.42
-  B10:
+  P1-J3:
     category: bundle
     show_name: false
     wirelabels:
@@ -205,7 +205,7 @@ cables:
     - VT
     gauge: 24 AWG
     length: 1.11
-  B11:
+  P1-E1:
     category: bundle
     show_name: false
     wirelabels:
@@ -214,7 +214,7 @@ cables:
     - GNYE
     gauge: 22 AWG
     length: 0.47
-  B12:
+  SP3-J1:
     category: bundle
     show_name: false
     wirelabels:
@@ -223,7 +223,7 @@ cables:
     - YE
     gauge: 24 AWG
     length: 0.45
-  B13:
+  SP3-J2:
     category: bundle
     show_name: false
     wirelabels:
@@ -232,7 +232,7 @@ cables:
     - YE
     gauge: 24 AWG
     length: 0.5
-  B14:
+  SP4-J1:
     category: bundle
     show_name: false
     wirelabels:
@@ -241,7 +241,7 @@ cables:
     - GN
     gauge: 24 AWG
     length: 0.43
-  B15:
+  SP4-J2:
     category: bundle
     show_name: false
     wirelabels:
@@ -250,7 +250,7 @@ cables:
     - GN
     gauge: 24 AWG
     length: 0.48
-  B16:
+  SP2-J3:
     category: bundle
     show_name: false
     wirelabels:
@@ -262,54 +262,54 @@ cables:
 connections:
 - - P1:
     - 1
-  - B1:
+  - P1-SP1:
     - 1
   - SP1
 - - SP1
-  - B2:
+  - SP1-J1:
     - 1
   - J1:
     - 1
 - - SP1
-  - B3:
+  - SP1-J2:
     - 1
   - J2:
     - 1
 - - SP1
-  - B4:
+  - SP1-J3:
     - 1
   - J3:
     - 1
 - - P1:
     - 2
-  - B5:
+  - P1-SP2:
     - 1
   - SP2
 - - SP2
-  - B6:
+  - SP2-J1:
     - 1
   - J1:
     - 2
 - - SP2
-  - B7:
+  - SP2-J2:
     - 1
   - J2:
     - 2
 - - P1:
     - 3
-  - B8:
+  - P1-SP3:
     - 1
   - SP3
 - - P1:
     - 4
-  - B9:
+  - P1-SP4:
     - 1
   - SP4
 - - P1:
     - 5
     - 6
     - 7
-  - B10:
+  - P1-J3:
     - 1
     - 2
     - 3
@@ -319,32 +319,32 @@ connections:
     - 5
 - - P1:
     - 8
-  - B11:
+  - P1-E1:
     - 1
   - E1:
     - 1
 - - SP3
-  - B12:
+  - SP3-J1:
     - 1
   - J1:
     - 3
 - - SP3
-  - B13:
+  - SP3-J2:
     - 1
   - J2:
     - 3
 - - SP4
-  - B14:
+  - SP4-J1:
     - 1
   - J1:
     - 4
 - - SP4
-  - B15:
+  - SP4-J2:
     - 1
   - J2:
     - 4
 - - SP2
-  - B16:
+  - SP2-J3:
     - 1
   - J3:
     - 2

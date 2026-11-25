@@ -1,0 +1,2 @@
+cable,pn,description,cut_length,jacket_length,end_a,strip_a,end_b,strip_b,run
+C1,C-2,2-conductor shielded,400,320,P1,40,J1,40,P1 > J1

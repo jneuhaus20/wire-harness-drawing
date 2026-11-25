@@ -2,7 +2,7 @@
 import re
 
 from harness.source import (Findings, HarnessSource, connector_genders, connector_shapes, face_layouts, face_views,
-                            format_length, is_number, pins_of, unit_conventions)
+                            format_length, iec_color_code, is_number, pins_of, unit_conventions)
 
 
 # Reject each value the rest of the generator cannot compute with, and remove it from the
@@ -12,6 +12,7 @@ def validate_source(source: HarnessSource, findings: Findings) -> None:
     """Report and remove values in the source that are the wrong kind of thing."""
     validate_drawing(source["drawing"], findings)
     validate_connectors(source["connectors"], findings)
+    read_colors(source, findings)
     expand_cables(source, findings)
     validate_wires(source, findings)
     validate_layout(source["layout"], findings)
@@ -117,6 +118,27 @@ def face_problems(designator: str, connector: dict) -> list[str]:
         if unplaced:
             problems.append(f"{designator}: face cavities do not place pins {', '.join(unplaced)}")
     return problems
+
+
+# A colour is read however it is written (BLK, black, WHT/BLU) and kept as its IEC code, so a
+# conductor named by colour gets the same name however its colour was spelled. One that is not
+# a colour is kept as written, reported, and drawn grey; one left out is simply not known yet.
+def read_colors(source: HarnessSource, findings: Findings) -> None:
+    """Replace each wire, cable and conductor colour with its IEC code, reporting any that is not a colour."""
+    def read(owner: dict, name: str) -> None:
+        if owner.get("color") in (None, ""):
+            return
+        code = iec_color_code(owner["color"])
+        if code is None:
+            findings.warn(f"{name}: colour '{owner['color']}' is not a colour this drawing knows; drawn grey")
+        else:
+            owner["color"] = code
+    for position, wire in enumerate(source["wires"], 1):
+        read(wire, wire.get("id") or f"wire #{position}")
+    for cable_id, cable in source["cables"].items():
+        read(cable, f"cable {cable_id}")
+        for position, conductor in enumerate(cable.get("conductors") or [], 1):
+            read(conductor, f"cable {cable_id}: conductor {position}")
 
 
 # A cable is one item; its conductors are named within it, by colour or number (W5-RD, W5-1).

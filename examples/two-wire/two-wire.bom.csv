@@ -1,0 +1,5 @@
+find,qty,unit,pn,description,manufacturer,refs
+1,1,EA,TBD,"KK 254, 2 pos",,P1
+2,1,EA,TBD,"KK 254, 2 pos",,J1
+3,0.5,m,,"Hook-up wire, 24 AWG, BK",,W1
+4,0.5,m,,"Hook-up wire, 24 AWG, RD",,W2

@@ -1,0 +1,241 @@
+{
+ "format": "wire-harness-explorer/1",
+ "title": "TWIST AND CABLE",
+ "number": "T-7",
+ "rev": "A",
+ "units": "mm",
+ "geometry": "schematic",
+ "root": "P1",
+ "connectors": [
+  {
+   "id": "P1",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "A-1",
+   "manufacturer": "",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    },
+    {
+     "pin": "2",
+     "label": ""
+    },
+    {
+     "pin": "3",
+     "label": ""
+    },
+    {
+     "pin": "4",
+     "label": ""
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "J1",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "A-2",
+   "manufacturer": "",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    },
+    {
+     "pin": "2",
+     "label": ""
+    },
+    {
+     "pin": "3",
+     "label": ""
+    },
+    {
+     "pin": "4",
+     "label": ""
+    }
+   ],
+   "face": null
+  }
+ ],
+ "wires": [
+  {
+   "id": "W1",
+   "from": {
+    "connector": "P1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "1"
+   },
+   "signal": "",
+   "gauge": "24 AWG",
+   "color": "WH",
+   "colors": [
+    "#eeeeea"
+   ],
+   "cut_length": "415",
+   "twist": "T1",
+   "cable": "",
+   "route": [
+    "P1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W2",
+   "from": {
+    "connector": "P1",
+    "pin": "2"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "2"
+   },
+   "signal": "",
+   "gauge": "24 AWG",
+   "color": "GN",
+   "colors": [
+    "#4e9a5f"
+   ],
+   "cut_length": "415",
+   "twist": "T1",
+   "cable": "",
+   "route": [
+    "P1",
+    "J1"
+   ]
+  },
+  {
+   "id": "C1-RD",
+   "from": {
+    "connector": "P1",
+    "pin": "3"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "3"
+   },
+   "signal": "",
+   "gauge": "24 AWG",
+   "color": "RD",
+   "colors": [
+    "#c4453f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "C1",
+   "route": [
+    "P1",
+    "J1"
+   ]
+  },
+  {
+   "id": "C1-BK",
+   "from": {
+    "connector": "P1",
+    "pin": "4"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "4"
+   },
+   "signal": "",
+   "gauge": "24 AWG",
+   "color": "BK",
+   "colors": [
+    "#2f2f2f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "C1",
+   "route": [
+    "P1",
+    "J1"
+   ]
+  }
+ ],
+ "cables": [
+  {
+   "id": "C1",
+   "description": "2-conductor shielded",
+   "part_number": "C-2",
+   "conductors": 2,
+   "wires": [
+    "C1-RD",
+    "C1-BK"
+   ],
+   "color": null,
+   "run": [
+    "P1",
+    "J1"
+   ],
+   "breakouts": {
+    "P1": 40,
+    "J1": 40
+   },
+   "cut_length": "400",
+   "jacket_length": "320",
+   "ends": [
+    {
+     "node": "P1",
+     "strip_back": "40",
+     "leads": {
+      "C1-RD": "40",
+      "C1-BK": "40"
+     }
+    },
+    {
+     "node": "J1",
+     "strip_back": "40",
+     "leads": {
+      "C1-RD": "40",
+      "C1-BK": "40"
+     }
+    }
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "P1",
+   "kind": "connector",
+   "x": 560.0,
+   "y": 484.0
+  },
+  {
+   "id": "J1",
+   "kind": "connector",
+   "x": 980.0,
+   "y": 484.0
+  }
+ ],
+ "segments": [
+  {
+   "nodes": [
+    "P1",
+    "J1"
+   ],
+   "known": true,
+   "length": "400 ±10",
+   "path": "M560.0,484.0 L980.0,484.0",
+   "wires": [
+    "W1",
+    "W2",
+    "C1-RD",
+    "C1-BK"
+   ]
+  }
+ ]
+}

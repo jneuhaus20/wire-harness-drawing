@@ -1,0 +1,13 @@
+wire,from,from_pin,to,to_pin,signal,gauge,color,cut_length,lead_a,lead_b,twist,cable,strip_a,strip_b,path
+W1-RD,P1,1,J1,4,,22 AWG,RD,,30,30,,W1,4,2.5,P1 > B1 > J1
+W1-WH,P1,2,J1,6,,22 AWG,WH,,30,30,,W1,4,2.5,P1 > B1 > J1
+W1-GN,P1,3,J1,3,,22 AWG,GN,,30,30,,W1,4,2.5,P1 > B1 > J1
+W1-BK,P1,4,J1,1,,22 AWG,BK,,30,30,,W1,4,2.5,P1 > B1 > J1
+W2-RD,P1,6,J2,4,,22 AWG,RD,,30,30,,W2,4,2.5,P1 > B1 > B2 > J2
+W2-WH,P1,7,J2,6,,22 AWG,WH,,30,30,,W2,4,2.5,P1 > B1 > B2 > J2
+W2-GN,P1,8,J2,3,,22 AWG,GN,,30,30,,W2,4,2.5,P1 > B1 > B2 > J2
+W2-BK,P1,9,J2,1,,22 AWG,BK,,30,30,,W2,4,2.5,P1 > B1 > B2 > J2
+W3-RD,P1,11,J3,4,,22 AWG,RD,,30,30,,W3,4,2.5,P1 > B1 > B2 > J3
+W3-WH,P1,12,J3,6,,22 AWG,WH,,30,30,,W3,4,2.5,P1 > B1 > B2 > J3
+W3-GN,P1,13,J3,3,,22 AWG,GN,,30,30,,W3,4,2.5,P1 > B1 > B2 > J3
+W3-BK,P1,14,J3,1,,22 AWG,BK,,30,30,,W3,4,2.5,P1 > B1 > B2 > J3

@@ -77,7 +77,7 @@ def wireviz_connector(connector: dict) -> dict:
 
 
 # One WireViz cable per twist group (named for it), per harness cable (drawn as that cable),
-# and per loose bundle of wires that share both ends and a gauge. Each cable connects its
+# and per loose bundle of wires that share both ends and a gauge (named for those ends). Each cable connects its
 # conductors to their pins, one connection set per pair of connectors; a splice, being a
 # simple box in WireViz, takes one conductor per set.
 def wireviz_source(source: HarnessSource, routes: list[Route]) -> dict:
@@ -96,7 +96,6 @@ def wireviz_source(source: HarnessSource, routes: list[Route]) -> dict:
         else:
             key = ("bundle", start, end, str(wire.get("gauge", "")))
         groups.setdefault(key, []).append((wire, route, start, wireviz_pin(start_pin), end, wireviz_pin(end_pin)))
-    bundle_count = 0
     for key, members in groups.items():
         wires, member_routes = [member[0] for member in members], [member[1] for member in members]
         if key[0] == "cable":
@@ -105,8 +104,11 @@ def wireviz_source(source: HarnessSource, routes: list[Route]) -> dict:
             name, cable = key[1], wireviz_bundle(drawing, wires, member_routes)
             cable.update(type=twist_name(len(wires)), show_name=True)
         else:
-            bundle_count += 1
-            name, cable = f"B{bundle_count}", wireviz_bundle(drawing, wires, member_routes)
+            # A loose bundle is named for the connectors it joins, never a B-number, which the
+            # drawing uses for breakouts; a second bundle between the same two adds its gauge.
+            _, start, end, gauge = key
+            name = f"{start}-{end}" if f"{start}-{end}" not in document["cables"] else f"{start}-{end} {gauge}".strip()
+            cable = wireviz_bundle(drawing, wires, member_routes)
         document["cables"][name] = cable
         document["connections"] += cable_connections(connectors, name, members)
     return document

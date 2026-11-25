@@ -1,0 +1,12 @@
+# Connectors described only as far as they are known: a generic circular male 4-pin, and a chosen part with a stated face.
+drawing: {title: GENERIC, number: T-5, rev: A}
+connectors:
+  P1: {pincount: 4, shape: circular, gender: male}
+  J1: {type: KK 254, pincount: 4, pn: 22-01-3047, manufacturer: Molex, gender: female,
+       face: {grid: [1, 4], view: mating face}}
+wires:
+  - {id: W1, from: "P1:1", to: "J1:1", gauge: 24 AWG, color: BK}
+  - {id: W2, from: "P1:2", to: "J1:2", gauge: 24 AWG, color: RD}
+layout:
+  root: P1
+  segments: [[P1, J1, 500]]

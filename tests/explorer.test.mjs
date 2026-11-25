@@ -6,7 +6,7 @@ import { test } from "node:test";
 const root = new URL("..", import.meta.url);
 const componentPath = new URL("skills/wire-harness-drawing/explorer/wire-harness-explorer.js", root);
 const { boxMesh, buildPlan, buildScene, pinoutSvg, planSvg, samplePath, version } = await import(componentPath);
-const example = JSON.parse(readFileSync(new URL("example/example.harness.json", root), "utf8"));
+const example = JSON.parse(readFileSync(new URL("examples/sensor-branch/sensor-branch.harness.json", root), "utf8"));
 const routed = JSON.parse(process.env.ROUTED_MODEL);
 
 const near = (a, b, tolerance) => Math.hypot(...a.map((value, i) => value - b[i])) <= tolerance;
@@ -108,4 +108,24 @@ test("a split cable's sheath runs to where its conductors part and stops short o
   assert.ok(svg.includes('data-cable="W5"'));
   assert.equal((svg.match(/data-segment="B2\|J2"/g) || []).length, 1, "beyond the jacket the conductors are a loose bundle");
   assert.equal((svg.match(/data-segment="B1\|B2"/g) || []).length, 0, "under the jacket they are not drawn as a bundle");
+});
+
+test("the initial view fits the whole harness in a frame of any shape, without leaving it small", async () => {
+  const { fitDistance, viewBasis, fieldOfView } = await import(componentPath);
+  const bounds = [[0, 500], [-20, 20], [-10, 10]];
+  const corners = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => bounds.map(([low, high], axis) => ((k >> axis) & 1 ? high : low)));
+  const centre = bounds.map(([low, high]) => (low + high) / 2);
+  for (const aspect of [0.6, 1, 2.2]) {
+    const distance = fitDistance(bounds, -0.35, 0.9, aspect);
+    const [right, up, toward] = viewBasis(-0.35, 0.9);
+    const tangent = Math.tan(fieldOfView / 2);
+    const reach = corners.map((corner) => {
+      const offset = corner.map((value, axis) => value - centre[axis]);
+      const dot = (a) => a.reduce((sum, value, axis) => sum + value * offset[axis], 0);
+      const depth = distance - dot(toward);
+      return Math.max(Math.abs(dot(right)) / (depth * tangent * aspect), Math.abs(dot(up)) / (depth * tangent));
+    });
+    assert.ok(Math.max(...reach) <= 1, `aspect ${aspect}: a corner is out of view`);
+    assert.ok(Math.max(...reach) >= 0.75, `aspect ${aspect}: the harness fills too little of the view`);
+  }
 });

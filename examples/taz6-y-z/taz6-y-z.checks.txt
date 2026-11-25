@@ -1,0 +1,3 @@
+WARN   J1: W1-RD (22 AWG), W1-WH (22 AWG), W1-GN (22 AWG), W1-BK (22 AWG) are outside its contact range 24-30 AWG; confirm the crimp before release
+WARN   J2: W2-RD (22 AWG), W2-WH (22 AWG), W2-GN (22 AWG), W2-BK (22 AWG) are outside its contact range 24-30 AWG; confirm the crimp before release
+WARN   J3: W3-RD (22 AWG), W3-WH (22 AWG), W3-GN (22 AWG), W3-BK (22 AWG) are outside its contact range 24-30 AWG; confirm the crimp before release

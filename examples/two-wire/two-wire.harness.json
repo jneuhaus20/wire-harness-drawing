@@ -1,0 +1,135 @@
+{
+ "format": "wire-harness-explorer/1",
+ "title": "TWO WIRE",
+ "number": "T-1",
+ "rev": "A",
+ "units": "mm",
+ "geometry": "schematic",
+ "root": "P1",
+ "connectors": [
+  {
+   "id": "P1",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "",
+   "manufacturer": "",
+   "splice": false,
+   "generic": true,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": "GND"
+    },
+    {
+     "pin": "2",
+     "label": "VCC"
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "J1",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "",
+   "manufacturer": "",
+   "splice": false,
+   "generic": true,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": "GND"
+    },
+    {
+     "pin": "2",
+     "label": "VCC"
+    }
+   ],
+   "face": null
+  }
+ ],
+ "wires": [
+  {
+   "id": "W1",
+   "from": {
+    "connector": "P1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "1"
+   },
+   "signal": "GND",
+   "gauge": "24 AWG",
+   "color": "BK",
+   "colors": [
+    "#2f2f2f"
+   ],
+   "cut_length": "500",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W2",
+   "from": {
+    "connector": "P1",
+    "pin": "2"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "2"
+   },
+   "signal": "VCC",
+   "gauge": "24 AWG",
+   "color": "RD",
+   "colors": [
+    "#c4453f"
+   ],
+   "cut_length": "500",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "J1"
+   ]
+  }
+ ],
+ "cables": [],
+ "nodes": [
+  {
+   "id": "P1",
+   "kind": "connector",
+   "x": 560.0,
+   "y": 498.5
+  },
+  {
+   "id": "J1",
+   "kind": "connector",
+   "x": 980.0,
+   "y": 498.5
+  }
+ ],
+ "segments": [
+  {
+   "nodes": [
+    "P1",
+    "J1"
+   ],
+   "known": true,
+   "length": "500 ±10",
+   "path": "M560.0,498.5 L980.0,498.5",
+   "wires": [
+    "W1",
+    "W2"
+   ]
+  }
+ ]
+}

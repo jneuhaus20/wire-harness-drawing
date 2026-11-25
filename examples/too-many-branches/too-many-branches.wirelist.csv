@@ -1,0 +1,11 @@
+wire,from,from_pin,to,to_pin,signal,gauge,color,cut_length,lead_a,lead_b,twist,cable,strip_a,strip_b,path
+W1,P1,1,J1,1,,24 AWG,BK,300,,,,,,,P1 > B1 > J1
+W2,P1,2,J2,1,,24 AWG,BK,400,,,,,,,P1 > B1 > B2 > J2
+W3,P1,3,J3,1,,24 AWG,BK,500,,,,,,,P1 > B1 > B2 > B3 > J3
+W4,P1,4,J4,1,,24 AWG,BK,600,,,,,,,P1 > B1 > B2 > B3 > B4 > J4
+W5,P1,5,J5,1,,24 AWG,BK,700,,,,,,,P1 > B1 > B2 > B3 > B4 > B5 > J5
+W6,P1,6,J6,1,,24 AWG,BK,800,,,,,,,P1 > B1 > B2 > B3 > B4 > B5 > B6 > J6
+W7,P1,7,J7,1,,24 AWG,BK,900,,,,,,,P1 > B1 > B2 > B3 > B4 > B5 > B6 > B7 > J7
+W8,P1,8,J8,1,,24 AWG,BK,1000,,,,,,,P1 > B1 > B2 > B3 > B4 > B5 > B6 > B7 > B8 > J8
+W9,P1,9,J9,1,,24 AWG,BK,1100,,,,,,,P1 > B1 > B2 > B3 > B4 > B5 > B6 > B7 > B8 > B9 > J9
+W10,P1,10,J10,1,,24 AWG,BK,1200,,,,,,,P1 > B1 > B2 > B3 > B4 > B5 > B6 > B7 > B8 > B9 > B10 > J10

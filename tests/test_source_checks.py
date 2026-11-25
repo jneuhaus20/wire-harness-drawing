@@ -27,6 +27,25 @@ class SourceChecksTest(unittest.TestCase):
     def test_the_labelled_harness_is_clean(self) -> None:
         self.assertEqual(self.findings_for(labelled_harness), "OK     no findings\n")
 
+    # A contact's AWG range is the maker's rating; a wire outside it may still crimp well, so the
+    # shop decides. It is reported for that decision and does not stop release.
+    def test_a_gauge_outside_the_contact_range_is_a_warning(self) -> None:
+        source = labelled_harness.replace("J1: {type: KK 254, pincount: 2,", "J1: {type: KK 254, awg: [24, 30], pincount: 2,")
+        source = source.replace("gauge: 24 AWG, color: RD}", "gauge: 22 AWG, color: RD}")
+        findings = self.findings_for(source)
+        self.assertIn("WARN   J1: W2 (22 AWG) is outside its contact range 24-30 AWG; confirm the crimp before release", findings)
+        self.assertNotIn("ERROR", findings)
+
+    def test_wires_outside_a_contact_range_are_reported_once_per_connector(self) -> None:
+        source = labelled_harness.replace("J1: {type: KK 254, pincount: 2,", "J1: {type: KK 254, awg: [26, 30], pincount: 2,")
+        source = source.replace("gauge: 24 AWG, color: RD}", "gauge: 22 AWG, color: RD}")
+        self.assertIn("WARN   J1: W1 (24 AWG), W2 (22 AWG) are outside its contact range 26-30 AWG; confirm the crimp before release",
+                      self.findings_for(source))
+
+    def test_a_gauge_inside_the_contact_range_is_not_reported(self) -> None:
+        source = labelled_harness.replace("J1: {type: KK 254, pincount: 2,", "J1: {type: KK 254, awg: [24, 30], pincount: 2,")
+        self.assertEqual(self.findings_for(source), "OK     no findings\n")
+
     def test_a_covering_item_that_is_not_listed(self) -> None:
         findings = self.findings_for(labelled_harness.replace("{item: SLV,", "{item: SLV9,"))
         self.assertRegex(findings, r"ERROR +covering SLV9: item SLV9 is not in items")

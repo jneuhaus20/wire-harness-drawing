@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tests.generator import run_generator_on_text
+from tests.generator import run_generator_on_text, example_text
 from tests.test_output_integrity import generate, svg_texts
 
 from harness.explorer_model import harness_model  # noqa: E402  (tests.generator puts scripts/ on the path)
@@ -12,23 +12,7 @@ from harness.package import analyse
 from harness.source import load_source
 
 # E1's branch leaves B1 straight down, then bends toward the right: 100 + 111.8 + 38.2 = 250.
-routed_harness = """
-drawing: {title: ROUTED, number: T-6, rev: A}
-connectors:
-  P1: {type: KK 254, pn: A-1, pincount: 2}
-  J1: {type: KK 254, pn: A-2, pincount: 1}
-  E1: {type: Ring lug, pn: A-3, pincount: 1}
-wires:
-  - {id: W1, from: "P1:1", to: "J1:1", gauge: 24 AWG, color: BK}
-  - {id: W2, from: "P1:2", to: "E1", gauge: 24 AWG, color: GNYE}
-layout:
-  root: P1
-  nodes: {P1: [0, 0], B1: [300, 0], J1: [600, 0], E1: [438.197, 150]}
-  segments:
-    - [P1, B1, 300]
-    - [B1, J1, 300]
-    - [B1, E1, 250, {via: [[300, 100], [400, 150]]}]
-"""
+routed_harness = example_text("routed-flat")
 
 routed_3d_harness = routed_harness.replace(
     "nodes: {P1: [0, 0], B1: [300, 0], J1: [600, 0], E1: [438.197, 150]}",

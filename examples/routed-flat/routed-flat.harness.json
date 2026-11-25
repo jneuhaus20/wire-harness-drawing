@@ -1,0 +1,234 @@
+{
+ "format": "wire-harness-explorer/1",
+ "title": "ROUTED",
+ "number": "T-6",
+ "rev": "A",
+ "units": "mm",
+ "geometry": "2d",
+ "root": "P1",
+ "connectors": [
+  {
+   "id": "P1",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "A-1",
+   "manufacturer": "",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    },
+    {
+     "pin": "2",
+     "label": ""
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "J1",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "A-2",
+   "manufacturer": "",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "E1",
+   "label": "",
+   "type": "Ring lug",
+   "part_number": "A-3",
+   "manufacturer": "",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    }
+   ],
+   "face": null
+  }
+ ],
+ "wires": [
+  {
+   "id": "W1",
+   "from": {
+    "connector": "P1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "1"
+   },
+   "signal": "",
+   "gauge": "24 AWG",
+   "color": "BK",
+   "colors": [
+    "#2f2f2f"
+   ],
+   "cut_length": "600",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W2",
+   "from": {
+    "connector": "P1",
+    "pin": "2"
+   },
+   "to": {
+    "connector": "E1",
+    "pin": "1"
+   },
+   "signal": "",
+   "gauge": "24 AWG",
+   "color": "GNYE",
+   "colors": [
+    "#4e9a5f",
+    "#e2c54b"
+   ],
+   "cut_length": "550",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "E1"
+   ]
+  }
+ ],
+ "cables": [],
+ "nodes": [
+  {
+   "id": "P1",
+   "kind": "connector",
+   "x": 198.6,
+   "y": 387.6
+  },
+  {
+   "id": "B1",
+   "kind": "breakout",
+   "x": 770.0,
+   "y": 387.6
+  },
+  {
+   "id": "J1",
+   "kind": "connector",
+   "x": 1341.4,
+   "y": 387.6
+  },
+  {
+   "id": "E1",
+   "kind": "connector",
+   "x": 1033.2,
+   "y": 673.4
+  }
+ ],
+ "segments": [
+  {
+   "nodes": [
+    "P1",
+    "B1"
+   ],
+   "known": true,
+   "length": "300 ±5",
+   "path": "M198.6,387.6 L770.0,387.6",
+   "wires": [
+    "W1",
+    "W2"
+   ],
+   "points": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     300,
+     0,
+     0
+    ]
+   ]
+  },
+  {
+   "nodes": [
+    "B1",
+    "J1"
+   ],
+   "known": true,
+   "length": "300 ±5",
+   "path": "M770.0,387.6 L1341.4,387.6",
+   "wires": [
+    "W1"
+   ],
+   "points": [
+    [
+     300,
+     0,
+     0
+    ],
+    [
+     600,
+     0,
+     0
+    ]
+   ]
+  },
+  {
+   "nodes": [
+    "B1",
+    "E1"
+   ],
+   "known": true,
+   "length": "250 ±5",
+   "path": "M770.0,387.6 L770.0,564.1 C770.0,578.1 770.0,578.1 782.5,584.4 L948.0,667.1 C960.5,673.4 960.5,673.4 974.5,673.4 L1033.2,673.4",
+   "wires": [
+    "W2"
+   ],
+   "points": [
+    [
+     300,
+     0,
+     0
+    ],
+    [
+     300,
+     0,
+     100
+    ],
+    [
+     400,
+     0,
+     150
+    ],
+    [
+     438.197,
+     0,
+     150
+    ]
+   ]
+  }
+ ]
+}

@@ -6,39 +6,16 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tests.generator import example_source, run_generator, run_generator_on_text
+from tests.generator import example_source, run_generator, run_generator_on_text, example_text
 
 from harness import svg  # noqa: E402  (tests.generator puts scripts/ on the path)
 
-two_wire_harness = """
-drawing: {title: TWO WIRE, number: T-1, rev: A}
-connectors:
-  P1: {type: KK 254, pincount: 2, pinlabels: [GND, VCC]}
-  J1: {type: KK 254, pincount: 2, pinlabels: [GND, VCC]}
-wires:
-  - {id: W1, from: "P1:1", to: "J1:1", signal: GND, gauge: 24 AWG, color: BK}
-  - {id: W2, from: "P1:2", to: "J1:2", signal: VCC, gauge: 24 AWG, color: RD}
-layout:
-  root: P1
-  segments: [[P1, J1, 500]]
-"""
+two_wire_harness = example_text("two-wire")
 
 
-# A trunk with a breakout every 100 mm and a 4-pin connector on each branch: more
-# leaves than one sheet holds.
 def ten_branch_harness() -> str:
-    """Return the source of a harness with ten branches off one trunk."""
-    connectors = ["  P1: {type: DE-9, pincount: 10}"]
-    wires = []
-    segments = []
-    for branch in range(1, 11):
-        connectors.append(f"  J{branch}: {{type: KK 254, pincount: 1}}")
-        wires.append(f'  - {{id: W{branch}, from: "P1:{branch}", to: "J{branch}:1", gauge: 24 AWG, color: BK}}')
-        previous = "P1" if branch == 1 else f"B{branch - 1}"
-        segments.append(f"    - [{previous}, B{branch}, 100]")
-        segments.append(f"    - [B{branch}, J{branch}, 200]")
-    return "\n".join(["drawing: {title: TEN BRANCH, number: T-10, rev: A}", "connectors:", *connectors,
-                      "wires:", *wires, "layout:", "  root: P1", "  segments:", *segments, ""])
+    """The source of a harness with ten branches off one trunk: more than one sheet holds."""
+    return example_text("too-many-branches")
 
 
 class GeneratedPackage:
@@ -49,7 +26,7 @@ class GeneratedPackage:
         self.directory = Path(self.temporary_directory.name)
         if source_text is None:
             self.process = run_generator(example_source, self.directory, "--no-wireviz")
-            self.base = "example"
+            self.base = "sensor-branch"
         else:
             self.process = run_generator_on_text(source_text, self.directory, "--no-wireviz")
             self.base = "harness"

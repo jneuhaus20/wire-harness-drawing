@@ -2,7 +2,7 @@
 
 A Claude skill that turns one YAML description of a wire harness into the drawing package a shop builds and inspects from: a formboard-style harness drawing, bill of materials, wire list, connector tables, a wiring diagram, and a check report.
 
-[`example/example.pdf`](example/example.pdf) is the package generated from [`example/example.yaml`](example/example.yaml).
+[`examples/sensor-branch/sensor-branch.pdf`](examples/sensor-branch/sensor-branch.pdf) is the package generated from [`examples/sensor-branch/sensor-branch.yaml`](examples/sensor-branch/sensor-branch.yaml). Every folder in [`examples/`](examples/) is a harness the tests generate and the site shows.
 
 ## What it writes
 
@@ -10,10 +10,11 @@ A Claude skill that turns one YAML description of a wire harness into the drawin
 |---|---|
 | `*.checks.txt` | Findings from the checks, including a comparison of the wiring against an independently stated netlist. Exit code 1 on any ERROR. |
 | `*.sheet1.svg` | Harness drawing: branch lengths with tolerances, breakouts, splices, coverings, labels, ballooned find numbers, notes, title block. |
-| `*.sheet2.svg` and up | BOM, wire list with cut lengths, one table per connector. |
+| `*.sheet2.svg` and up | BOM, wire list with cut lengths, cable list, and one table per connector with its pinout where the source states one. |
 | last sheet | Wiring diagram drawn by [WireViz](https://github.com/wireviz/WireViz). |
 | `*.pdf` | All sheets. |
 | `*.bom.csv`, `*.wirelist.csv` | The same data for purchasing and for cut, strip and crimp work. |
+| `*.cables.csv` | Each multi-conductor cable's cut length, jacket length and strip-back at each end; its conductors' leads are in the wire list. |
 | `*.harness.json` | The harness model for the interactive 2D/3D explorer, a single dependency-free web component in [`skills/wire-harness-drawing/explorer/`](skills/wire-harness-drawing/explorer/). |
 
 [`SKILL.md`](skills/wire-harness-drawing/SKILL.md) holds the input schema, the checks, the drafting conventions the drawing follows, and the limits.
@@ -53,11 +54,11 @@ WireViz and Graphviz draw the wiring-diagram sheet; cairosvg and pypdf build the
 ## Run it directly
 
 ```bash
-python3 skills/wire-harness-drawing/scripts/harnessgen.py example/example.yaml --check-only
+python3 skills/wire-harness-drawing/scripts/harnessgen.py examples/sensor-branch/sensor-branch.yaml --check-only
 ```
 
 ```bash
-python3 skills/wire-harness-drawing/scripts/harnessgen.py example/example.yaml -o out/
+python3 skills/wire-harness-drawing/scripts/harnessgen.py examples/sensor-branch/sensor-branch.yaml -o out/
 ```
 
 The example passes every check, so the check prints `OK     no findings` and exits 0.
@@ -68,7 +69,11 @@ The example passes every check, so the check prints `OK     no findings` and exi
 python3 -m unittest discover -s tests -t .
 ```
 
-The tests need Python 3.11 or later. They regenerate the example and compare it with the committed outputs in `example/` and the golden sheets in `tests/golden/`. After a deliberate change to the generator's output, regenerate those files and review the diff.
+The tests need Python 3.11 or later. They regenerate every example and compare it with its committed outputs in `examples/` and the golden sheets in `tests/golden/`. After a deliberate change to the generator's output, run `python3 tools/regenerate_examples.py` and review the diff.
+
+## The project site
+
+[`site/`](site/) holds the GitHub Pages site. `python3 tools/build_site.py` builds it into `_site/`: the pages, the skill's explorer component, and every example generated from its source, with the numbers and files the page quotes filled in from those outputs. `tests/test_site.py` checks that the page shows every example and nothing else. The Pages workflow builds and publishes it on every push to `main`.
 
 ## Releasing
 
@@ -80,4 +85,4 @@ To build the zip locally: `python3 tools/build_release.py` writes it to `dist/`.
 
 ## Licence
 
-[MIT](LICENSE).
+[MIT](LICENSE), except [`examples/taz6-y-z/`](examples/taz6-y-z/), which is derived from LulzBot's TAZ 6 harness drawing and is licensed [CC BY-SA 4.0](examples/taz6-y-z/LICENSE), as is the TAZ 6 photo in `site/`.

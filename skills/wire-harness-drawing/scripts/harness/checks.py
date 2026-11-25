@@ -16,6 +16,7 @@ def check_harness(source: HarnessSource, tree: HarnessTree | None, routes: list[
     check_wire_ids(source, findings)
     for wire in source["wires"]:
         check_wire(source, tree, wire, findings)
+    check_contact_gauges(source, findings)
     cavities = wires_in_cavities(source)
     check_shared_cavities(source, cavities, findings)
     check_connector_use(source, tree, cavities, findings)
@@ -57,24 +58,35 @@ def check_wire(source: HarnessSource, tree: HarnessTree | None, wire: dict, find
         label, signal = pin_label(connector, pin), wire.get("signal")
         if signal and label and label != signal and not wire.get("signal_differs_ok"):
             findings.warn(f"{wire['id']}: signal '{signal}' but {designator}:{pin} is labelled '{label}'")
-        check_gauge(wire, designator, connector, findings)
     if wire_end(wire["from"])[0] == wire_end(wire["to"])[0]:
         findings.info(f"{wire['id']}: loopback on {wire_end(wire['from'])[0]}")
 
 
-def check_gauge(wire: dict, designator: str, connector: dict, findings: Findings) -> None:
-    """Report a gauge outside the contact's AWG range, or one that cannot be compared with it."""
-    contact_range = connector.get("awg")
-    if not contact_range:
-        return
-    gauge = str(wire.get("gauge", ""))
-    awg = re.match(r"\s*(\d+)\s*AWG", gauge, re.I)
-    smallest, largest = min(contact_range), max(contact_range)
-    if awg and not (smallest <= int(awg.group(1)) <= largest):
-        findings.error(f"{wire['id']}: {gauge} outside {designator} contact range {smallest}-{largest} AWG")
-    elif not awg and gauge.strip() and gauge.strip().upper() != "TBD":
-        findings.warn(f"{wire['id']}: gauge '{gauge}' is not in AWG, so it was not checked against "
-                      f"{designator}'s {smallest}-{largest} AWG range")
+# A contact's AWG range is its maker's rating. A wire just outside it can still crimp well when
+# its insulation fits, which the shop qualifies, so it is a warning for that decision, not an
+# error, and one line per connector names every wire it covers.
+def check_contact_gauges(source: HarnessSource, findings: Findings) -> None:
+    """Report wires whose gauge is outside a contact's AWG range, or cannot be compared with it."""
+    for designator, connector in source["connectors"].items():
+        contact_range = connector.get("awg")
+        if not contact_range:
+            continue
+        smallest, largest = min(contact_range), max(contact_range)
+        outside = []
+        for wire in source["wires"]:
+            if designator not in (wire_end(wire.get("from", ""))[0], wire_end(wire.get("to", ""))[0]):
+                continue
+            gauge = str(wire.get("gauge", ""))
+            awg = re.match(r"\s*(\d+)\s*AWG", gauge, re.I)
+            if awg and not (smallest <= int(awg.group(1)) <= largest):
+                outside.append(f"{wire['id']} ({awg.group(1)} AWG)")
+            elif not awg and gauge.strip() and gauge.strip().upper() != "TBD":
+                findings.warn(f"{wire['id']}: gauge '{gauge}' is not in AWG, so it was not checked against "
+                              f"{designator}'s {smallest}-{largest} AWG range")
+        if outside:
+            verb = "is" if len(outside) == 1 else "are"
+            findings.warn(f"{designator}: {', '.join(outside)} {verb} outside its contact range {smallest}-{largest} AWG; "
+                          "confirm the crimp before release")
 
 
 def wires_in_cavities(source: HarnessSource) -> dict[Cavity, list[str]]:

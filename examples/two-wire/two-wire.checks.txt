@@ -1,0 +1,2 @@
+WARN   P1: no part number; drawn as a generic connector
+WARN   J1: no part number; drawn as a generic connector

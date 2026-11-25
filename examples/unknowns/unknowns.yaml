@@ -1,0 +1,12 @@
+# What is not known yet: a length known only as a minimum, a TBD length, a colour not chosen, and connectors with no part number.
+drawing: {title: UNKNOWNS, number: T-4, rev: A}
+connectors:
+  P1: {type: KK 254, pincount: 2}
+  J1: {type: KK 254, pincount: 1}
+  J2: {type: KK 254, pincount: 1}
+wires:
+  - {id: W1, from: "P1:1", to: "J1:1", gauge: 24 AWG, color: BK}
+  - {id: W2, from: "P1:2", to: "J2:1", gauge: 24 AWG}
+layout:
+  root: P1
+  segments: [[P1, B1, 300], [B1, J1, {min: 200}], [B1, J2, TBD]]

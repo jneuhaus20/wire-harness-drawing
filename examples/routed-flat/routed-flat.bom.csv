@@ -1,0 +1,6 @@
+find,qty,unit,pn,description,manufacturer,refs
+1,1,EA,A-1,"KK 254, 2 pos",,P1
+2,1,EA,A-2,KK 254,,J1
+3,1,EA,A-3,Ring lug,,E1
+4,0.6,m,,"Hook-up wire, 24 AWG, BK",,W1
+5,0.55,m,,"Hook-up wire, 24 AWG, GNYE",,W2

@@ -1,0 +1,48 @@
+# Ten branches off one trunk: more than one sheet holds. The checks say so, and every sheet is marked not for release.
+drawing: {title: TEN BRANCH, number: T-11, rev: A}
+connectors:
+  P1: {type: Micro-Fit 3.0, pn: A-1, pincount: 10}
+  J1: {type: KK 254, pn: A-2, pincount: 1}
+  J2: {type: KK 254, pn: A-2, pincount: 1}
+  J3: {type: KK 254, pn: A-2, pincount: 1}
+  J4: {type: KK 254, pn: A-2, pincount: 1}
+  J5: {type: KK 254, pn: A-2, pincount: 1}
+  J6: {type: KK 254, pn: A-2, pincount: 1}
+  J7: {type: KK 254, pn: A-2, pincount: 1}
+  J8: {type: KK 254, pn: A-2, pincount: 1}
+  J9: {type: KK 254, pn: A-2, pincount: 1}
+  J10: {type: KK 254, pn: A-2, pincount: 1}
+wires:
+  - {id: W1, from: "P1:1", to: "J1:1", gauge: 24 AWG, color: BK}
+  - {id: W2, from: "P1:2", to: "J2:1", gauge: 24 AWG, color: BK}
+  - {id: W3, from: "P1:3", to: "J3:1", gauge: 24 AWG, color: BK}
+  - {id: W4, from: "P1:4", to: "J4:1", gauge: 24 AWG, color: BK}
+  - {id: W5, from: "P1:5", to: "J5:1", gauge: 24 AWG, color: BK}
+  - {id: W6, from: "P1:6", to: "J6:1", gauge: 24 AWG, color: BK}
+  - {id: W7, from: "P1:7", to: "J7:1", gauge: 24 AWG, color: BK}
+  - {id: W8, from: "P1:8", to: "J8:1", gauge: 24 AWG, color: BK}
+  - {id: W9, from: "P1:9", to: "J9:1", gauge: 24 AWG, color: BK}
+  - {id: W10, from: "P1:10", to: "J10:1", gauge: 24 AWG, color: BK}
+layout:
+  root: P1
+  segments:
+    - [P1, B1, 100]
+    - [B1, J1, 200]
+    - [B1, B2, 100]
+    - [B2, J2, 200]
+    - [B2, B3, 100]
+    - [B3, J3, 200]
+    - [B3, B4, 100]
+    - [B4, J4, 200]
+    - [B4, B5, 100]
+    - [B5, J5, 200]
+    - [B5, B6, 100]
+    - [B6, J6, 200]
+    - [B6, B7, 100]
+    - [B7, J7, 200]
+    - [B7, B8, 100]
+    - [B8, J8, 200]
+    - [B8, B9, 100]
+    - [B9, J9, 200]
+    - [B9, B10, 100]
+    - [B10, J10, 200]

@@ -1,0 +1,7 @@
+find,qty,unit,pn,description,manufacturer,refs
+1,1,EA,70107-0015,"Molex SL 16-way housing, single row",Molex,P1
+2,12,EA,16-02-0107,"SL crimp pin, male, 22-24 AWG",Molex,P1
+3,3,EA,PHR-6,JST PH 6-way housing,JST,J1 J2 J3
+4,12,EA,SPH-002T-P0.5S,"PH crimp socket, 24-30 AWG",JST,J1 J2 J3
+5,1.285,m,EL-WR0099,"4-conductor shielded, 22 AWG, grey",,W1 W2 W3
+6,1.225,m,EL-MS0073,"Braided sleeving, 1/4 in, black, 220 mm on W1, 410 mm on W2, 595 mm on W3",Panduit,W1 W2 W3

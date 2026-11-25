@@ -1,0 +1,2 @@
+cable,pn,description,cut_length,jacket_length,end_a,strip_a,end_b,strip_b,run
+W5,C-4,"4-conductor shielded, 24 AWG",650,360,P1,40,B2,250,P1 > B1 > B2

@@ -1,0 +1,6 @@
+wire,from,from_pin,to,to_pin,signal,gauge,color,cut_length,lead_a,lead_b,twist,cable,strip_a,strip_b,path
+W1,P1,1,J1,1,PWR,22 AWG,RD,500,,,,,,,P1 > B1 > J1
+W5-RD,P1,2,J2,1,A+,24 AWG,RD,,40,150,,W5,,,P1 > B1 > B2 > J2
+W5-BK,P1,3,J2,2,A-,24 AWG,BK,,40,150,,W5,,,P1 > B1 > B2 > J2
+W5-WH,P1,4,J3,1,B+,24 AWG,WH,,40,250,,W5,,,P1 > B1 > B2 > J3
+W5-GN,P1,5,J3,2,B-,24 AWG,GN,,40,250,,W5,,,P1 > B1 > B2 > J3

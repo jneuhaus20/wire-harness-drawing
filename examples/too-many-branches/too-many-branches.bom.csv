@@ -1,0 +1,4 @@
+find,qty,unit,pn,description,manufacturer,refs
+1,1,EA,A-1,"Micro-Fit 3.0, 10 pos",,P1
+2,10,EA,A-2,KK 254,,J1 J2 J3 J4 J5 J6 J7 J8 J9 J10
+3,7.5,m,,"Hook-up wire, 24 AWG, BK",,W1 W2 W3 W4 W5 W6 W7 W8 W9 W10

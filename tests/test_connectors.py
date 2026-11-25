@@ -4,24 +4,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tests.generator import run_generator_on_text
+from tests.generator import run_generator_on_text, example_text
 from tests.test_output_integrity import generate, two_wire_harness
 
 from harness.source import cavity_positions, display_colors  # noqa: E402  (tests.generator puts scripts/ on the path)
 
-generic_harness = """
-drawing: {title: GENERIC, number: T-5, rev: A}
-connectors:
-  P1: {pincount: 4, shape: circular, gender: male}
-  J1: {type: KK 254, pincount: 4, pn: 22-01-3047, manufacturer: Molex, gender: female,
-       face: {grid: [1, 4], view: mating face}}
-wires:
-  - {id: W1, from: "P1:1", to: "J1:1", gauge: 24 AWG, color: BK}
-  - {id: W2, from: "P1:2", to: "J1:2", gauge: 24 AWG, color: RD}
-layout:
-  root: P1
-  segments: [[P1, J1, 500]]
-"""
+generic_harness = example_text("generic-parts")
 
 
 class GenericConnectorTest(unittest.TestCase):

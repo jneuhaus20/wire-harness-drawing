@@ -1,0 +1,6 @@
+find,qty,unit,pn,description,manufacturer,refs
+1,1,EA,A-1,"KK 254, 4 pos",,P1
+2,1,EA,A-2,"KK 254, 4 pos",,J1
+3,0.4,m,C-2,2-conductor shielded,,C1
+4,0.415,m,,"Hook-up wire, 24 AWG, WH",,W1
+5,0.415,m,,"Hook-up wire, 24 AWG, GN",,W2
