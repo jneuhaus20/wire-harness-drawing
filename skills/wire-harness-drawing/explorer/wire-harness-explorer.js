@@ -633,7 +633,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     }
     const plan = this.view === "2d";
     this.shadowRoot.querySelector(".help").textContent = plan ? "Click a connector or wire."
-      : "Click a connector or wire. Drag to orbit, right-drag or two fingers to pan, scroll or pinch to zoom.";
+      : "Click a connector or wire. Drag to orbit, right-drag or two fingers to pan, pinch or Ctrl-scroll to zoom.";
     this.shadowRoot.querySelector("[data-reset]").hidden = plan;
     this._canvas.hidden = plan;
     this._labels.hidden = plan;
@@ -753,8 +753,10 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     };
     this._stage.addEventListener("pointerup", release);
     this._stage.addEventListener("pointercancel", (event) => pointers.delete(event.pointerId));
+    // A plain wheel scrolls the page the explorer sits in; Ctrl or ⌘ with the wheel, or a
+    // trackpad pinch (which browsers send as a Ctrl-wheel), zooms.
     this._stage.addEventListener("wheel", (event) => {
-      if (this.view === "2d") return;
+      if (this.view === "2d" || !(event.ctrlKey || event.metaKey)) return;
       event.preventDefault();
       this._camera.distance *= Math.exp(event.deltaY * 0.0012);
       this._draw();
