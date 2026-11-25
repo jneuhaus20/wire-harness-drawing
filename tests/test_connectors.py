@@ -7,7 +7,7 @@ from pathlib import Path
 from tests.generator import run_generator_on_text
 from tests.test_output_integrity import generate, two_wire_harness
 
-from harness.source import cavity_positions  # noqa: E402  (tests.generator puts scripts/ on the path)
+from harness.source import cavity_positions, display_colors  # noqa: E402  (tests.generator puts scripts/ on the path)
 
 generic_harness = """
 drawing: {title: GENERIC, number: T-5, rev: A}
@@ -72,7 +72,7 @@ class PinoutDiagramTest(unittest.TestCase):
         diagram = re.search(r'<g class="pinout" data-connector="J1">(.*?)</g>', tables, re.S)
         self.assertIsNotNone(diagram)
         self.assertEqual(diagram.group(1).count("<circle"), 4)
-        self.assertIn('fill="#1a1a1a"', diagram.group(1), "pin 1 carries the BK wire")
+        self.assertIn(f'fill="{display_colors["BK"]}"', diagram.group(1), "pin 1 carries the BK wire")
         self.assertIn(">J1 PINOUT, MATING FACE<", tables)
 
     def test_a_connector_without_one_gets_no_diagram(self) -> None:

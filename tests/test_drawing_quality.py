@@ -9,6 +9,7 @@ from tests.test_geometry import routed_harness
 from tests.test_output_integrity import generate, svg_texts, two_wire_harness
 
 from harness.formboard import formboard_sheet  # noqa: E402  (tests.generator puts scripts/ on the path)
+from harness.source import display_colors
 from harness.package import analyse
 from harness.source import load_source
 from harness.wiring import wireviz_source
@@ -92,7 +93,7 @@ class FrameTest(unittest.TestCase):
 class WireRenderingTest(unittest.TestCase):
     def test_a_striped_wire_draws_both_colours(self) -> None:
         sheet = generate(self, None).sheets()[0]
-        yellow_stripes = re.findall(r'<path [^>]*stroke="#f2d600"[^>]*stroke-dasharray', sheet)
+        yellow_stripes = re.findall(rf'<path [^>]*stroke="{display_colors["YE"]}"[^>]*stroke-dasharray', sheet)
         self.assertEqual(len(yellow_stripes), 2, "W13 GNYE at P1 and at E1")
 
 

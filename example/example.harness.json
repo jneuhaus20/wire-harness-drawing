@@ -365,7 +365,7 @@
    "gauge": "20 AWG",
    "color": "BK",
    "colors": [
-    "#1a1a1a"
+    "#2f2f2f"
    ],
    "cut_length": "360",
    "twist": "",
@@ -390,7 +390,7 @@
    "gauge": "24 AWG",
    "color": "BK",
    "colors": [
-    "#1a1a1a"
+    "#2f2f2f"
    ],
    "cut_length": "490",
    "twist": "",
@@ -418,7 +418,7 @@
    "gauge": "24 AWG",
    "color": "BK",
    "colors": [
-    "#1a1a1a"
+    "#2f2f2f"
    ],
    "cut_length": "540",
    "twist": "",
@@ -447,7 +447,7 @@
    "gauge": "24 AWG",
    "color": "BK",
    "colors": [
-    "#1a1a1a"
+    "#2f2f2f"
    ],
    "cut_length": "770",
    "twist": "",
@@ -476,7 +476,7 @@
    "gauge": "20 AWG",
    "color": "RD",
    "colors": [
-    "#e01e1e"
+    "#c4453f"
    ],
    "cut_length": "380",
    "twist": "",
@@ -502,7 +502,7 @@
    "gauge": "24 AWG",
    "color": "RD",
    "colors": [
-    "#e01e1e"
+    "#c4453f"
    ],
    "cut_length": "470",
    "twist": "",
@@ -529,7 +529,7 @@
    "gauge": "24 AWG",
    "color": "RD",
    "colors": [
-    "#e01e1e"
+    "#c4453f"
    ],
    "cut_length": "520",
    "twist": "",
@@ -557,7 +557,7 @@
    "gauge": "20 AWG",
    "color": "YE",
    "colors": [
-    "#f2d600"
+    "#e2c54b"
    ],
    "cut_length": "400",
    "twist": "",
@@ -584,7 +584,7 @@
    "gauge": "20 AWG",
    "color": "GN",
    "colors": [
-    "#14a33a"
+    "#4e9a5f"
    ],
    "cut_length": "420",
    "twist": "",
@@ -612,7 +612,7 @@
    "gauge": "24 AWG",
    "color": "BU",
    "colors": [
-    "#1f5fd6"
+    "#4c7cc4"
    ],
    "cut_length": "1110",
    "twist": "",
@@ -643,7 +643,7 @@
    "gauge": "24 AWG",
    "color": "OG",
    "colors": [
-    "#ff8c00"
+    "#dd8a3c"
    ],
    "cut_length": "1110",
    "twist": "",
@@ -674,7 +674,7 @@
    "gauge": "24 AWG",
    "color": "VT",
    "colors": [
-    "#8a2be2"
+    "#8667b8"
    ],
    "cut_length": "1110",
    "twist": "",
@@ -705,8 +705,8 @@
    "gauge": "22 AWG",
    "color": "GNYE",
    "colors": [
-    "#14a33a",
-    "#f2d600"
+    "#4e9a5f",
+    "#e2c54b"
    ],
    "cut_length": "470",
    "twist": "",
@@ -731,7 +731,7 @@
    "gauge": "24 AWG",
    "color": "YE",
    "colors": [
-    "#f2d600"
+    "#e2c54b"
    ],
    "cut_length": "450",
    "twist": "",
@@ -757,7 +757,7 @@
    "gauge": "24 AWG",
    "color": "YE",
    "colors": [
-    "#f2d600"
+    "#e2c54b"
    ],
    "cut_length": "500",
    "twist": "",
@@ -784,7 +784,7 @@
    "gauge": "24 AWG",
    "color": "GN",
    "colors": [
-    "#14a33a"
+    "#4e9a5f"
    ],
    "cut_length": "430",
    "twist": "",
@@ -809,7 +809,7 @@
    "gauge": "24 AWG",
    "color": "GN",
    "colors": [
-    "#14a33a"
+    "#4e9a5f"
    ],
    "cut_length": "480",
    "twist": "",
@@ -835,7 +835,7 @@
    "gauge": "24 AWG",
    "color": "RD",
    "colors": [
-    "#e01e1e"
+    "#c4453f"
    ],
    "cut_length": "750",
    "twist": "",

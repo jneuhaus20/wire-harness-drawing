@@ -207,12 +207,13 @@ def pin_label(connector: dict, pin: str) -> str:
 # ---------- Colours ----------
 
 
-# IEC 60757 two-letter codes and the colour each is drawn in.
+# IEC 60757 two-letter codes and the colour each is drawn in: insulation colours, softened from
+# pure hues so a sheet full of wires stays readable.
 display_colors = {
-    "BK": "#1a1a1a", "BN": "#8b4513", "RD": "#e01e1e", "OG": "#ff8c00", "YE": "#f2d600",
-    "GN": "#14a33a", "BU": "#1f5fd6", "VT": "#8a2be2", "GY": "#8c8c8c", "WH": "#f4f4f4",
-    "PK": "#ff8fb4", "TQ": "#20c0c0", "SR": "#c0c0c0", "GD": "#d4af37", "OR": "#ff8c00",
-    "BL": "#1f5fd6", "VI": "#8a2be2", "BR": "#8b4513", "GR": "#8c8c8c",
+    "BK": "#2f2f2f", "BN": "#8a5a3b", "RD": "#c4453f", "OG": "#dd8a3c", "YE": "#e2c54b",
+    "GN": "#4e9a5f", "BU": "#4c7cc4", "VT": "#8667b8", "GY": "#9a9a96", "WH": "#eeeeea",
+    "PK": "#e2a0b6", "TQ": "#4fb0ab", "SR": "#c3c3c0", "GD": "#c9a54a", "OR": "#dd8a3c",
+    "BL": "#4c7cc4", "VI": "#8667b8", "BR": "#8a5a3b", "GR": "#9a9a96",
 }
 unknown_color = "#888888"
 

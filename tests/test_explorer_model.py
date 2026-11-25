@@ -8,7 +8,7 @@ from tests.test_output_integrity import generate, two_wire_harness
 from harness.explorer_model import harness_model  # noqa: E402  (tests.generator puts scripts/ on the path)
 from harness.formboard import sheet_placement
 from harness.package import analyse
-from harness.source import load_source
+from harness.source import display_colors, load_source
 
 
 class ExampleModelTest(unittest.TestCase):
@@ -33,7 +33,7 @@ class ExampleModelTest(unittest.TestCase):
     def test_a_wire_carries_its_ends_colours_length_and_route(self) -> None:
         wire = next(w for w in self.model["wires"] if w["id"] == "W13")
         self.assertEqual((wire["from"], wire["to"]), ({"connector": "P1", "pin": "8"}, {"connector": "E1", "pin": "1"}))
-        self.assertEqual(wire["colors"], ["#14a33a", "#f2d600"])
+        self.assertEqual(wire["colors"], [display_colors["GN"], display_colors["YE"]])
         self.assertEqual(wire["cut_length"], "470")
         self.assertEqual(wire["route"], ["P1", "B1", "E1"])
 
