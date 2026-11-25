@@ -1,4 +1,4 @@
-// <wire-harness-explorer> 1.0.0 — an interactive 2D/3D view of one wire harness.
+// <wire-harness-explorer> 1.1.0 — an interactive 2D/3D view of one wire harness.
 //
 // One self-contained ES module with no dependencies. Load it once per page, then give each
 // element its harness model (the <name>.harness.json the wire-harness-drawing generator
@@ -8,7 +8,7 @@
 // Attributes: view="3d" | "2d" (default 3d), theme="light" | "dark" (default: follows the page).
 // The component does no I/O: every number it shows comes from the model.
 
-const version = "1.0.0";
+const version = "1.1.0";
 const modelFormat = "wire-harness-explorer/1";
 
 // ---------- Vector and matrix helpers (column-major 4×4) ----------
