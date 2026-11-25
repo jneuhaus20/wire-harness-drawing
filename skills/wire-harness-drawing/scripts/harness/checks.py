@@ -3,8 +3,8 @@ import re
 from collections import defaultdict
 
 from harness.routing import HarnessTree, Route
-from harness.source import (Findings, HarnessSource, conventions, format_length, is_number, is_splice, pin_label,
-                            pins_of, wire_end)
+from harness.source import (Findings, HarnessSource, conventions, format_length, is_generic, is_number, is_splice,
+                            pin_label, pins_of, wire_end)
 
 Cavity = tuple[str, str]  # (designator, pin)
 
@@ -105,6 +105,8 @@ def check_connector_use(source: HarnessSource, tree: HarnessTree | None, cavitie
                         findings: Findings) -> None:
     """Report splices, pins and connectors that are used less than they should be."""
     for designator, connector in source["connectors"].items():
+        if is_generic(connector):
+            findings.warn(f"{designator}: no part number; drawn as a generic connector")
         if is_splice(connector):
             joined = sum(len(wire_ids) for (splice, _), wire_ids in cavities.items() if splice == designator)
             if joined < 3:

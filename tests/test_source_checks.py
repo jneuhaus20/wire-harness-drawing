@@ -6,7 +6,7 @@ from pathlib import Path
 from tests.generator import run_generator_on_text
 from tests.test_output_integrity import two_wire_harness
 
-labelled_harness = two_wire_harness + """  coverings: [{item: SLV, segments: [P1-J1]}]
+labelled_harness = two_wire_harness.replace("pinlabels: [GND, VCC]}", "pinlabels: [GND, VCC], pn: 22-01-3027}") + """  coverings: [{item: SLV, segments: [P1-J1]}]
   labels:
     - {at: P1, text: P1, distance: 50, item: LBL}
     - {at: J1, text: J1, distance: 50, item: LBL}

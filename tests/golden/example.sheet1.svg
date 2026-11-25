@@ -66,7 +66,7 @@
 <text x="1316.0" y="1036.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111" >A</text>
 <rect x="1388.0" y="1013.0" width="180.0" height="30.0" fill="none" stroke="#111" stroke-width="0.8" />
 <text x="1392.0" y="1023.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >SHEET</text>
-<text x="1396.0" y="1036.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >1 OF 2</text>
+<text x="1396.0" y="1036.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >1 OF 3</text>
 <rect x="1008.0" y="1043.0" width="140.0" height="28.0" fill="none" stroke="#111" stroke-width="0.8" />
 <text x="1012.0" y="1053.0" font-family="Arial, Helvetica, sans-serif" font-size="7.5" text-anchor="start" font-weight="normal" fill="#555" >DRAWN</text>
 <text x="1016.0" y="1064.0" font-family="Arial, Helvetica, sans-serif" font-size="12" text-anchor="start" font-weight="normal" fill="#111" >CLAUDE</text>
@@ -143,8 +143,8 @@
 <path d="M196.0,379.1 C183.0,379.1 183.0,389.8 170.0,389.8" fill="none" stroke="#8a2be2" stroke-width="2"/>
 <path d="M196.0,379.1 C183.0,379.1 183.0,394.0 170.0,394.0" fill="none" stroke="#14a33a" stroke-width="2"/>
 <path d="M196.0,379.1 C183.0,379.1 183.0,394.0 170.0,394.0" fill="none" stroke="#f2d600" stroke-width="2" stroke-dasharray="3 3"/>
-<rect x="106.0" y="357.1" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
-<rect x="106.0" y="363.1" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<rect x="106.0" y="357.1" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3" class="connector-body rectangular"/>
+<g class="mating-male"><rect x="106.0" y="363.1" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" /><line x1="106.0" y1="368.1" x2="99.0" y2="368.1" stroke="#555" stroke-width="2" /><line x1="106.0" y1="379.1" x2="99.0" y2="379.1" stroke="#555" stroke-width="2" /><line x1="106.0" y1="390.1" x2="99.0" y2="390.1" stroke="#555" stroke-width="2" /></g>
 <text x="125.6" y="419.1" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">P1</text>
 <text x="125.6" y="433.1" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >TO CONTROLLER</text>
 <line x1="66.0" y1="317.1" x2="125.2" y2="357.1" stroke="#111" stroke-width="0.7" /><polygon points="125.2,357.1 116.5,354.9 119.9,349.8" fill="#111"/><circle cx="66.0" cy="317.1" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="66.0" y="321.1" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >1</text><circle cx="66.0" cy="340.1" r="11" fill="white" stroke="#111"/><text x="66.0" y="344.1" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >2</text>
@@ -152,8 +152,8 @@
 <path d="M1102.2,226.4 C1115.2,226.4 1115.2,223.9 1128.2,223.9" fill="none" stroke="#e01e1e" stroke-width="2"/>
 <path d="M1102.2,226.4 C1115.2,226.4 1115.2,228.9 1128.2,228.9" fill="none" stroke="#f2d600" stroke-width="2"/>
 <path d="M1102.2,226.4 C1115.2,226.4 1115.2,233.9 1128.2,233.9" fill="none" stroke="#14a33a" stroke-width="2"/>
-<rect x="1128.2" y="204.4" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
-<rect x="1186.2" y="210.4" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<rect x="1128.2" y="204.4" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3" class="connector-body rectangular"/>
+<g class="mating-female"><rect x="1186.2" y="210.4" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" /><rect x="1187.7" y="213.4" width="3.0" height="4.0" fill="#555" stroke="none" stroke-width="1" /><rect x="1187.7" y="224.4" width="3.0" height="4.0" fill="#555" stroke="none" stroke-width="1" /><rect x="1187.7" y="235.4" width="3.0" height="4.0" fill="#555" stroke="none" stroke-width="1" /></g>
 <text x="1160.2" y="266.4" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">J1</text>
 <text x="1160.2" y="280.4" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >SENSOR A</text>
 <line x1="1232.2" y1="164.4" x2="1173.0" y2="204.4" stroke="#111" stroke-width="0.7" /><polygon points="1173.0,204.4 1178.3,197.1 1181.7,202.2" fill="#111"/><circle cx="1232.2" cy="164.4" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1232.2" y="168.4" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >3</text><circle cx="1232.2" cy="187.4" r="11" fill="white" stroke="#111"/><text x="1232.2" y="191.4" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >4</text><text x="1246.2" y="191.4" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >4X</text>
@@ -161,8 +161,8 @@
 <path d="M1145.4,531.9 C1158.4,531.9 1158.4,529.4 1171.4,529.4" fill="none" stroke="#e01e1e" stroke-width="2"/>
 <path d="M1145.4,531.9 C1158.4,531.9 1158.4,534.4 1171.4,534.4" fill="none" stroke="#f2d600" stroke-width="2"/>
 <path d="M1145.4,531.9 C1158.4,531.9 1158.4,539.4 1171.4,539.4" fill="none" stroke="#14a33a" stroke-width="2"/>
-<rect x="1171.4" y="509.9" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
-<rect x="1229.4" y="515.9" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<rect x="1171.4" y="509.9" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3" class="connector-body rectangular"/>
+<g class="mating-female"><rect x="1229.4" y="515.9" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" /><rect x="1230.9" y="518.9" width="3.0" height="4.0" fill="#555" stroke="none" stroke-width="1" /><rect x="1230.9" y="529.9" width="3.0" height="4.0" fill="#555" stroke="none" stroke-width="1" /><rect x="1230.9" y="540.9" width="3.0" height="4.0" fill="#555" stroke="none" stroke-width="1" /></g>
 <text x="1203.4" y="571.9" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">J2</text>
 <text x="1203.4" y="585.9" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >SENSOR B</text>
 <line x1="1275.4" y1="469.9" x2="1216.2" y2="509.9" stroke="#111" stroke-width="0.7" /><polygon points="1216.2,509.9 1221.5,502.6 1224.9,507.7" fill="#111"/><circle cx="1275.4" cy="469.9" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1275.4" y="473.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >3</text><circle cx="1275.4" cy="492.9" r="11" fill="white" stroke="#111"/><text x="1275.4" y="496.9" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >4</text><text x="1289.4" y="496.9" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >4X</text>
@@ -171,14 +171,14 @@
 <path d="M1344.0,379.1 C1357.0,379.1 1357.0,379.1 1370.0,379.1" fill="none" stroke="#ff8c00" stroke-width="2"/>
 <path d="M1344.0,379.1 C1357.0,379.1 1357.0,384.1 1370.0,384.1" fill="none" stroke="#8a2be2" stroke-width="2"/>
 <path d="M1344.0,379.1 C1357.0,379.1 1357.0,389.1 1370.0,389.1" fill="none" stroke="#e01e1e" stroke-width="2"/>
-<rect x="1370.0" y="357.1" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
-<rect x="1428.0" y="363.1" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
+<rect x="1370.0" y="357.1" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3" class="connector-body rectangular"/>
+<g class="mating-female"><rect x="1428.0" y="363.1" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" /><rect x="1429.5" y="366.1" width="3.0" height="4.0" fill="#555" stroke="none" stroke-width="1" /><rect x="1429.5" y="377.1" width="3.0" height="4.0" fill="#555" stroke="none" stroke-width="1" /><rect x="1429.5" y="388.1" width="3.0" height="4.0" fill="#555" stroke="none" stroke-width="1" /></g>
 <text x="1402.0" y="419.1" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">J3</text>
 <text x="1402.0" y="433.1" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >SPI DEVICE</text>
 <line x1="1474.0" y1="317.1" x2="1414.8" y2="357.1" stroke="#111" stroke-width="0.7" /><polygon points="1414.8,357.1 1420.1,349.8 1423.5,354.9" fill="#111"/><circle cx="1474.0" cy="317.1" r="11" fill="white" stroke="#111" stroke-width="1"/><text x="1474.0" y="321.1" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >5</text><circle cx="1474.0" cy="340.1" r="11" fill="white" stroke="#111"/><text x="1474.0" y="344.1" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#111" >4</text><text x="1488.0" y="344.1" font-family="Arial, Helvetica, sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#111" >5X</text>
 <path d="M532.6,684.6 C545.6,684.6 545.6,684.6 558.6,684.6" fill="none" stroke="#14a33a" stroke-width="2"/>
 <path d="M532.6,684.6 C545.6,684.6 545.6,684.6 558.6,684.6" fill="none" stroke="#f2d600" stroke-width="2" stroke-dasharray="3 3"/>
-<rect x="558.6" y="662.6" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3"/>
+<rect x="558.6" y="662.6" width="64.0" height="44.0" fill="#e4e4e4" stroke="#111" stroke-width="1.2" rx="3" class="connector-body rectangular"/>
 <rect x="616.6" y="668.6" width="6.0" height="32.0" fill="#bdbdbd" stroke="#111" stroke-width="0.8" />
 <text x="595.3" y="724.6" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111" text-decoration="underline">E1</text>
 <text x="595.3" y="738.6" font-family="Arial, Helvetica, sans-serif" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#333" >CHASSIS GND</text>

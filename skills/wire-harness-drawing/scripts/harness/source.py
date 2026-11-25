@@ -1,4 +1,5 @@
 """The harness source: reading it, the findings about it, and the conventions it is read by."""
+import math
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -148,6 +149,39 @@ def wire_connectors(wire: dict) -> tuple[str, str]:
 
 def is_splice(connector: dict) -> bool:
     return connector.get("type", "").lower() == "splice"
+
+
+connector_shapes = ("rectangular", "circular")
+connector_genders = ("male", "female")
+face_views = ("mating face", "rear")
+face_layouts = ("grid", "ring", "cavities")
+
+
+def is_generic(connector: dict) -> bool:
+    """A connector whose part is not chosen yet: no part number. Splices are drawn as splices regardless."""
+    return not connector.get("pn") and not is_splice(connector)
+
+
+# A stated cavity layout, as seen from its stated view: a rows × columns grid numbered along
+# rows (or columns), a ring numbered clockwise from the top, or explicit positions. Positions
+# are in cavity pitches with y down; they are empty when the source states no layout.
+def cavity_positions(connector: dict) -> dict[str, tuple[float, float]]:
+    """Where each pin's cavity sits on the connector face."""
+    face = connector.get("face") or {}
+    pins = pins_of(connector)
+    if "grid" in face:
+        rows, columns = face["grid"]
+        by_columns = face.get("numbering") == "columns"
+        return {pin: ((index // rows, index % rows) if by_columns else (index % columns, index // columns))
+                for index, pin in enumerate(pins)}
+    if "ring" in face:
+        count = len(pins)
+        return {pin: (math.sin(2 * math.pi * index / count), -math.cos(2 * math.pi * index / count))
+                for index, pin in enumerate(pins)}
+    if "cavities" in face:
+        cavities = {str(pin): tuple(position) for pin, position in face["cavities"].items()}
+        return {pin: cavities[pin] for pin in pins}
+    return {}
 
 
 def pins_of(connector: dict) -> list[str]:

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from harness.bom import BomLine, find_numbers
 from harness.frame import close_sheet, frame
+from harness.pinout import Figure, pinout_figure
 from harness.routing import Route
 from harness.source import HarnessSource, format_length, is_splice, pin_label, pins_of, wire_end
 from harness.svg import Column, sheet_height, sheet_width, table
@@ -41,8 +42,8 @@ def wire_list_table(source: HarnessSource, routes: list[Route], bom: list[BomLin
     return TableContent("WIRE LIST (FROM–TO)", columns, rows)
 
 
-def connector_tables(source: HarnessSource) -> list[TableContent]:
-    """For each connector, every cavity: the wire in it and where it goes, or that it is empty."""
+def connector_tables(source: HarnessSource) -> list[TableContent | Figure]:
+    """For each connector, its pinout diagram when its face is stated, then every cavity: the wire in it and where it goes."""
     tables = []
     for designator, connector in source["connectors"].items():
         if is_splice(connector):
@@ -63,17 +64,37 @@ def connector_tables(source: HarnessSource) -> list[TableContent]:
             title += f"  [{connector['view']}]"
         columns = [("PIN", 34, "c"), ("SIGNAL", 110, "l"), ("WIRE", 50, "c"), ("COLOR", 50, "c"), ("GAUGE", 60, "c"),
                    ("TO", 70, "c")]
+        figure = pinout_figure(source, designator, connector)
+        if figure:
+            tables.append(figure)
         tables.append(TableContent(title, columns, rows))
     return tables
 
 
 table_area = (40, 150, sheet_width - 40, sheet_height - 170)  # left, top, right, bottom
+
+
+def opening_width(following: list) -> float:
+    """The width of the table a figure belongs to."""
+    if not following or isinstance(following[0], Figure):
+        return 0
+    return sum(width for _, width, _ in following[0].columns)
+
+
+def opening_height(following: list) -> float:
+    """The height a figure keeps free below itself: its table, or the table's first few rows."""
+    if not following or isinstance(following[0], Figure):
+        return 0
+    content = following[0]
+    _, height, _ = table(0, 0, content.columns, content.rows[:4], content.title)
+    return height
 column_gap, table_gap = 25, 22
 
 
 # Tables fill a column top to bottom, then the next column to the right, then a new sheet.
-# A table that does not fit where it starts continues in the next column, titled "(cont.)".
-def flow_tables(tables: list[TableContent]) -> list[list[str]]:
+# A table that does not fit where it starts continues in the next column, titled "(cont.)";
+# a figure moves whole to the next column.
+def flow_tables(tables: list[TableContent | Figure]) -> list[list[str]]:
     """The tables placed onto sheets: each sheet's list of table SVGs."""
     left, top, right, bottom = table_area
     sheets, current = [], []
@@ -91,7 +112,17 @@ def flow_tables(tables: list[TableContent]) -> list[list[str]]:
         if x + table_width > right:
             next_sheet()
 
-    for content in tables:
+    for index, content in enumerate(tables):
+        if isinstance(content, Figure):
+            group_width = max(content.width, opening_width(tables[index + 1:]))
+            if x + group_width > right:
+                next_sheet()
+            if bottom - y < content.height + table_gap + opening_height(tables[index + 1:]):
+                next_column(group_width)
+            current.append(content.draw(x, y))
+            column_width = max(column_width, content.width)
+            y += content.height + table_gap
+            continue
         table_width = sum(width for _, width, _ in content.columns)
         placed = 0
         first_piece = True

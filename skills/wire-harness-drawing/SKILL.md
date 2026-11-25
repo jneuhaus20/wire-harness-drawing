@@ -47,7 +47,7 @@ Setup (once per machine): `pip install pyyaml wireviz cairosvg pypdf` and Graphv
 - **Reference designators** (external, common practice/aerospace): P = plug (free connector), J = jack/receptacle (fixed), SP or BS = splice (don't mix), E = unterminated end/lug, W = wire, T = twist group.
 - **Labels** (external, IPC/WHMA-A-620 §12.4 as cited by L3 60102381): at most 12 in (300 mm) from the end of a breakout or the rear of the connector accessory; text reads toward the connector; position dimensioned from datum to label centre.
 - **Twists** (external): "TWIST INDICATED WIRES PER IPC/WHMA-A-620"; L3Harris examples are ≥4 twists/inch pairs, 3 triples, 2.5 quads. The default note cites the standard without a rate; add a rate in notes when the signal needs one. Twisting shortens a wire's reach, so cut lengths add `drawing.twist_takeup` (default 3 %, a shop convention; set it from your twist rate) over the segments the group runs through together, and a note states it.
-- **Pinout view**: state whether a connector table is mating face or wire-insertion side (`view:`), because the two are mirror images.
+- **Pinout view**: state whether a connector table is mating face or wire-insertion side (`view:`), because the two are mirror images. A pinout diagram is drawn only from a `face:` the source states, taken from the connector's datasheet; without one the connector gets its pin table and no diagram.
 - **Sealed connectors**: `sealed: true` makes empty cavities show "(seal)" and adds an INFO line for sealing plugs.
 - **Not to scale**: harness drawings are normally NTS; dimensions govern. A segment whose length is unknown (TBD or a minimum) carries a break mark on the bundle. A 1:1 nailboard print is a separate step this tool does not do (see Limits).
 
@@ -84,6 +84,13 @@ connectors:
     strip: 3               # length, written to wirelist.csv
     sealed: false   view: "mating face"   double_crimp: [pin, ...]   loops: [[1, 2]]
     hide_unused: false     # hide empty pins in the WireViz diagram
+    shape: rectangular | circular    gender: male | female    # optional; drawn on sheet 1
+    face:                  # optional cavity layout, as seen from its view; draws a pinout diagram. Give exactly one of:
+      {grid: [rows, columns], numbering: rows | columns, view: mating face | rear}
+      {ring: true, view: ...}                        # pins evenly round a circle, clockwise from the top
+      {cavities: {1: [x, y], 2: [x, y]}, view: ...}  # any layout, y down
+    # no pn: a generic connector (part not chosen). P1: {pincount: 6} is enough; it is drawn dashed and pale,
+    # captioned GENERIC 6-PIN, its BOM line reads "Generic 6-position connector" with P/N TBD, and the checks WARN.
     mpn: str   notes: str  # passed through to the WireViz diagram
   SP1: {type: splice, desc: str, pn: str}   # wires end at "SP1"
 

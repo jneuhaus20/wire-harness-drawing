@@ -1,7 +1,8 @@
 """Reject source values the generator cannot compute with, before anything is computed."""
 import re
 
-from harness.source import Findings, HarnessSource, format_length, is_number, unit_conventions
+from harness.source import (Findings, HarnessSource, connector_genders, connector_shapes, face_layouts, face_views,
+                            format_length, is_number, pins_of, unit_conventions)
 
 
 # Reject each value the rest of the generator cannot compute with, and remove it from the
@@ -67,10 +68,54 @@ def validate_drawing(drawing: dict, findings: Findings) -> None:
 
 
 def validate_connectors(connectors: dict, findings: Findings) -> None:
-    """Check each connector's wire allowance."""
+    """Check each connector's wire allowance, shape, gender and face layout."""
     for designator, connector in connectors.items():
         if "wire_allowance" in connector and not is_number(connector["wire_allowance"]):
             findings.error(f"{designator}: wire_allowance must be a number, not '{connector.pop('wire_allowance')}'")
+        if "shape" in connector and connector["shape"] not in connector_shapes:
+            findings.error(f"{designator}: shape '{connector.pop('shape')}' is not {' or '.join(connector_shapes)}")
+        if "gender" in connector and connector["gender"] not in connector_genders:
+            findings.error(f"{designator}: gender '{connector.pop('gender')}' is not {' or '.join(connector_genders)}")
+        if "face" in connector:
+            problems = face_problems(designator, connector)
+            for problem in problems:
+                findings.error(problem)
+            if problems:
+                connector.pop("face")
+
+
+# A face states one layout that places every pin, seen from a known side. A face with any
+# problem is dropped, so no pinout is drawn from it.
+def face_problems(designator: str, connector: dict) -> list[str]:
+    """What is wrong with a connector's face layout."""
+    face = connector["face"]
+    if not isinstance(face, dict):
+        return [f"{designator}: face must be a mapping with grid, ring or cavities"]
+    problems = []
+    if face.get("view", "mating face") not in face_views:
+        problems.append(f"{designator}: face view '{face['view']}' is not {' or '.join(face_views)}")
+    layouts = [layout for layout in face_layouts if layout in face]
+    if len(layouts) != 1:
+        return problems + [f"{designator}: face must give exactly one of grid, ring or cavities"]
+    pins = pins_of(connector)
+    if "grid" in face:
+        grid = face["grid"]
+        if not (isinstance(grid, list) and len(grid) == 2 and all(isinstance(n, int) and n > 0 for n in grid)):
+            return problems + [f"{designator}: face grid must be [rows, columns]"]
+        if grid[0] * grid[1] < len(pins):
+            problems.append(f"{designator}: face grid {grid[0]}×{grid[1]} has {grid[0] * grid[1]} cavities for {len(pins)} pins")
+        if face.get("numbering", "rows") not in ("rows", "columns"):
+            problems.append(f"{designator}: face numbering '{face['numbering']}' is not rows or columns")
+    if "cavities" in face:
+        cavities = face["cavities"]
+        if not isinstance(cavities, dict):
+            return problems + [f"{designator}: face cavities must map each pin to [x, y]"]
+        placed = {str(pin) for pin, position in cavities.items()
+                  if isinstance(position, list) and len(position) == 2 and all(is_number(v) for v in position)}
+        unplaced = [pin for pin in pins if pin not in placed]
+        if unplaced:
+            problems.append(f"{designator}: face cavities do not place pins {', '.join(unplaced)}")
+    return problems
 
 
 # Give every wire an id first, so each later finding can name the wire it is about. A wire

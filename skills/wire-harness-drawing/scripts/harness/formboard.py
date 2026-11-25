@@ -8,7 +8,7 @@ from harness.bom import BomLine, find_numbers, item_find_numbers
 from harness.frame import Box, frame, frame_box
 from harness.routing import HarnessTree, Route, wire_counts_by_segment
 from harness.source import (HarnessSource, color_parts, conventions, default_twist_takeup, display_color, format_length,
-                            is_splice, pins_of, tolerance_for, wire_end)
+                            is_generic, is_splice, pins_of, tolerance_for, wire_end)
 from harness.svg import (balloon_pitch, balloon_radius, balloon_stack, horizontal_dimension, ink, line, rect,
                          sheet_height, sheet_width, text, text_width)
 from harness.validation import covered_segment_ends, parse_segment_length, segment_length_value
@@ -341,10 +341,8 @@ class FormboardSheet:
         body_height = min(110, max(44, 8 + len(pins_of(connector)) * 3.2))
         body_x = x - connector_body_width if faces_left else x
         self.draw_wire_fan(designator, x, y, body_height, -1 if faces_left else 1)
-        self.out.append(rect(body_x, y - body_height / 2, connector_body_width, body_height, fill="#e4e4e4", stroke_width=1.2,
-                             extra='rx="3"'))
-        mating_x = body_x if faces_left else body_x + connector_body_width - 6
-        self.out.append(rect(mating_x, y - body_height / 2 + 6, 6, body_height - 12, fill="#bdbdbd", stroke_width=0.8))
+        self.out.append(connector_body(connector, body_x, y - body_height / 2, body_height))
+        self.out.append(mating_face(connector, body_x, y, body_height, faces_left))
         self.draw_caption(designator, connector, x, y, body_x, body_height, faces_left)
         body_left = body_x - (0 if faces_left else connector_fan_length)
         body_right = body_x + connector_body_width + (connector_fan_length if faces_left else 0)
@@ -370,6 +368,9 @@ class FormboardSheet:
     def draw_caption(self, designator: str, connector: dict, x, y, body_x, body_height, faces_left: bool) -> None:
         """Designator and description, centred under the body but clear of the datum line at x."""
         description = connector.get("label") or connector.get("type", "")
+        if is_generic(connector):
+            generic = f"GENERIC {len(pins_of(connector))}-PIN"
+            description = f"{description} · {generic}" if description else generic
         caption_width = max(text_width(designator, 14, True), text_width(description, 9.5, False))
         centred = body_x + connector_body_width / 2
         caption_x = min(centred, x - 4 - caption_width / 2) if faces_left else max(centred, x + 4 + caption_width / 2)
@@ -478,6 +479,37 @@ class FormboardSheet:
             self.out.append(text(left, top + 12 + index * 15, content, 10.5, extra='xml:space="preserve"'))
         widest = max(text_width(content, 10.5, False) for content in lines)
         self.layout.regions["notes"] = (left, top - 20, left + widest, frame_box[3])
+
+
+# A connector body in side view. A generic part, one not yet chosen, is drawn pale with a
+# dashed outline so it cannot be read as a real part; a circular one has rounded ends.
+def connector_body(connector: dict, x, top, height) -> str:
+    """The body of a connector on sheet 1."""
+    generic = is_generic(connector)
+    shape = connector.get("shape", "rectangular")
+    style = f'rx="{12 if shape == "circular" else 3}" class="connector-body{" generic" if generic else ""} {shape}"'
+    if generic:
+        style += ' stroke-dasharray="5 3"'
+    return rect(x, top, connector_body_width, height, fill="#f4f4f4" if generic else "#e4e4e4", stroke_width=1.2, extra=style)
+
+
+# The mating face at the body's far end: a plain strip when the gender is not stated, with
+# socket openings for a female connector and protruding pins for a male one.
+def mating_face(connector: dict, body_x, y, height, faces_left: bool) -> str:
+    """The mating face of a connector on sheet 1."""
+    face_x = body_x if faces_left else body_x + connector_body_width - 6
+    strip = rect(face_x, y - height / 2 + 6, 6, height - 12, fill="#bdbdbd", stroke_width=0.8)
+    gender = connector.get("gender")
+    if gender is None:
+        return strip
+    marks_y = [y - height / 4, y, y + height / 4]
+    if gender == "female":
+        marks = "".join(rect(face_x + 1.5, mark_y - 2, 3, 4, fill="#555", stroke="none") for mark_y in marks_y)
+    else:
+        tip = face_x - 7 if faces_left else face_x + 13
+        root = face_x if faces_left else face_x + 6
+        marks = "".join(line(root, mark_y, tip, mark_y, 2, "#555") for mark_y in marks_y)
+    return f'<g class="mating-{gender}">{strip}{marks}</g>'
 
 
 def unknown_length_text(minimum: float | None) -> str:

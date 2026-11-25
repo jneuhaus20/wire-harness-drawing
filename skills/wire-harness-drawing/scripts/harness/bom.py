@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 from harness.routing import HarnessTree, Route
-from harness.source import HarnessSource, conventions, format_length, is_splice, pins_of, wire_end
+from harness.source import HarnessSource, conventions, format_length, is_generic, is_splice, pins_of, wire_end
 from harness.validation import covered_segment_ends, covered_segment_name
 
 PartKind = Literal["splice", "connector", "contact", "accessory", "cable", "wire", "item"]
@@ -75,8 +75,10 @@ def connector_description(connector: dict) -> str:
     """The description of a connector's housing line on the BOM."""
     if connector.get("desc"):
         return connector["desc"]
-    words = " ".join(str(x) for x in (connector.get("type", "Connector"), connector.get("subtype", "")) if x)
     positions = len(pins_of(connector))
+    if is_generic(connector) and not connector.get("type"):
+        return ", ".join([f"Generic {positions}-position connector"] + [connector[key] for key in ("shape", "gender") if key in connector])
+    words = " ".join(str(x) for x in (connector.get("type", "Connector"), connector.get("subtype", "")) if x)
     states_count = re.search(r"\b\d+\s*-?\s*(pins?|pos|positions?|ways?|p)\b", words, re.I)
     return words if positions == 1 or states_count else f"{words}, {positions} pos"
 
@@ -126,8 +128,8 @@ def add_connector_parts(builder: BomBuilder, source: HarnessSource) -> None:
                         quantity=1, unit="EA", refs=[designator], as_required=False)
             continue
         description = connector_description(connector)
-        builder.add("connector", (connector.get("pn") or description,), description=description,
-                    part_number=connector.get("pn", ""), manufacturer=connector.get("manufacturer", ""),
+        builder.add("connector", (connector.get("pn") or designator if is_generic(connector) else connector.get("pn"),),
+                    description=description, part_number=connector.get("pn") or "TBD", manufacturer=connector.get("manufacturer", ""),
                     quantity=1, unit="EA", refs=[designator], as_required=False)
         contact = connector.get("contact")
         if contact:

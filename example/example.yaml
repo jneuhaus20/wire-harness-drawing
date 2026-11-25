@@ -22,6 +22,8 @@ connectors:
     manufacturer: TE
     pincount: 9
     pinlabels: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, SHLD, NC]
+    gender: male
+    face: {view: mating face, cavities: {1: [0, 0], 2: [1, 0], 3: [2, 0], 4: [3, 0], 5: [4, 0], 6: [0.5, 1], 7: [1.5, 1], 8: [2.5, 1], 9: [3.5, 1]}}
     accessories: [{desc: "Cable clamp kit, DE-9, zinc, 4-40, 9.4 mm max", pn: 5745171-5, manufacturer: TE}]
     awg: [20, 28]          # TE states 20 AWG maximum for the solder cup and no minimum; 28 is this drawing's floor
   J1:
@@ -32,6 +34,8 @@ connectors:
     manufacturer: Molex
     pincount: 4
     pinlabels: [GND, +5V, SCL, SDA]
+    gender: female
+    face: {grid: [1, 4], view: mating face}
     contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
     strip: 3
     awg: [22, 30]
@@ -43,6 +47,8 @@ connectors:
     manufacturer: Molex
     pincount: 4
     pinlabels: [GND, +5V, SCL, SDA]
+    gender: female
+    face: {grid: [1, 4], view: mating face}
     contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
     strip: 3
   J3:
@@ -53,6 +59,8 @@ connectors:
     manufacturer: Molex
     pincount: 5
     pinlabels: [GND, +5V, MISO, MOSI, SCK]
+    gender: female
+    face: {grid: [1, 5], view: mating face}
     contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
     strip: 3
   E1:
