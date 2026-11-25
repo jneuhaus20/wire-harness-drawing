@@ -267,3 +267,12 @@ test("2D text keeps its size on screen however the drawing is scaled to fit", as
   const svg = planSvg(example, buildPlan(example));
   assert.doesNotMatch(svg, /<text[^>]*font-size=/, "no text carries its size in drawing units");
 });
+
+test("a model in one plain colour takes the body's stated colour", () => {
+  const mesh = JSON.parse(readFileSync(new URL("examples/sensor-branch/meshes/22-01-3047.json", root), "utf8"));
+  assert.equal(mesh.palette.length, 1);
+  const model = JSON.parse(readFileSync(new URL("examples/two-wire/two-wire.harness.json", root), "utf8"));
+  const tinted = { ...model, connectors: model.connectors.map((c) => c.id === "J1" ? { ...c, body: { shape: "model", mesh, rotate: [0, 90, 0], color: "#ece6d6" } } : c) };
+  const body = buildScene(tinted).bodies.find((b) => b.connector.id === "J1");
+  assert.deepEqual(body.model.colors[0].map((v) => Math.round(v * 255)), [0xec, 0xe6, 0xd6]);
+});

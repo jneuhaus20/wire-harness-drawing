@@ -64,6 +64,22 @@ class ModelFallbackTest(unittest.TestCase):
         self.assertEqual((j1["body"]["shape"], j1["body"].get("mesh")), ("box", None))
 
 
+class ConvertedMeshTest(unittest.TestCase):
+    # A mesh already converted (the converter's own output) is read as it is, with no converter: so
+    # an example can carry its connectors' meshes and build anywhere.
+    def test_a_body_can_name_a_converted_mesh(self) -> None:
+        directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        shutil.copy(repository / "tests" / "fixtures" / "ph-mesh.json", directory / "ph.mesh.json")
+        source = harness_with_model("ph.mesh.json", ", rotate: [0, 90, 0]")
+        process = run_generator_on_text(source, directory, "--no-wireviz", env={"WIRE_HARNESS_CONVERTER": "/nonexistent"})
+        self.assertNotIn("Traceback", process.stderr, process.stderr)
+        model = json.loads((directory / "harness.harness.json").read_text())
+        j1 = next(c for c in model["connectors"] if c["id"] == "J1")
+        self.assertEqual(j1["body"]["mesh"]["triangles"], json.loads((directory / "ph.mesh.json").read_text())["triangles"])
+        self.assertEqual(j1["body"]["rotate"], [0, 90, 0])
+        self.assertNotIn("body model", (directory / "harness.checks.txt").read_text())
+
+
 @unittest.skipUnless(converter_installed, "set WIRE_HARNESS_CONVERTER to a folder with occt-import-js installed")
 class ModelMeshTest(unittest.TestCase):
     def generate(self, source: str, cache: Path) -> tuple[str, dict]:
