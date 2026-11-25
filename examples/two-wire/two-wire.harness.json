@@ -27,7 +27,8 @@
      "label": "VCC"
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J1",
@@ -49,7 +50,8 @@
      "label": "VCC"
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   }
  ],
  "wires": [

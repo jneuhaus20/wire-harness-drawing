@@ -1,7 +1,7 @@
 """Reject source values the generator cannot compute with, before anything is computed."""
 import re
 
-from harness.source import (Findings, HarnessSource, connector_genders, connector_shapes, face_layouts, face_views,
+from harness.source import (Findings, body_color, body_shapes, HarnessSource, connector_genders, connector_shapes, face_layouts, face_views,
                             format_length, iec_color_code, is_number, undecided_colors, pins_of, unit_conventions)
 
 
@@ -78,12 +78,36 @@ def validate_connectors(connectors: dict, findings: Findings) -> None:
             findings.error(f"{designator}: shape '{connector.pop('shape')}' is not {' or '.join(connector_shapes)}")
         if "gender" in connector and connector["gender"] not in connector_genders:
             findings.error(f"{designator}: gender '{connector.pop('gender')}' is not {' or '.join(connector_genders)}")
+        if "body" in connector:
+            problems = body_problems(designator, connector["body"])
+            for problem in problems:
+                findings.error(problem)
+            if problems:
+                connector.pop("body")
         if "face" in connector:
             problems = face_problems(designator, connector)
             for problem in problems:
                 findings.error(problem)
             if problems:
                 connector.pop("face")
+
+
+# A body is drawn only as its datasheet states it; one with any problem is dropped, and the
+# connector is drawn as a body not stated.
+def body_problems(designator: str, body) -> list[str]:
+    """What is wrong with a connector's stated body."""
+    if not isinstance(body, dict):
+        return [f"{designator}: body must be a mapping with shape, length, width, height and color"]
+    problems = []
+    if body.get("shape", "box") not in body_shapes:
+        problems.append(f"{designator}: body shape '{body['shape']}' is not {', '.join(body_shapes[:-1])} or {body_shapes[-1]}")
+    sizes = ("length", "diameter") if body.get("shape") == "cylinder" else ("length", "width", "height")
+    for size in sizes:
+        if not (is_number(body.get(size)) and float(body[size]) > 0):
+            problems.append(f"{designator}: body {size} must be a number above 0")
+    if "color" in body and body_color(body["color"]) is None:
+        problems.append(f"{designator}: body colour '{body['color']}' is not a colour name or #rrggbb")
+    return problems
 
 
 # A face states one layout that places every pin, seen from a known side. A face with any

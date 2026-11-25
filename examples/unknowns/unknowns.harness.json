@@ -27,7 +27,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J1",
@@ -45,7 +46,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J2",
@@ -63,7 +65,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   }
  ],
  "wires": [

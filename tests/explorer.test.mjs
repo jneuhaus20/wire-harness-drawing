@@ -5,7 +5,7 @@ import { test } from "node:test";
 
 const root = new URL("..", import.meta.url);
 const componentPath = new URL("skills/wire-harness-drawing/explorer/wire-harness-explorer.js", root);
-const { boxMesh, buildPlan, buildScene, pinoutSvg, planSvg, samplePath, version } = await import(componentPath);
+const { bodyMesh, boxMesh, buildPlan, buildScene, cableEndsTable, pinoutSvg, planSvg, samplePath, version, zoomedViewBox } = await import(componentPath);
 const example = JSON.parse(readFileSync(new URL("examples/sensor-branch/sensor-branch.harness.json", root), "utf8"));
 const routed = JSON.parse(process.env.ROUTED_MODEL);
 
@@ -144,4 +144,51 @@ test("the pinout popover puts each numbered contact where the model's face does,
       assert.ok(near(drawn[pin], [drawn[a][0] + scale * (x - face[a][0]), drawn[a][1] + scale * (y - face[a][1])], 0.01), `${connector.id} pin ${pin}`);
     }
   }
+});
+
+test("zooming the 2D view keeps the point under the pointer where it is", () => {
+  const box = [0, 0, 400, 200];
+  const zoomed = zoomedViewBox(box, 0.5, [100, 50]);
+  assert.deepEqual(zoomed, [50, 25, 200, 100]);
+  const back = zoomedViewBox(zoomed, 2, [100, 50]);
+  assert.deepEqual(back, box);
+});
+
+test("a cable's ends table reads End, Lead, Strip, To, Conductors, one group of rows per end", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/split-cable/split-cable.harness.json", root), "utf8"));
+  const [cable] = model.cables;
+  const html = cableEndsTable(cable, model);
+  const headings = [...html.matchAll(/<th>([^<]+)<\/th>/g)].map((m) => m[1]);
+  assert.deepEqual(headings, ["End", "Lead (mm)", "Strip (mm)", "To", "Conductors"]);
+  assert.equal([...html.matchAll(/<tbody class="end">/g)].length, cable.ends.length);
+  const firstRow = html.match(/<tbody class="end"><tr>(.*?)<\/tr>/s)[1];
+  assert.deepEqual([...firstRow.matchAll(/<td>([^<]*)/g)].slice(0, 3).map((m) => m[1]), ["P1", "40", "40"]);
+});
+
+test("a shielded cable shows its shield where the jacket ends, in 3D and in 2D", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/twist-and-cable/twist-and-cable.harness.json", root), "utf8"));
+  const [cable] = model.cables;
+  assert.equal(cable.shield, true);
+  const scene = buildScene(model);
+  const [jacket] = scene.jackets;
+  assert.equal(jacket.shield, true);
+  assert.equal(scene.shieldBands.length, 2, "a band of shield at each end of the jacket");
+  const plain = buildScene({ ...model, cables: [{ ...cable, shield: false }] });
+  assert.equal(plain.shieldBands.length, 0);
+  assert.match(planSvg(model, buildPlan(model)), /class="shield"/);
+  assert.doesNotMatch(planSvg({ ...model, cables: [{ ...cable, shield: false }] }, buildPlan({ ...model, cables: [{ ...cable, shield: false }] })), /class="shield"/);
+});
+
+test("a stated body is drawn at its size and colour; an unstated one is drawn plain and says so", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/taz6-y-z/taz6-y-z.harness.json", root), "utf8"));
+  const stated = { ...model, connectors: model.connectors.map((c) => c.id === "J1" ? { ...c, body: { shape: "box", length: 6.35, width: 13.8, height: 4.5, color: "#ece6d6" } } : { ...c, body: null }) };
+  const scene = buildScene(stated);
+  const j1 = scene.bodies.find((b) => b.connector.id === "J1"), j2 = scene.bodies.find((b) => b.connector.id === "J2");
+  assert.deepEqual(j1.size, [6.35, 4.5, 13.8]);
+  assert.equal(j1.stated, true);
+  assert.deepEqual(j1.color.map((v) => Math.round(v * 255)), [0xec, 0xe6, 0xd6]);
+  assert.equal(j2.stated, false);
+  assert.ok(Math.min(...j2.color) > 0.4, "an unstated body is a plain mid grey, not black");
+  const dsub = buildScene({ ...stated, connectors: stated.connectors.map((c) => c.id === "J1" ? { ...c, body: { ...c.body, shape: "dsub" } } : c) });
+  assert.ok(bodyMesh(dsub.bodies.find((b) => b.connector.id === "J1")).positions.length > bodyMesh(j1).positions.length);
 });

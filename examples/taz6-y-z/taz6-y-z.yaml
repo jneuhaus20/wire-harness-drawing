@@ -46,6 +46,7 @@ connectors:
     gender: female
     contact: {pn: SPH-002T-P0.5S, desc: "PH crimp socket, 24-30 AWG", manufacturer: JST}
     awg: [24, 30]          # JST PH catalogue: SPH-002T-P0.5S takes 30-24 AWG, insulation 0.9-1.5 mm
+    body: {shape: box, length: 6.35, width: 13.8, height: 4.5, color: natural}   # JST PH catalogue: PHR-6, B = 13.8, natural (white)
     strip: 2.5
   J2:
     label: Y MOTOR
@@ -57,6 +58,7 @@ connectors:
     gender: female
     contact: {pn: SPH-002T-P0.5S, desc: "PH crimp socket, 24-30 AWG", manufacturer: JST}
     awg: [24, 30]          # JST PH catalogue: SPH-002T-P0.5S takes 30-24 AWG, insulation 0.9-1.5 mm
+    body: {shape: box, length: 6.35, width: 13.8, height: 4.5, color: natural}   # JST PH catalogue: PHR-6, B = 13.8, natural (white)
     strip: 2.5
   J3:
     label: Z RIGHT MOTOR
@@ -68,6 +70,7 @@ connectors:
     gender: female
     contact: {pn: SPH-002T-P0.5S, desc: "PH crimp socket, 24-30 AWG", manufacturer: JST}
     awg: [24, 30]          # JST PH catalogue: SPH-002T-P0.5S takes 30-24 AWG, insulation 0.9-1.5 mm
+    body: {shape: box, length: 6.35, width: 13.8, height: 4.5, color: natural}   # JST PH catalogue: PHR-6, B = 13.8, natural (white)
     strip: 2.5
 
 cables:

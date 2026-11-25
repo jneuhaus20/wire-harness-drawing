@@ -1,7 +1,7 @@
 """The harness model the explorer component draws: one JSON document per harness, built from the same analysis as the drawing."""
 from harness.formboard import segment_dimension_label, segment_path, sheet_placement
 from harness.pinout import scaled_positions
-from harness.source import chosen_color, format_length, color_parts, display_color, is_generic, is_splice, pin_label, pins_of, wire_end
+from harness.source import body_color, chosen_color, format_length, color_parts, display_color, is_generic, is_splice, pin_label, pins_of, wire_end
 
 model_format = "wire-harness-explorer/1"
 
@@ -17,7 +17,22 @@ def connector_entry(designator: str, connector: dict) -> dict:
             "part_number": connector.get("pn", ""), "manufacturer": connector.get("manufacturer", ""),
             "splice": is_splice(connector), "generic": is_generic(connector),
             "shape": connector.get("shape"), "gender": connector.get("gender"),
-            "pins": [{"pin": pin, "label": pin_label(connector, pin)} for pin in pins_of(connector)], "face": face}
+            "pins": [{"pin": pin, "label": pin_label(connector, pin)} for pin in pins_of(connector)], "face": face,
+            "body": body_entry(connector.get("body"))}
+
+
+def body_entry(body: dict | None) -> dict | None:
+    """A stated body as the explorer draws it: shape, size and colour; None when not stated."""
+    if not body:
+        return None
+    sizes = {"diameter": "width"} if body.get("shape") == "cylinder" else {}
+    entry = {"shape": body.get("shape", "box"), "length": float(body["length"])}
+    for key in (("diameter",) if body.get("shape") == "cylinder" else ("width", "height")):
+        entry[sizes.get(key, key)] = float(body[key])
+    if body.get("shape") == "cylinder":
+        entry["height"] = entry["width"]
+    entry["color"] = body_color(body.get("color", "grey"))
+    return {key: (int(value) if isinstance(value, float) and value.is_integer() else value) for key, value in entry.items()}
 
 
 # A cable is one item: its jacket's run and where along it the jacket stops, its cut length,
@@ -26,7 +41,7 @@ def cable_entry(source: dict, cable_id: str, cable: dict, cut) -> dict:
     """One cable as the explorer draws it."""
     conductors = [wire["id"] for wire in source["wires"] if wire.get("cable") == cable_id]
     entry = {"id": cable_id, "description": cable.get("desc", ""), "part_number": cable.get("pn", ""),
-             "conductors": len(conductors), "wires": conductors,
+             "conductors": len(conductors), "wires": conductors, "shield": bool(cable.get("shield")),
              "color": display_color(color_parts(chosen_color(cable))[0]) if chosen_color(cable) else None}
     if cut:
         entry.update(run=cut.run, breakouts={end.node: whole(end.breakout) for end in cut.ends},

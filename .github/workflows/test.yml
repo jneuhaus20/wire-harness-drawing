@@ -20,6 +20,17 @@ jobs:
       - run: pip install pyyaml cairosvg pypdf wireviz==0.4.1
       - run: python -m unittest
 
+  # The repository installs as a Claude Code plugin marketplace: check its manifests as Claude Code does.
+  plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install -g @anthropic-ai/claude-code
+      - run: claude plugin validate .
+
   # The tests need Python 3.11, but the skill itself supports 3.10: generate the example there.
   oldest-python:
     runs-on: ubuntu-latest

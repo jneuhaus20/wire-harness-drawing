@@ -96,6 +96,13 @@
       1.025
      ]
     }
+   },
+   "body": {
+    "shape": "dsub",
+    "length": 54.6,
+    "width": 30.8,
+    "height": 15.7,
+    "color": "#c3c4c2"
    }
   },
   {
@@ -147,7 +154,8 @@
       0
      ]
     }
-   }
+   },
+   "body": null
   },
   {
    "id": "J2",
@@ -198,7 +206,8 @@
       0
      ]
     }
-   }
+   },
+   "body": null
   },
   {
    "id": "J3",
@@ -257,7 +266,8 @@
       0
      ]
     }
-   }
+   },
+   "body": null
   },
   {
    "id": "E1",
@@ -275,7 +285,8 @@
      "label": "SHLD"
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "SP1",
@@ -293,7 +304,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "SP2",
@@ -311,7 +323,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "SP3",
@@ -329,7 +342,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "SP4",
@@ -347,7 +361,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   }
  ],
  "wires": [

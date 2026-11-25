@@ -35,7 +35,8 @@
      "label": "SDA"
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J1",
@@ -65,7 +66,8 @@
      "label": "SDA"
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   }
  ],
  "wires": [

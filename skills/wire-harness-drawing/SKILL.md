@@ -63,8 +63,9 @@ Every ERROR marks the package NOT FOR RELEASE. Read every WARN and fix it or say
 - **Twists and cables**: a twist group of one wire, or whose wires end at different connectors (WARN); a conductor with neither colour nor number; a wire with the old `cable` key; a cable with no conductors (WARN) or whose conductors share no run for its jacket.
 - **Layout**: not a tree (loops, disconnected nodes, duplicate segments, root not on a segment); a connector not placed; a negative or malformed length; a segment carrying no wires or a leaf that is not a connector (WARN); TBD and minimum lengths (INFO, with the cut lengths they leave open). With `layout.nodes`: mixed 2D and 3D positions, and a stated length that differs from its route by more than its tolerance.
 - **Coverings, labels and items**: a covering or label naming an unknown item, node or segment; a label beyond its segment, or farther than 300 mm (12 in) from its connector; a label item whose qty differs from the labels using it.
-- **Netlist**, against `expect.nets`: opens (net split or member not wired), shorts (two expected nets joined), unexpected members, and wired connections no expected net claims. Splices and connector `loops` are merged into nets.
-- **Drawing**: a tolerance table with no `upto: null` row; anything on sheet 1 that runs off the sheet or onto the notes, title, revision or release-mark blocks.
+- **Netlist**, against `expect.nets`: crossings (wires swapped between the pins of two or more nets, reported once with how they are wired instead), opens (net split or member not wired), shorts (two expected nets joined), unexpected members, and wired connections no expected net claims. Splices and connector `loops` are merged into nets.
+- **Drawing**: a tolerance table with no `upto: null` row; anything on sheet 1 that runs off the sheet or onto the notes, title, revision or release-mark blocks. A drawing not to scale that does not fit is first laid out tighter (closer branch lanes and dimension rows); only one that does not fit even then is an ERROR.
+- **Bodies**: a stated body with an unknown shape, a size that is not a number above 0, or a colour that is neither a name nor #rrggbb.
 
 ## harness.yaml schema
 
@@ -72,6 +73,7 @@ Every ERROR marks the package NOT FOR RELEASE. Read every WARN and fix it or say
 drawing:
   title: str            number: str      rev: str      date: str
   drawn_by: str         checked_by: str  units: mm | in   # unit of every length entered; the BOM buys in m or ft
+                                         # until checked_by is set, sheet 1's first note says NOT YET CHECKED
   ipc_class: 1|2|3                       # default 2
   datum: "connector rear face"           # printed in note 2
   tolerance: [{upto: 300, tol: 5}, {upto: 1000, tol: 10}, {upto: null, tol: "1%"}]
@@ -102,6 +104,11 @@ connectors:
       {cavities: {1: [x, y], 2: [x, y]}, view: ...}  # any layout, y down
     # no pn: a generic connector (part not chosen). P1: {pincount: 6} is enough; it is drawn dashed and pale,
     # captioned GENERIC 6-PIN, its BOM line reads "Generic 6-position connector" with P/N TBD, and the checks WARN.
+    body: {shape: box | cylinder | dsub, length: 6.35, width: 13.8, height: 4.5, color: natural}
+                           # optional, from the datasheet drawing, in the drawing's units: length along the mating
+                           # axis, width across the contacts (cylinder: diameter instead of width and height);
+                           # color by name (natural, black, nickel, tin, zinc, white, grey, red, ...) or #rrggbb.
+                           # The 3D view draws the body at that size and colour; without it, a plain box, and says so.
     mpn: str   notes: str  # passed through to the WireViz diagram
   SP1: {type: splice, desc: str, pn: str}   # wires end at "SP1"
 
@@ -114,6 +121,7 @@ cables:                    # optional multi-conductor cables: each is one item, 
     conductors:            # named by colour or number within the cable: W5-RD, W5-1
       - {color: RD, from: "P1:2", to: "J2:1", signal: A+}
       - {number: 2, from: "P1:3", to: "J2:2", signal: A-, color: BK}
+      - {drain: true, from: "P1:1", to: "J2:3"}   # the shield's drain wire: W5-SH, bare tinned (SR)
   # The jacket covers the run all conductors share. The generator gives the cable's cut length,
   # its jacket length, the jacket to strip back at each end, and each conductor's lead beyond it
   # (a cable that splits to two connectors at one end gets a lead per group). Conductors are not
@@ -123,7 +131,7 @@ wires:                     # the from-to list, one row per conductor
   - {id: W1, from: "P1:1", to: "J1:1", signal: GND, gauge: "22 AWG", color: BK,
      twist: T1, length: (override), pn, type, note,
      signal_differs_ok: true}   # accept a signal name that differs from the pin label
-    # gauge TBD or color omitted while undecided: the diagram shows a wire count, no stand-in colour
+    # gauge TBD, or color TBD or omitted, while undecided: drawn with no colour, the diagram shows a wire count
 
 layout:
   root: P1                 # leftmost connector; dimensions are measured from it
@@ -158,6 +166,6 @@ To give a harness an interactive 2D/3D view (in a build guide, a README, a docs 
 ## Limits (say these when they matter)
 
 - Connector bodies on sheet 1 are boxes. A pinout diagram is drawn only from a `face:` taken from the datasheet; keying and clocking details go in a note with the manufacturer's drawing.
-- Layout is automatic: the farthest-reaching child continues the trunk, other branches alternate above and below. Past ~10 leaves or very uneven lengths the drawing stops fitting the sheet, which the checks report as an ERROR; split into sub-harnesses joined at an in-line connector.
-- A cable's `shield: true` reaches the wiring diagram; its drain wire, and any overbraid termination, go in notes.
+- Layout is automatic: the farthest-reaching child continues the trunk, other branches alternate above and below. A crowded harness is drawn tighter to fit one A3 sheet; one that still does not fit is reported as an ERROR, and is best split into sub-harnesses joined at an in-line connector.
+- A cable's `shield: true` is drawn on the cable in the 3D view and the wiring diagram; list its drain wire as a `drain: true` conductor. Overbraid termination goes in the notes.
 - No 1:1 formboard/nailboard print. With routing geometry, sheet 1 is to a standard scale, not full size.

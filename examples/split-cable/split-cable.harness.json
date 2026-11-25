@@ -39,7 +39,8 @@
      "label": "B-"
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J1",
@@ -57,7 +58,8 @@
      "label": "PWR"
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J2",
@@ -79,7 +81,8 @@
      "label": "A-"
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J3",
@@ -101,7 +104,8 @@
      "label": "B-"
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   }
  ],
  "wires": [
@@ -247,6 +251,7 @@
     "W5-WH",
     "W5-GN"
    ],
+   "shield": true,
    "color": "#2f2f2f",
    "run": [
     "P1",

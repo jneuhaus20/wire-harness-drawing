@@ -265,3 +265,20 @@ def color_parts(code: str | None) -> list[str]:
 
 def display_color(part: str) -> str:
     return display_colors.get(part, unknown_color)
+
+
+# ---------- Connector bodies ----------
+
+# A connector body, when the source states it from the datasheet: its shape and its size in the
+# drawing's units (length along the mating axis, width across it, height), and its colour, by
+# name or as #rrggbb. Named colours are the usual housing materials and finishes.
+body_shapes = ("box", "cylinder", "dsub")
+body_colors = {"natural": "#ece6d6", "white": "#f4f4f2", "black": "#2b2b2b", "grey": "#8f8f8c", "gray": "#8f8f8c",
+               "nickel": "#c3c4c2", "tin": "#d4d4cf", "zinc": "#b9bab7", "red": "#c4453f", "blue": "#4c7cc4",
+               "yellow": "#e2c54b", "green": "#4e9a5f", "orange": "#dd8a3c"}
+
+
+def body_color(name: str) -> str | None:
+    """A body colour as #rrggbb, or None if it is neither a named colour nor #rrggbb."""
+    text = str(name).strip().lower()
+    return text if re.fullmatch(r"#[0-9a-f]{6}", text) else body_colors.get(text)
