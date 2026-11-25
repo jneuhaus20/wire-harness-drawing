@@ -133,11 +133,12 @@ function packingOffsets(count, pitch) {
 // frame as a hairline. A routed harness is in true units, so it gets nominal true sizes in mm.
 function sceneSizes(model) {
   if (model.geometry === "schematic") {
-    return { wire: 3, pitch: 6.4, bodyLength: 64, bodyHeight: 26, bodyWidth: (pins) => Math.min(110, Math.max(44, 8 + pins * 3.2)),
+    return { wire: 3, pitch: 6.4, lay: 48, bodyLength: 64, bodyHeight: 26, bodyWidth: (pins) => Math.min(110, Math.max(44, 8 + pins * 3.2)),
              splice: 22, breakout: 7 };
   }
   const unit = model.units === "in" ? 1 / 25.4 : 1;
-  return { wire: 0.9 * unit, pitch: 2 * unit, bodyLength: 30 * unit, bodyHeight: 10 * unit,
+  // Twists are drawn at 4 per inch, the rate L3Harris drawings call for on pairs.
+  return { wire: 0.9 * unit, pitch: 2 * unit, lay: 6.35 * unit, bodyLength: 30 * unit, bodyHeight: 10 * unit,
            bodyWidth: (pins) => Math.min(60, Math.max(10, 4 + pins * 2.5)) * unit, splice: 8 * unit, breakout: 2.5 * unit };
 }
 
@@ -149,13 +150,12 @@ function buildScene(model) {
   const routed = model.geometry !== "schematic";
   const positions = {};
   const connectors = Object.fromEntries(model.connectors.map((connector) => [connector.id, connector]));
+  const wiresById = Object.fromEntries(model.wires.map((wire) => [wire.id, wire]));
   const segmentByKey = new Map();
   const segments = model.segments.map((segment) => ({ ...segment }));
   for (const segment of segments) {
     const polyline = routed ? segment.points : samplePath(segment.path).map(([x, y]) => [x, 0, y]);
-    const ordered = [...segment.wires].sort((a, b) => cableOf(model, a).localeCompare(cableOf(model, b)));
-    const offsets = packingOffsets(ordered.length, sizes.pitch);
-    segment.offsets = Object.fromEntries(ordered.map((wireId, index) => [wireId, offsets[index]]));
+    Object.assign(segment, packSegment(segment, sizes, wiresById));
     segment.polyline = routed ? densify(polyline, sizes.pitch * 4) : polyline;
     segmentByKey.set(`${segment.nodes[0]}|${segment.nodes[1]}`, segment);
     positions[segment.nodes[0]] = polyline[0];
@@ -163,24 +163,83 @@ function buildScene(model) {
   }
   const wires = model.wires.map((wire) => {
     const points = [];
+    let travelled = 0;
     for (let i = 0; i + 1 < wire.route.length; i++) {
       const forward = segmentByKey.get(`${wire.route[i]}|${wire.route[i + 1]}`);
       const segment = forward || segmentByKey.get(`${wire.route[i + 1]}|${wire.route[i]}`);
-      const centre = forward ? segment.polyline : [...segment.polyline].reverse();
-      const [side, up] = segment.offsets[wire.id] || [0, 0];
+      const place = segment.placement[wire.id];
+      const along = forward ? segment.polyline : [...segment.polyline].reverse();
+      const centre = place.radius ? resample(along, sizes.lay / 12) : along;
       const flip = forward ? 1 : -1;
-      const offsetLine = offsetPolyline(centre, side * flip, up);
-      const trimmed = i === 0 ? offsetLine : offsetLine.slice(1);
-      points.push(...trimmed);
+      const distances = runLengths(centre);
+      const offsets = distances.map((distance) => {
+        const turn = place.phase + (2 * Math.PI * (travelled + distance)) / sizes.lay;
+        return [(place.centre[0] + place.radius * Math.cos(turn)) * flip, place.centre[1] + place.radius * Math.sin(turn)];
+      });
+      travelled += distances.at(-1);
+      const offsetLine = offsetPolyline(centre, offsets);
+      points.push(...(i === 0 ? offsetLine : offsetLine.slice(1)));
     }
     return { wire, points, colors: wire.colors.length ? wire.colors.map(hexToRgb) : [[0.62, 0.62, 0.62]] };
   });
+  const jackets = segments.flatMap((segment) => Object.entries(segment.cables).map(([cable, jacket]) => ({
+    cable, points: offsetPolyline(segment.polyline, segment.polyline.map(() => jacket.offset)), radius: jacket.radius,
+  })));
   const bodies = model.nodes.filter((node) => node.kind !== "breakout")
     .map((node) => connectorBody(segments, positions[node.id], connectors[node.id], sizes));
   const breakouts = model.nodes.filter((node) => node.kind === "breakout").map((node) => positions[node.id]);
-  const points = wires.flatMap((wire) => wire.points);
+  const points = [...wires.flatMap((wire) => wire.points),
+    ...bodies.flatMap((body) => [add(body.centre, scale(body.axis, body.size[0] / 2)), subtract(body.centre, scale(body.axis, body.size[0] / 2))])];
   const bounds = [0, 1, 2].map((axis) => [Math.min(...points.map((p) => p[axis])), Math.max(...points.map((p) => p[axis]))]);
-  return { wires, bodies, breakouts, sizes, bounds, segments, positions };
+  return { wires, jackets, bodies, breakouts, sizes, bounds, segments, positions };
+}
+
+// A segment's wires pack in units on a hexagonal grid: a lone wire is a unit, and a twist group
+// is one unit its wires wind around. Units of one cable sit together, and each cable gets a
+// jacket around its units. Each wire's place is its unit's centre (side, up), the radius it
+// winds at (zero for a lone wire) and its starting angle.
+function packSegment(segment, sizes, wiresById) {
+  const units = new Map();
+  for (const id of segment.wires) {
+    const key = wiresById[id].twist ? `twist:${wiresById[id].twist}` : `wire:${id}`;
+    units.set(key, [...(units.get(key) || []), id]);
+  }
+  const ordered = [...units.values()].sort((a, b) => (wiresById[a[0]].cable || "").localeCompare(wiresById[b[0]].cable || ""));
+  const twisted = ordered.some((ids) => ids.length > 1);
+  const slots = packingOffsets(ordered.length, sizes.pitch * (twisted ? 2 : 1));
+  const placement = {};
+  ordered.forEach((ids, index) => ids.forEach((id, k) => {
+    placement[id] = { centre: slots[index], radius: ids.length > 1 ? sizes.pitch / 2 / Math.sin(Math.PI / ids.length) : 0,
+                      phase: (2 * Math.PI * k) / ids.length };
+  }));
+  const members = {};
+  ordered.forEach((ids, index) => {
+    const cable = wiresById[ids[0]].cable;
+    if (cable) (members[cable] = members[cable] || []).push({ slot: slots[index], radius: placement[ids[0]].radius });
+  });
+  const cables = {};
+  for (const [cable, cableUnits] of Object.entries(members)) {
+    const offset = [0, 1].map((axis) => cableUnits.reduce((sum, unit) => sum + unit.slot[axis], 0) / cableUnits.length);
+    const reach = Math.max(...cableUnits.map((unit) => Math.hypot(unit.slot[0] - offset[0], unit.slot[1] - offset[1]) + unit.radius));
+    cables[cable] = { offset, radius: reach + sizes.wire * 2 };
+  }
+  return { placement, cables, order: ordered.flat() };
+}
+
+// Points along a polyline no further apart than spacing, keeping its corners.
+function resample(points, spacing) {
+  const out = [points[0]];
+  for (let i = 1; i < points.length; i++) {
+    const steps = Math.max(1, Math.ceil(length(subtract(points[i], points[i - 1])) / spacing));
+    for (let step = 1; step <= steps; step++) out.push(add(points[i - 1], scale(subtract(points[i], points[i - 1]), step / steps)));
+  }
+  return out;
+}
+
+function runLengths(points) {
+  const distances = [0];
+  for (let i = 1; i < points.length; i++) distances.push(distances[i - 1] + length(subtract(points[i], points[i - 1])));
+  return distances;
 }
 
 // Round a route's corners so tubes bend instead of folding: each corner is replaced by a short
@@ -203,16 +262,15 @@ function densify(points, radius) {
   return out;
 }
 
-function cableOf(model, wireId) {
-  return (model.wires.find((wire) => wire.id === wireId) || {}).cable || "";
-}
-
-function offsetPolyline(points, side, up) {
+// Offset each point of a polyline sideways (in the table plane, square to the run) and up, by
+// that point's own [side, up].
+function offsetPolyline(points, offsets) {
   return points.map((point, index) => {
     const before = points[Math.max(index - 1, 0)];
     const after = points[Math.min(index + 1, points.length - 1)];
     const tangent = normalize(subtract(after, before));
     const sideways = normalize(cross([0, 1, 0], tangent));
+    const [side, up] = offsets[index];
     return add(add(point, scale(sideways, side)), [0, up, 0]);
   });
 }
@@ -230,15 +288,24 @@ function buildPlan(model) {
     for (let i = 0; i + 1 < wire.route.length; i++) {
       const forward = segmentByKey.get(`${wire.route[i]}|${wire.route[i + 1]}`);
       const segment = forward || segmentByKey.get(`${wire.route[i + 1]}|${wire.route[i]}`);
-      const order = Object.keys(segment.offsets);
+      const order = segment.order;
       const side = (order.indexOf(wire.id) - (order.length - 1) / 2) * planPitch * (forward ? 1 : -1);
       const centre = forward ? segment.polyline : [...segment.polyline].reverse();
-      const line = offsetPolyline(centre, side, 0).map(([x, , z]) => [x, z]);
+      const line = offsetPolyline(centre, centre.map(() => [side, 0])).map(([x, , z]) => [x, z]);
       points.push(...(i === 0 ? line : line.slice(1)));
     }
     return { wire, points };
   });
-  return { wires, bodies: scene.bodies, nodes: model.nodes, segments: scene.segments };
+  // A cable's wires lie side by side in its segments; a band behind them shows the jacket.
+  const wiresById = Object.fromEntries(model.wires.map((wire) => [wire.id, wire]));
+  const bands = scene.segments.flatMap((segment) => Object.keys(segment.cables).map((cable) => {
+    const sides = segment.order.map((id, index) => [id, (index - (segment.order.length - 1) / 2) * planPitch])
+      .filter(([id]) => wiresById[id].cable === cable).map(([, side]) => side);
+    const middle = (Math.min(...sides) + Math.max(...sides)) / 2;
+    const line = offsetPolyline(segment.polyline, segment.polyline.map(() => [middle, 0])).map(([x, , z]) => [x, z]);
+    return { cable, points: line, width: Math.max(...sides) - Math.min(...sides) + 7 };
+  }));
+  return { wires, bands, bodies: scene.bodies, nodes: model.nodes, segments: scene.segments };
 }
 
 function planSvg(model, plan) {
@@ -250,6 +317,10 @@ function planSvg(model, plan) {
   for (const segment of plan.segments) {
     const width = 4 + 2.6 * Math.max(segment.wires.length, 1);
     parts.push(`<path d="${segment.path}" fill="none" stroke="var(--line)" stroke-width="${width}" stroke-linecap="round"/>`);
+  }
+  for (const band of plan.bands) {
+    const d = band.points.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+    parts.push(`<path class="jacket" d="${d}" fill="none" stroke="var(--muted)" stroke-opacity=".7" stroke-width="${band.width.toFixed(1)}" stroke-linecap="round"/>`);
   }
   for (const { wire, points } of plan.wires) {
     const d = points.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
@@ -649,6 +720,9 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
       const stripe = colors.length > 1;
       const color = stripe ? (i, k) => (k % 8 < 3 && (i % 6) < 3 ? colors[1] : colors[0]) : colors[0];
       renderer.upload(`wire:${wire.id}`, tubeMesh(points, this._scene.sizes.wire, 10, color));
+    }
+    for (const jacket of this._scene.jackets) {
+      renderer.upload(`cable:${jacket.cable}`, tubeMesh(jacket.points, jacket.radius, 20, [0.78, 0.78, 0.76]), 0.4);
     }
     for (const body of this._scene.bodies) {
       const generic = body.connector.generic;

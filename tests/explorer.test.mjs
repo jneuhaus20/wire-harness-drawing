@@ -40,9 +40,22 @@ test("every wire of the example runs from its first route node to its last", () 
 test("a routed harness is drawn in its true units at nominal sizes", () => {
   const scene = buildScene(routed);
   assert.equal(scene.sizes.wire, 0.9);
-  const [xs, , zs] = scene.bounds;
+  const points = scene.wires.flatMap((wire) => wire.points);
+  const [xs, zs] = [0, 2].map((axis) => [Math.min(...points.map((p) => p[axis])), Math.max(...points.map((p) => p[axis]))]);
   assert.ok(Math.abs(xs[0] - 0) < 5 && Math.abs(xs[1] - 600) < 5, `x spans ${xs}`);
   assert.ok(zs[1] > 140 && zs[1] < 160, `z reaches ${zs[1]}`);
+});
+
+test("a twisted pair winds round its shared centre and a cable gets a jacket", () => {
+  const twisted = JSON.parse(process.env.TWISTED_MODEL);
+  const scene = buildScene(twisted);
+  const [first, second] = ["W1", "W2"].map((id) => scene.wires.find((entry) => entry.wire.id === id).points);
+  const heights = first.map((point) => point[1]);
+  assert.ok(Math.max(...heights) - Math.min(...heights) > scene.sizes.pitch * 0.9, "W1 rises and falls as it winds");
+  const middle = Math.floor(first.length / 2);
+  assert.ok(near(first[middle], second[middle], scene.sizes.pitch * 1.2), "the pair stays together");
+  assert.deepEqual(scene.jackets.map((jacket) => jacket.cable), ["C1"]);
+  assert.ok(planSvg(twisted, buildPlan(twisted)).includes('class="jacket"'));
 });
 
 test("the 2D view draws every wire and connector as something to click", () => {
