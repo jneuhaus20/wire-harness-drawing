@@ -1,4 +1,4 @@
 cable,pn,description,cut_length,jacket_length,end_a,strip_a,end_b,strip_b,run
-W1,EL-WR0099,"4-conductor shielded, 22 AWG, grey",240,180,P1,30,J1,30,P1 > B1 > J1
-W2,EL-WR0099,"4-conductor shielded, 22 AWG, grey",430,370,P1,30,J2,30,P1 > B1 > B2 > J2
-W3,EL-WR0099,"4-conductor shielded, 22 AWG, grey",615,555,P1,30,J3,30,P1 > B1 > B2 > J3
+W1,C0762A,"4-conductor, 22 AWG, foil shield and drain, grey",240,180,P1,30,J1,30,P1 > B1 > J1
+W2,C0762A,"4-conductor, 22 AWG, foil shield and drain, grey",430,370,P1,30,J2,30,P1 > B1 > B2 > J2
+W3,C0762A,"4-conductor, 22 AWG, foil shield and drain, grey",615,555,P1,30,J3,30,P1 > B1 > B2 > J3

@@ -8,6 +8,8 @@
 # lower frame cross member under the Y table to the Z motors at the foot of each upright, and to
 # the Y motor. Node positions are estimated from those photos and the frame's 20 x 510 mm
 # extrusions, to about 20 mm: x right along the cross member, y toward the back, z up.
+# LulzBot's drawing is in lulzbot/ here, with drawing EL-HR0143, whose parts list gives the supplier part
+# behind each LulzBot part number. tests/test_lulzbot_example.py reads both and checks this package against them.
 # This file and the package generated from it are licensed CC BY-SA 4.0 (see LICENSE here).
 drawing:
   title: TAZ 6 Y-Z HARNESS
@@ -21,7 +23,7 @@ drawing:
   notes:
     - "DERIVED FROM LULZBOT DRAWING EL-HR0091 REV A (ALEPH OBJECTS, INC., CC BY-SA 4.0)."
     - "BARE SHIELD WIRE OF EACH CABLE TO P1 PINS 5, 10 AND 15; TRIM THE SHIELD AT THE MOTOR END."
-    - "BRAIDED SLEEVING OVER EACH CABLE, ENDING 10 MM SHORT OF EACH JACKET END."
+    - "BRAIDED SLEEVING OVER EACH CABLE, ENDING 10 MM SHORT OF EACH CABLE END."
 
 connectors:
   P1:
@@ -70,8 +72,9 @@ connectors:
 
 cables:
   W1:
-    desc: 4-conductor shielded, 22 AWG, grey
-    pn: EL-WR0099
+    desc: 4-conductor, 22 AWG, foil shield and drain, grey
+    pn: C0762A
+    manufacturer: Carol (General Cable)
     gauge: 22 AWG
     color: GY
     shield: true
@@ -82,8 +85,9 @@ cables:
       - {color: GN, from: "P1:3", to: "J1:3"}
       - {color: BK, from: "P1:4", to: "J1:1"}
   W2:
-    desc: 4-conductor shielded, 22 AWG, grey
-    pn: EL-WR0099
+    desc: 4-conductor, 22 AWG, foil shield and drain, grey
+    pn: C0762A
+    manufacturer: Carol (General Cable)
     gauge: 22 AWG
     color: GY
     shield: true
@@ -94,8 +98,9 @@ cables:
       - {color: GN, from: "P1:8", to: "J2:3"}
       - {color: BK, from: "P1:9", to: "J2:1"}
   W3:
-    desc: 4-conductor shielded, 22 AWG, grey
-    pn: EL-WR0099
+    desc: 4-conductor, 22 AWG, foil shield and drain, grey
+    pn: C0762A
+    manufacturer: Carol (General Cable)
     gauge: 22 AWG
     color: GY
     shield: true

@@ -513,8 +513,8 @@
  "cables": [
   {
    "id": "W1",
-   "description": "4-conductor shielded, 22 AWG, grey",
-   "part_number": "EL-WR0099",
+   "description": "4-conductor, 22 AWG, foil shield and drain, grey",
+   "part_number": "C0762A",
    "conductors": 4,
    "wires": [
     "W1-RD",
@@ -559,8 +559,8 @@
   },
   {
    "id": "W2",
-   "description": "4-conductor shielded, 22 AWG, grey",
-   "part_number": "EL-WR0099",
+   "description": "4-conductor, 22 AWG, foil shield and drain, grey",
+   "part_number": "C0762A",
    "conductors": 4,
    "wires": [
     "W2-RD",
@@ -606,8 +606,8 @@
   },
   {
    "id": "W3",
-   "description": "4-conductor shielded, 22 AWG, grey",
-   "part_number": "EL-WR0099",
+   "description": "4-conductor, 22 AWG, foil shield and drain, grey",
+   "part_number": "C0762A",
    "conductors": 4,
    "wires": [
     "W3-RD",
