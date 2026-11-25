@@ -150,10 +150,11 @@ def check_twists(source: HarnessSource, findings: Findings) -> None:
 
 def check_cables(source: HarnessSource, routes: list[Route], findings: Findings) -> None:
     """Report cables with no conductors, and cables whose conductors share no run for a jacket."""
-    for cable_id in source["cables"]:
+    for cable_id, cable in source["cables"].items():
         members = [route for wire, route in zip(source["wires"], routes) if wire.get("cable") == cable_id]
         if not members:
-            findings.warn(f"cable {cable_id} has no conductors")
+            if not cable.get("conductors_rejected"):
+                findings.warn(f"cable {cable_id} has no conductors")
         elif all(route.segments for route in members) and not set.intersection(
                 *({frozenset(segment) for segment in route.segments} for route in members)):
             findings.error(f"cable {cable_id}: its conductors share no segment, so there is no run for its jacket")

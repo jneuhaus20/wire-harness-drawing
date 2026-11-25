@@ -12,6 +12,7 @@ def validate_source(source: HarnessSource, findings: Findings) -> None:
     """Report and remove values in the source that are the wrong kind of thing."""
     validate_drawing(source["drawing"], findings)
     validate_connectors(source["connectors"], findings)
+    validate_cables(source["cables"], findings)
     read_colors(source, findings)
     expand_cables(source, findings)
     validate_wires(source, findings)
@@ -142,6 +143,44 @@ def face_problems(designator: str, connector: dict) -> list[str]:
         if unplaced:
             problems.append(f"{designator}: face cavities do not place pins {', '.join(unplaced)}")
     return problems
+
+
+# A cable lists its conductors, each a mapping with its ends, and its breakout as one length or a
+# length per jacket end. Version 1.0 took a conductor count; a count, or any other value that is
+# not a list, is reported and the cable is left with no conductors, so nothing is guessed.
+def validate_cables(cables: dict, findings: Findings) -> None:
+    """Check each cable's conductor list and breakout lengths."""
+    for cable_id, cable in cables.items():
+        conductors = cable.get("conductors")
+        if conductors is not None and not isinstance(conductors, list):
+            findings.error(f"cable {cable_id}: conductors must be a list of conductors, each with from and to, not {conductors}")
+            cable["conductors"] = []
+            cable["conductors_rejected"] = True
+        kept = []
+        for position, conductor in enumerate(cable.get("conductors") or [], 1):
+            if isinstance(conductor, dict):
+                kept.append(conductor)
+            else:
+                findings.error(f"cable {cable_id}: conductor {position} must be a mapping with from and to, not '{conductor}'")
+                cable["conductors_rejected"] = True
+        if "conductors" in cable:
+            cable["conductors"] = kept
+        validate_breakout(cable_id, cable, findings)
+
+
+def validate_breakout(cable_id: str, cable: dict, findings: Findings) -> None:
+    """A breakout is a length of 0 or more, or a mapping of jacket end to such a length."""
+    if "breakout" not in cable:
+        return
+    breakout = cable["breakout"]
+    if isinstance(breakout, dict):
+        for node, length in list(breakout.items()):
+            if not (is_number(length) and length >= 0):
+                findings.error(f"cable {cable_id}: breakout at {node} must be a number of 0 or more, not '{length}'")
+                breakout.pop(node)
+    elif not (is_number(breakout) and breakout >= 0):
+        findings.error(f"cable {cable_id}: breakout must be a number of 0 or more, not '{breakout}'")
+        cable.pop("breakout")
 
 
 # A colour is read however it is written (BLK, black, WHT/BLU) and kept as its IEC code, so a

@@ -6,8 +6,28 @@ from harness.routing import HarnessTree, Route
 from harness.source import HarnessSource, conventions, format_length, wire_end
 
 # The jacket stops this short of a connector it runs right up to, so the conductors can fan
-# into their cavities: 40 mm, or 1.5 in.
+# into their cavities: 40 mm, or 1.5 in. A cable states one breakout for both ends, or one per
+# end by node; an end it does not name takes the default, and a factory-terminated end takes 0.
 default_breakout = {"mm": 40, "in": 1.5}
+
+
+def breakout_at(source: HarnessSource, cable: dict, node: str) -> float:
+    """How far short of a connector at the given jacket end the cable's jacket stops."""
+    default = default_breakout.get(source["drawing"].get("units", "mm"), 40)
+    breakout = cable.get("breakout", default)
+    return float(breakout.get(node, default) if isinstance(breakout, dict) else breakout)
+
+
+def breakout_misnamings(source: HarnessSource, cuts: list["CableCut"]) -> list[str]:
+    """A finding for each cable whose breakout names a node its jacket does not end at."""
+    problems = []
+    for cut in cuts:
+        breakout = source["cables"][cut.cable].get("breakout")
+        ends = (cut.run[0], cut.run[-1])
+        for node in breakout if isinstance(breakout, dict) else ():
+            if node not in ends:
+                problems.append(f"cable {cut.cable}: breakout names {node}, which is not an end of its jacket ({', '.join(ends)})")
+    return problems
 
 
 # One end of a cable's jacket: where it ends, how far short of that node it stops (zero where
@@ -78,11 +98,10 @@ def cable_cuts(source: HarnessSource, tree: HarnessTree, routes: list[Route]) ->
 def cut_cable(source: HarnessSource, tree: HarnessTree, cable_id: str, cable: dict, members: list) -> CableCut:
     """How one cable is cut."""
     drawing = source["drawing"]
-    breakout = float(cable.get("breakout", default_breakout.get(drawing.get("units", "mm"), 40)))
     shared = set.intersection(*({frozenset(segment) for segment in route.segments} for _, route in members))
     run = longest_shared_run(members[0][1].node_names(), shared)
     run_lengths = [tree.segment_lengths[frozenset(pair)] for pair in zip(run, run[1:])]
-    ends = tuple(cable_end(source, tree, members, run, end_node, breakout) for end_node in (run[0], run[-1]))
+    ends = tuple(cable_end(source, tree, members, run, end_node, breakout_at(source, cable, end_node)) for end_node in (run[0], run[-1]))
     jacket = None if None in run_lengths else sum(run_lengths) - ends[0].breakout - ends[1].breakout
     strips = [end.strip_back() for end in ends]
     total = None if jacket is None or None in strips else jacket + sum(strips) + float(drawing.get("extra_per_wire", 0))

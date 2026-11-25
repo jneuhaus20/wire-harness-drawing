@@ -54,15 +54,15 @@ def cable_list_table(source: HarnessSource, bom: list[BomLine], cuts: list[Cable
         cable = source["cables"][cut.cable]
         a, b = cut.ends
         rows.append([cut.cable, ", ".join(map(str, find_numbers(bom, "cable", cut.cable))), a.node, "", "", b.node, "", "",
-                     cable.get("desc", ""), cable.get("color", ""), format_length(cut.cut_length), format_length(cut.jacket_length),
+                     cable.get("desc", ""), cable.get("color", ""), "", format_length(cut.cut_length), format_length(cut.jacket_length),
                      format_length(a.strip_back()), format_length(b.strip_back())])
         for wire in (w for w in source["wires"] if w.get("cable") == cut.cable):
             (start, start_pin), (end, end_pin) = wire_end(wire["from"]), wire_end(wire["to"])
             lead_from, lead_to = conductor_leads(cuts, wire)
             rows.append([wire["id"], "", start, start_pin, lead_from, end, end_pin, lead_to, wire.get("signal", ""),
-                         wire.get("color", ""), "", "", "", ""])
+                         wire.get("color", ""), wire.get("twist", ""), "", "", "", ""])
     columns = [("CABLE", 56, "c"), ("FIND", 36, "c"), ("FROM", 44, "c"), ("PIN", 30, "c"), ("LEAD", 40, "c"), ("TO", 44, "c"),
-               ("PIN", 30, "c"), ("LEAD", 40, "c"), ("SIGNAL / DESC", 130, "l"), ("COLOR", 46, "c"), ("CUT LEN", 52, "c"),
+               ("PIN", 30, "c"), ("LEAD", 40, "c"), ("SIGNAL / DESC", 130, "l"), ("COLOR", 46, "c"), ("TWIST", 44, "c"), ("CUT LEN", 52, "c"),
                ("JACKET", 52, "c"), ("STRIP A", 50, "c"), ("STRIP B", 50, "c")]
     return TableContent("CABLE LIST", columns, rows)
 
@@ -175,11 +175,21 @@ def flow_tables(tables: list[TableContent | Figure]) -> list[list[str]]:
 def table_sheets(source: HarnessSource, bodies: list[list[str]], first_sheet: int, sheet_count: int,
                  check_errors: int) -> list[str]:
     """The SVG documents of the table sheets, framed and numbered from first_sheet."""
-    return [close_sheet(frame(source, first_sheet + index, sheet_count, "BOM / WIRE LIST / CONNECTORS", check_errors)[0] + body)
+    return [close_sheet(frame(source, first_sheet + index, sheet_count, table_sheet_title(source), check_errors)[0] + body)
             for index, body in enumerate(bodies)]
+
+
+def has_loose_wires(source: HarnessSource) -> bool:
+    """Whether any wire is cut on its own rather than with a cable; only those get a wire list."""
+    return any(not wire.get("cable") for wire in source["wires"])
+
+
+def table_sheet_title(source: HarnessSource) -> str:
+    return "BOM / WIRE LIST / CONNECTORS" if has_loose_wires(source) else "BOM / CABLE LIST / CONNECTORS"
 
 
 def table_sheet_bodies(source: HarnessSource, routes: list[Route], bom: list[BomLine], cuts: list[CableCut]) -> list[list[str]]:
     """The BOM, wire list, cable list and connector tables, flowed onto sheets."""
+    wires = [wire_list_table(source, routes, bom)] if has_loose_wires(source) else []
     cables = [cable_list_table(source, bom, cuts)] if cuts else []
-    return flow_tables([bom_table(bom), wire_list_table(source, routes, bom), *cables, *connector_tables(source)])
+    return flow_tables([bom_table(bom), *wires, *cables, *connector_tables(source)])

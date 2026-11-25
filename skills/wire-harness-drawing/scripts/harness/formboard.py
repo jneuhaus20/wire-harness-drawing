@@ -810,6 +810,8 @@ def default_notes(source: HarnessSource, tree: HarnessTree, scale_denominator: f
         notes.append("THE 3D ROUTE IS SHOWN FLATTENED, AS LAID ON THE FORMBOARD; SEE THE 3D VIEW FOR ITS SHAPE IN PLACE.")
     if any(wire.get("twist") for wire in source["wires"]):
         notes.append("TWIST INDICATED WIRES PER IPC/WHMA-A-620.")
+    # A cable's conductors are cut with their cable, so only a loose twisted wire takes up length.
+    if any(wire.get("twist") and not wire.get("cable") for wire in source["wires"]):
         notes.append(f"TWISTED WIRE CUT LENGTHS INCLUDE {drawing.get('twist_takeup', default_twist_takeup)} "
                      "TAKE-UP OVER THE TWISTED RUN.")
     if source["layout"].get("labels"):

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from harness.bom import BomLine, build_bom
-from harness.cables import CableCut, cable_cuts, conductor_leads
+from harness.cables import CableCut, breakout_misnamings, cable_cuts, conductor_leads
 from harness.checks import check_harness
 from harness.explorer_model import harness_model
 from harness.formboard import Spacing, drawn_to_scale, formboard_sheet, sheet_misfits, spacings
@@ -40,6 +40,8 @@ def analyse(source: HarnessSource) -> Analysis:
     routes = route_wires(source, tree)
     check_harness(source, tree, routes, findings)
     cuts = cable_cuts(source, tree, routes) if tree else []
+    for problem in breakout_misnamings(source, cuts):
+        findings.error(problem)
     bom = build_bom(source, tree, routes, cuts) if tree else None
     spacing = spacings[0]
     if tree:
