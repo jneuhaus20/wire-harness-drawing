@@ -192,3 +192,40 @@ test("a stated body is drawn at its size and colour; an unstated one is drawn pl
   const dsub = buildScene({ ...stated, connectors: stated.connectors.map((c) => c.id === "J1" ? { ...c, body: { ...c.body, shape: "dsub" } } : c) });
   assert.ok(bodyMesh(dsub.bodies.find((b) => b.connector.id === "J1")).positions.length > bodyMesh(j1).positions.length);
 });
+
+test("the 2D view draws every loose wire in its colour along each bundle it runs in, not only where it fans out", () => {
+  for (const model of [example, routed]) {
+    const svg = planSvg(model, buildPlan(model));
+    for (const wire of model.wires.filter((w) => w.colors.length && !w.cable)) {
+      const strands = [...svg.matchAll(new RegExp(`<path[^>]*data-strand="${wire.id}"[^>]*>`, "g"))].map((m) => m[0]);
+      assert.equal(strands.length, wire.route.length - 1, `${wire.id}: one strand per segment of its route`);
+      assert.ok(strands.every((path) => path.includes(`stroke="${wire.colors[0]}"`)), `${wire.id} is drawn in ${wire.colors[0]}`);
+    }
+  }
+});
+
+test("the 2D view names every breakout, and gives each connector its label under its designator", () => {
+  const svg = planSvg(example, buildPlan(example));
+  for (const node of example.nodes.filter((n) => n.kind === "breakout")) {
+    assert.match(svg, new RegExp(`<text[^>]*class="breakout"[^>]*>${node.id}</text>`), node.id);
+  }
+  for (const connector of example.connectors.filter((c) => c.label && !c.splice)) {
+    assert.ok(svg.includes(`class="caption">${connector.label}</text>`), connector.id);
+  }
+});
+
+test("the 2D view shows each label where sheet 1 draws it", () => {
+  const svg = planSvg(example, buildPlan(example));
+  assert.ok(example.labels.length > 0);
+  for (const label of example.labels) {
+    assert.match(svg, new RegExp(`<g class="label"[^>]*data-label="${label.text}"[^>]*>[^]*?x="${label.x}" y="${label.y}"`), label.text);
+  }
+});
+
+test("2D text keeps its size on screen however the drawing is scaled to fit", async () => {
+  const { planUnit } = await import(componentPath);
+  assert.equal(planUnit([0, 0, 1000, 500], 500, 500), 2, "a wide box fits by its width");
+  assert.equal(planUnit([0, 0, 1000, 500], 2000, 500), 1, "a tall stage fits by its height");
+  const svg = planSvg(example, buildPlan(example));
+  assert.doesNotMatch(svg, /<text[^>]*font-size=/, "no text carries its size in drawing units");
+});
