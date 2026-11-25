@@ -10,7 +10,7 @@ import yaml
 
 from harness.frame import close_sheet, frame
 from harness.routing import Route
-from harness.source import HarnessSource, color_parts, conventions, is_splice, pin_label, pins_of, wire_end
+from harness.source import chosen_color, HarnessSource, color_parts, conventions, is_splice, pin_label, pins_of, wire_end
 from harness.svg import sheet_height, sheet_width
 
 
@@ -23,8 +23,8 @@ def twist_name(wire_count: int) -> str:
 def wireviz_conductors(drawing: dict, wires: list[dict], routes: list[Route]) -> dict:
     """The conductor attributes WireViz draws for a group of wires."""
     attributes = {"wirelabels": [wire["id"] for wire in wires]}
-    if all(wire.get("color") for wire in wires):
-        attributes["colors"] = ["".join(color_parts(wire.get("color"))) for wire in wires]
+    if all(chosen_color(wire) for wire in wires):
+        attributes["colors"] = ["".join(color_parts(chosen_color(wire))) for wire in wires]
     else:  # colours not chosen yet: count only, no stand-in colour
         attributes["wirecount"] = len(wires)
     gauges = {str(wire.get("gauge", "")) for wire in wires}

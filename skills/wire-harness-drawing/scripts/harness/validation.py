@@ -2,7 +2,7 @@
 import re
 
 from harness.source import (Findings, HarnessSource, connector_genders, connector_shapes, face_layouts, face_views,
-                            format_length, iec_color_code, is_number, pins_of, unit_conventions)
+                            format_length, iec_color_code, is_number, undecided_colors, pins_of, unit_conventions)
 
 
 # Reject each value the rest of the generator cannot compute with, and remove it from the
@@ -127,6 +127,9 @@ def read_colors(source: HarnessSource, findings: Findings) -> None:
     """Replace each wire, cable and conductor colour with its IEC code, reporting any that is not a colour."""
     def read(owner: dict, name: str) -> None:
         if owner.get("color") in (None, ""):
+            return
+        if str(owner["color"]).strip().upper() in undecided_colors:
+            owner["color"] = str(owner["color"]).strip().upper()
             return
         code = iec_color_code(owner["color"])
         if code is None:

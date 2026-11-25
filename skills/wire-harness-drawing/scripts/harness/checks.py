@@ -253,7 +253,10 @@ def cavity_names(cavities) -> str:
 # Each expected net must be wired at every member, in one piece, with nothing else in it, and
 # no wired net may go unclaimed or be claimed by two expected nets.
 def compare_nets(built: list[set[Cavity]], expected: dict[str, list], findings: Findings) -> None:
-    """Report opens, shorts and strays between the wired nets and the expected netlist."""
+    """Report crossings, opens, shorts and strays between the wired nets and the expected netlist."""
+    crossed_nets, crossed_wiring = crossings(built, expected, findings)
+    built = [net for index, net in enumerate(built) if index not in crossed_wiring]
+    expected = {name: members for name, members in expected.items() if name not in crossed_nets}
     net_of = {cavity: index for index, net in enumerate(built) for cavity in net}
     claimed = {}
     for name, members in expected.items():
@@ -276,3 +279,35 @@ def compare_nets(built: list[set[Cavity]], expected: dict[str, list], findings: 
     for index, net in enumerate(built):
         if index not in claimed:
             findings.error(f"wired connection not in expected netlist: {', '.join(sorted(f'{d}:{p}' for d, p in net))}")
+
+
+# Wires swapped between their pins: a group of expected nets wired with exactly their own pins,
+# as many wired nets as expected ones, but each wired net joining pins of two or more of them.
+# That is one mistake, reported once, and left out of the open, short and stray checks.
+def crossings(built: list[set[Cavity]], expected: dict[str, list], findings: Findings) -> tuple[set[str], set[int]]:
+    """Report each crossed group of nets; return the expected nets and wired nets it accounts for."""
+    members = {name: {wire_end(member) for member in cavities} for name, cavities in expected.items()}
+    touching = {index: {name for name, cavities in members.items() if cavities & net} for index, net in enumerate(built)}
+    crossed_nets, crossed_wiring = set(), set()
+    for index, names in touching.items():
+        if len(names) < 2 or index in crossed_wiring:
+            continue
+        group, wiring = set(names), {index}
+        while True:
+            more = {other for other, touched in touching.items() if touched & group} - wiring
+            if not more:
+                break
+            wiring |= more
+            group |= set().union(*(touching[other] for other in more))
+        wanted = set().union(*(members[name] for name in group))
+        wired = set().union(*(built[other] for other in wiring))
+        if wired == wanted and len(wiring) == len(group) and all(len(touching[other]) > 1 for other in wiring):
+            names_text = " and ".join(sorted(group)) if len(group) == 2 else ", ".join(sorted(group))
+            listed = [wire_end(member) for name in sorted(group) for member in expected[name]]
+            place = {cavity: position for name in group for position, cavity in enumerate(map(wire_end, expected[name]))}
+            ends = [sorted(built[other], key=lambda cavity: (place[cavity], listed.index(cavity))) for other in wiring]
+            pairs = ", ".join("–".join(f"{d}:{p}" for d, p in net) for net in sorted(ends, key=lambda net: listed.index(net[0])))
+            findings.error(f"nets {names_text} are crossed: wired {pairs}")
+            crossed_nets |= group
+            crossed_wiring |= wiring
+    return crossed_nets, crossed_wiring

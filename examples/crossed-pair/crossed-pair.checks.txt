@@ -1,0 +1,1 @@
+ERROR  nets SCL and SDA are crossed: wired P1:3–J1:4, P1:4–J1:3

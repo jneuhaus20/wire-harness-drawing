@@ -1,4 +1,4 @@
-# Ten branches off one trunk: more than one sheet holds. The checks say so, and every sheet is marked not for release.
+# Ten branches off one trunk: tight for one sheet, so the drawing is laid out tighter to fit.
 drawing: {title: TEN BRANCH, number: T-11, rev: A}
 connectors:
   P1: {type: Micro-Fit 3.0, pn: A-1, pincount: 10}

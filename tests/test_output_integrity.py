@@ -15,7 +15,7 @@ two_wire_harness = example_text("two-wire")
 
 def ten_branch_harness() -> str:
     """The source of a harness with ten branches off one trunk: more than one sheet holds."""
-    return example_text("too-many-branches")
+    return example_text("ten-branches")
 
 
 class GeneratedPackage:
@@ -69,16 +69,46 @@ class FailedChecksMarkTheSheetsTest(unittest.TestCase):
             self.assertNotIn("NOT FOR RELEASE", sheet, f"sheet {number}")
 
 
+# A harness drawing is not to scale, so when one does not fit its sheet the generator draws it
+# tighter, as a draftsman would, before it calls it a misfit.
+def many_branch_harness(count: int) -> str:
+    """A harness with the given number of single-wire branches off one trunk."""
+    connectors = "".join(f"  J{n}: {{type: KK 254, pn: A-2, pincount: 1}}\n" for n in range(1, count + 1))
+    wires = "".join(f'  - {{id: W{n}, from: "P1:{n}", to: "J{n}:1", gauge: 24 AWG, color: BK}}\n' for n in range(1, count + 1))
+    segments = "".join(f"    - [B{n - 1 if n > 1 else 0}, J{n}, {150 + 10 * n}]\n" for n in range(1, count + 1))
+    trunk = "".join(f"    - [B{n - 1}, B{n}, 60]\n" for n in range(1, count))
+    return (f"drawing: {{title: MANY, number: T-99, rev: A}}\nconnectors:\n  P1: {{type: Micro-Fit 3.0, pn: A-1, pincount: {count}}}\n"
+            f"{connectors}wires:\n{wires}layout:\n  root: P1\n  segments:\n    - [P1, B0, 100]\n{trunk}{segments}")
+
+
+class UncheckedDrawingTest(unittest.TestCase):
+    caution = "NOT YET CHECKED: VERIFY PARTS, PINOUTS AND LENGTHS AGAINST THE DATASHEETS AND DESIGN BEFORE RELEASE."
+
+    def test_a_drawing_nobody_has_checked_says_so(self) -> None:
+        self.assertIn(self.caution, " ".join(svg_texts(generate(self, two_wire_harness).sheets()[0])))
+
+    def test_a_checked_drawing_drops_the_caution(self) -> None:
+        source = two_wire_harness.replace("rev: A}", "rev: A, checked_by: J. SMITH}")
+        texts = " ".join(svg_texts(generate(self, source).sheets()[0]))
+        self.assertNotIn("NOT YET CHECKED", texts)
+        self.assertIn("J. SMITH", texts)
+
+
 class DrawingFitsTheSheetTest(unittest.TestCase):
-    def test_a_drawing_too_big_for_the_sheet_is_an_error(self) -> None:
+    def test_ten_branches_are_drawn_tighter_to_fit(self) -> None:
         package = generate(self, ten_branch_harness())
+        self.assertNotIn("does not fit", package.read("checks.txt"))
+        self.assertNotIn("NOT FOR RELEASE", package.sheets()[0])
+
+    def test_a_drawing_too_big_even_drawn_tight_is_an_error(self) -> None:
+        package = generate(self, many_branch_harness(30))
         checks = package.read("checks.txt")
-        self.assertRegex(checks, r"ERROR .*does not fit", checks)
+        self.assertRegex(checks, r"ERROR +harness drawing does not fit sheet 1 even drawn at its tightest", checks)
         self.assertIn("NOT FOR RELEASE", package.sheets()[0])
 
     def test_check_only_reports_the_misfit_too(self) -> None:
         directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
-        process = run_generator_on_text(ten_branch_harness(), directory, "--check-only")
+        process = run_generator_on_text(many_branch_harness(30), directory, "--check-only")
         self.assertEqual(process.returncode, 1)
         self.assertIn("does not fit", process.stdout)
 

@@ -1,7 +1,7 @@
 """The harness model the explorer component draws: one JSON document per harness, built from the same analysis as the drawing."""
 from harness.formboard import segment_dimension_label, segment_path, sheet_placement
 from harness.pinout import scaled_positions
-from harness.source import format_length, color_parts, display_color, is_generic, is_splice, pin_label, pins_of, wire_end
+from harness.source import chosen_color, format_length, color_parts, display_color, is_generic, is_splice, pin_label, pins_of, wire_end
 
 model_format = "wire-harness-explorer/1"
 
@@ -27,7 +27,7 @@ def cable_entry(source: dict, cable_id: str, cable: dict, cut) -> dict:
     conductors = [wire["id"] for wire in source["wires"] if wire.get("cable") == cable_id]
     entry = {"id": cable_id, "description": cable.get("desc", ""), "part_number": cable.get("pn", ""),
              "conductors": len(conductors), "wires": conductors,
-             "color": display_color(color_parts(cable["color"])[0]) if cable.get("color") else None}
+             "color": display_color(color_parts(chosen_color(cable))[0]) if chosen_color(cable) else None}
     if cut:
         entry.update(run=cut.run, breakouts={end.node: whole(end.breakout) for end in cut.ends},
                      cut_length=format_length(cut.cut_length), jacket_length=format_length(cut.jacket_length),
@@ -46,7 +46,7 @@ def wire_entry(source: dict, wire: dict, route) -> dict:
     return {"id": wire["id"], "from": {"connector": start[0], "pin": start[1]}, "to": {"connector": end[0], "pin": end[1]},
             "signal": wire.get("signal") or pin_label(source["connectors"].get(start[0], {}), start[1]),
             "gauge": str(wire.get("gauge", "")), "color": wire.get("color", ""),
-            "colors": [display_color(part) for part in color_parts(wire["color"])] if wire.get("color") else [],
+            "colors": [display_color(part) for part in color_parts(chosen_color(wire))] if chosen_color(wire) else [],
             "cut_length": "" if wire.get("cable") else route.cut_length_text(), "twist": wire.get("twist", ""), "cable": wire.get("cable", ""),
             "route": route.node_names()}
 
@@ -64,7 +64,7 @@ def harness_model(analysis) -> dict:
     """The explorer's model of an analysed harness."""
     source, tree, routes = analysis.source, analysis.tree, analysis.routes
     drawing = source["drawing"]
-    placement = sheet_placement(source, tree)
+    placement = sheet_placement(source, tree, analysis.spacing)
     connectors = source["connectors"]
     wires_by_segment = {}
     for wire, route in zip(source["wires"], routes):

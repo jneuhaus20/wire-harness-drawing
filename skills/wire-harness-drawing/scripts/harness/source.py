@@ -247,6 +247,16 @@ def iec_color_code(written: str) -> str | None:
     return "".join(codes) or None
 
 
+# A colour still to be decided is written TBD (or TBC): printed as written, drawn as no colour.
+undecided_colors = {"TBD", "TBC"}
+
+
+def chosen_color(owner: dict) -> str | None:
+    """A wire's or cable's colour code, or None when it is not chosen yet."""
+    color = owner.get("color")
+    return None if not color or str(color).upper() in undecided_colors else color
+
+
 def color_parts(code: str | None) -> list[str]:
     """A colour code's two-letter parts, base colour first: 'GNYE' -> ['GN', 'YE']."""
     code = (code or "").replace("/", "").upper()

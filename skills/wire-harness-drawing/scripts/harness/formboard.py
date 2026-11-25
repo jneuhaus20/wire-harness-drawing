@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from harness.bom import BomLine, find_numbers, item_find_numbers
 from harness.frame import Box, frame, frame_box, not_to_scale
 from harness.routing import HarnessTree, Route, wire_counts_by_segment
-from harness.source import (HarnessSource, color_parts, conventions, default_twist_takeup, display_color, format_length,
+from harness.source import (chosen_color, HarnessSource, color_parts, conventions, default_twist_takeup, display_color, format_length,
                             is_generic, is_splice, pins_of, tolerance_for, wire_end)
 from harness.svg import (balloon_pitch, balloon_radius, balloon_stack, horizontal_dimension, ink, line, rect,
                          sheet_height, sheet_width, text, text_width)
@@ -126,6 +126,19 @@ class Placement:
         return f"1:{format_length(self.scale_denominator)}" if self.scale_denominator else not_to_scale
 
 
+# How tightly a drawing that is not to scale is laid out: the least space between branch lanes,
+# between rows of overall dimensions, and from the lowest branch to the first row. A drawing that
+# does not fit its sheet at the first is drawn at the next, as a draftsman would draw it tighter.
+@dataclass(frozen=True)
+class Spacing:
+    lane_minimum: float = 80
+    dimension_pitch: float = 24
+    dimension_clearance: float = 100
+
+
+spacings = (Spacing(), Spacing(64, 20, 90), Spacing(52, 18, 80), Spacing(44, 16, 70))
+
+
 # At each node the child that reaches farthest continues the trunk; the other branches
 # alternate below and above it, starting below, counted across the whole harness.
 def branch_order(tree: HarnessTree) -> tuple[dict[str, list[str]], dict[str, str]]:
@@ -153,7 +166,7 @@ def branch_order(tree: HarnessTree) -> tuple[dict[str, list[str]], dict[str, str
 # Leaves get evenly spaced lanes top to bottom, and every other node sits on its trunk's lane.
 # Across, each segment is drawn in proportion to its length but no shorter than 110 or longer
 # than 420, scaled down to fit the box and centred in it.
-def place_nodes(tree: HarnessTree, box: Box) -> Placement:
+def place_nodes(tree: HarnessTree, box: Box, spacing: Spacing = spacings[0]) -> Placement:
     """Where each node of the tree is drawn."""
     left, top, right, bottom = box
     order, trunk = branch_order(tree)
@@ -167,7 +180,7 @@ def place_nodes(tree: HarnessTree, box: Box) -> Placement:
             collect_leaves(child)
 
     collect_leaves(tree.root)
-    lane = min(170, max(80, (bottom - top) / max(1, len(leaves))))
+    lane = min(170, max(spacing.lane_minimum, (bottom - top) / max(1, len(leaves))))
     middle = (top + bottom) / 2
     ys = {node: middle + (index - (len(leaves) - 1) / 2) * lane for index, node in enumerate(leaves)}
 
@@ -200,20 +213,20 @@ def place_nodes(tree: HarnessTree, box: Box) -> Placement:
 # The drawing gets the frame above the overall dimensions, which get the space above the notes.
 # A routed drawing has no overall dimensions, so it gets that space too. The notes are counted
 # at the longest scale text, since the scale is chosen to fit this box.
-def drawing_box(source: HarnessSource, tree: HarnessTree) -> Box:
+def drawing_box(source: HarnessSource, tree: HarnessTree, spacing: Spacing = spacings[0]) -> Box:
     """The box the harness itself is laid out in on sheet 1."""
     leaf_count = sum(1 for node in tree.order if node in source["connectors"] and node != tree.root and tree.is_leaf(node))
     notes = default_notes(source, tree, standard_scales[-1] if drawn_to_scale(tree) else None)
     notes_top = frame_box[3] - 12 - 15 * sum(note.count("\n") + 1 for note in notes) - 30
-    dimensions_height = 0 if drawn_to_scale(tree) else 24 * leaf_count + 40
+    dimensions_height = 0 if drawn_to_scale(tree) else spacing.dimension_pitch * leaf_count + 40
     bottom = min(notes_top, sheet_height - 150) - dimensions_height - 70
     return (170, 150, sheet_width - 230, max(bottom, 420))
 
 
-def sheet_placement(source: HarnessSource, tree: HarnessTree) -> Placement:
+def sheet_placement(source: HarnessSource, tree: HarnessTree, spacing: Spacing = spacings[0]) -> Placement:
     """Where sheet 1 draws each node; the explorer's 2D view uses the same placement."""
-    box = drawing_box(source, tree)
-    return routed_placement(source, tree, box) if drawn_to_scale(tree) else place_nodes(tree, box)
+    box = drawing_box(source, tree, spacing)
+    return routed_placement(source, tree, box) if drawn_to_scale(tree) else place_nodes(tree, box, spacing)
 
 
 standard_scales = (1, 2, 2.5, 4, 5, 10, 20, 25, 50, 100, 200)
@@ -305,12 +318,12 @@ def bundle_path(parent_x, parent_y, child_x, child_y) -> tuple[str, tuple[float,
 # connectors and splices, labels, covering balloons, overall dimensions and notes. Each
 # layer records what it draws, so later layers can keep clear of it.
 def formboard_sheet(source: HarnessSource, tree: HarnessTree, routes: list[Route], bom: list[BomLine],
-                    sheet_count: int, check_errors: int) -> tuple[str, SheetLayout]:
+                    sheet_count: int, check_errors: int, spacing: Spacing = spacings[0]) -> tuple[str, SheetLayout]:
     """Sheet 1's SVG and the record of what it draws where."""
-    placement = sheet_placement(source, tree)
+    placement = sheet_placement(source, tree, spacing)
     out, regions = frame(source, 1, sheet_count, "HARNESS DRAWING", check_errors, placement.scale_text())
     sheet_class = RoutedFormboardSheet if drawn_to_scale(tree) else FormboardSheet
-    sheet = sheet_class(source, tree, bom, out, SheetLayout(regions), placement)
+    sheet = sheet_class(source, tree, bom, out, SheetLayout(regions), placement, spacing)
     covering_marks = sheet.draw_coverings()
     sheet.draw_bundles(wire_counts_by_segment(routes))
     sheet.draw_segment_dimensions()
@@ -328,11 +341,12 @@ class FormboardSheet:
     """Sheet 1 while it is being drawn: the source, where each node sits, and what is drawn so far."""
 
     def __init__(self, source: HarnessSource, tree: HarnessTree, bom: list[BomLine], out: list[str],
-                 layout: SheetLayout, placement: Placement) -> None:
+                 layout: SheetLayout, placement: Placement, spacing: Spacing = spacings[0]) -> None:
         self.source, self.tree, self.bom, self.out, self.layout = source, tree, bom, out, layout
         self.drawing = source["drawing"]
         self.connectors = source["connectors"]
-        self.box = drawing_box(source, tree)
+        self.spacing = spacing
+        self.box = drawing_box(source, tree, spacing)
         self.placement = placement
         self.x, self.y = placement.x, placement.y
         self.caption_bottom: dict[str, float] = {}
@@ -452,7 +466,7 @@ class FormboardSheet:
         for index, wire in enumerate(wires_here):
             wire_y = y + (index - (count - 1) / 2) * min(5, (body_height - 10) / max(count, 1))
             path = f"M{fan_start:.1f},{y:.1f} C{control_x:.1f},{y:.1f} {control_x:.1f},{wire_y:.1f} {x:.1f},{wire_y:.1f}"
-            base_color, *stripe_colors = color_parts(wire.get("color"))
+            base_color, *stripe_colors = color_parts(chosen_color(wire))
             self.out.append(f'<path d="{path}" fill="none" stroke="{display_color(base_color)}" stroke-width="2"/>')
             for stripe in stripe_colors[:1]:
                 self.out.append(f'<path d="{path}" fill="none" stroke="{display_color(stripe)}" stroke-width="2" '
@@ -544,19 +558,20 @@ class FormboardSheet:
         tree, root = self.tree, self.tree.root
         leaves = sorted((node for node in tree.order if node in self.connectors and node != root and tree.is_leaf(node)),
                         key=lambda node: self.x[node])
-        first_row = max(max(self.y.values()) + 100, self.box[3] + 60)
+        pitch = self.spacing.dimension_pitch
+        first_row = max(max(self.y.values()) + self.spacing.dimension_clearance, self.box[3] + 60)
         for index, leaf in enumerate(leaves):
             length, minimum = tree.depth[leaf], tree.minimum_depth[leaf]
             label = f"{format_length(length)} REF" if length is not None else f"{unknown_length_text(minimum)} REF"
             what = f"overall dimension {root}–{leaf}"
-            row_y = first_row + index * 24
+            row_y = first_row + index * pitch
             self.out.append(draw_dimension(self.layout, what, self.x[root], self.x[leaf], row_y, f"{label}  ({root}–{leaf})"))
             self.out.append(draw_broken_extension(self.layout, f"{what} extension", self.x[leaf],
                                                   self.caption_bottom.get(leaf, self.y[leaf] + 20), row_y + 4, {what}))
         if leaves:
             self.out.append(draw_broken_extension(self.layout, f"{root} datum extension", self.x[root],
                                                   self.caption_bottom.get(root, self.y[root] + 20),
-                                                  first_row + (len(leaves) - 1) * 24 + 4,
+                                                  first_row + (len(leaves) - 1) * pitch + 4,
                                                   {f"overall dimension {root}–{leaf}" for leaf in leaves}))
 
     def draw_notes(self) -> None:
@@ -770,13 +785,19 @@ def length_break(x, y, bundle_width) -> str:
 
 # The standard notes, then any the source adds, each wrapped to 150 characters. A routed
 # harness is drawn to scale, and a 3D route is drawn in plan.
+unchecked_note = "NOT YET CHECKED: VERIFY PARTS, PINOUTS AND LENGTHS AGAINST THE DATASHEETS AND DESIGN BEFORE RELEASE."
+
+
 def default_notes(source: HarnessSource, tree: HarnessTree, scale_denominator: float | None) -> list[str]:
     """The notes printed on sheet 1."""
     drawing = source["drawing"]
     datum = drawing.get("datum", "connector rear face")
     tolerances = ", ".join((f"≤{row['upto']}: ±{row['tol']}" if row.get("upto") else f"over: ±{row['tol']}")
                            for row in drawing.get("tolerance", conventions(drawing)["tolerance"]))
-    notes = [
+    # Until a person signs it as checked, the drawing says it has not been: it was drawn by
+    # software from a source that may itself have been written by an assistant.
+    unchecked = [] if drawing.get("checked_by") else [unchecked_note]
+    notes = unchecked + [
         f"FABRICATE, INSPECT AND TEST PER IPC/WHMA-A-620, CLASS {drawing.get('ipc_class', 2)}.",
         f"ALL DIMENSIONS IN {drawing.get('units', 'mm').upper()}. LENGTHS ARE MEASURED FROM {datum.upper()} TO BREAKOUT CENTRE "
         f"OR TO THE NEXT {datum.upper()}.",

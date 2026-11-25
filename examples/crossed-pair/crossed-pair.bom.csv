@@ -1,0 +1,6 @@
+find,qty,unit,pn,description,manufacturer,refs
+1,2,EA,22-01-3047,"KK 254, 4 pos",Molex,P1 J1
+2,0.4,m,,"Hook-up wire, 24 AWG, BK",,W1
+3,0.4,m,,"Hook-up wire, 24 AWG, RD",,W2
+4,0.4,m,,"Hook-up wire, 24 AWG, YE",,W3
+5,0.4,m,,"Hook-up wire, 24 AWG, GN",,W4

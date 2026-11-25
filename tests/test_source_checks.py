@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tests.generator import run_generator_on_text
+from tests.generator import example_text, run_generator_on_text
 from tests.test_output_integrity import two_wire_harness
 
 labelled_harness = two_wire_harness.replace("pinlabels: [GND, VCC]}", "pinlabels: [GND, VCC], pn: 22-01-3027}") + """  coverings: [{item: SLV, segments: [P1-J1]}]
@@ -45,6 +45,16 @@ class SourceChecksTest(unittest.TestCase):
     def test_a_gauge_inside_the_contact_range_is_not_reported(self) -> None:
         source = labelled_harness.replace("J1: {type: KK 254, pincount: 2,", "J1: {type: KK 254, awg: [24, 30], pincount: 2,")
         self.assertEqual(self.findings_for(source), "OK     no findings\n")
+
+    # Two wires swapped between their pins is one mistake, reported as one: which nets are crossed,
+    # and how they are wired instead.
+    def test_crossed_wires_are_reported_as_crossed(self) -> None:
+        findings = self.findings_for(example_text("crossed-pair"))
+        self.assertEqual(findings, "ERROR  nets SCL and SDA are crossed: wired P1:3–J1:4, P1:4–J1:3\n")
+
+    def test_a_short_that_is_not_a_crossing_is_still_a_short(self) -> None:
+        source = example_text("crossed-pair").replace('  - {id: W4, from: "P1:4", to: "J1:3"', '  - {id: W4, from: "P1:4", to: "J1:4"')
+        self.assertIn("SHORT: nets SCL and SDA are connected", self.findings_for(source))
 
     def test_a_covering_item_that_is_not_listed(self) -> None:
         findings = self.findings_for(labelled_harness.replace("{item: SLV,", "{item: SLV9,"))

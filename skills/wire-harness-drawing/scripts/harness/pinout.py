@@ -2,7 +2,7 @@
 import math
 from dataclasses import dataclass
 
-from harness.source import HarnessSource, cavity_positions, color_parts, display_color, wire_end
+from harness.source import chosen_color, HarnessSource, cavity_positions, color_parts, display_color, wire_end
 from harness.svg import ink, rect, text
 
 cavity_pitch = 24
@@ -56,8 +56,8 @@ def pinout_figure(source: HarnessSource, designator: str, connector: dict) -> Fi
     for wire in source["wires"]:
         for end in ("from", "to"):
             end_designator, pin = wire_end(wire[end])
-            if end_designator == designator and pin not in wire_colors and wire.get("color"):
-                wire_colors[pin] = display_color(color_parts(wire["color"])[0])
+            if end_designator == designator and pin not in wire_colors and chosen_color(wire):
+                wire_colors[pin] = display_color(color_parts(chosen_color(wire))[0])
     span_x = max(x for x, _ in positions.values()) * cavity_pitch
     span_y = max(y for _, y in positions.values()) * cavity_pitch
     face = connector["face"]
