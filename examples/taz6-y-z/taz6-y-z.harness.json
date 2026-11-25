@@ -83,7 +83,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J1",
@@ -121,7 +122,14 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": {
+    "shape": "box",
+    "length": 6.35,
+    "width": 13.8,
+    "height": 4.5,
+    "color": "#ece6d6"
+   }
   },
   {
    "id": "J2",
@@ -159,7 +167,14 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": {
+    "shape": "box",
+    "length": 6.35,
+    "width": 13.8,
+    "height": 4.5,
+    "color": "#ece6d6"
+   }
   },
   {
    "id": "J3",
@@ -197,7 +212,14 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": {
+    "shape": "box",
+    "length": 6.35,
+    "width": 13.8,
+    "height": 4.5,
+    "color": "#ece6d6"
+   }
   }
  ],
  "wires": [
@@ -513,8 +535,8 @@
  "cables": [
   {
    "id": "W1",
-   "description": "4-conductor shielded, 22 AWG, grey",
-   "part_number": "EL-WR0099",
+   "description": "4-conductor, 22 AWG, foil shield and drain, grey",
+   "part_number": "C0762A",
    "conductors": 4,
    "wires": [
     "W1-RD",
@@ -522,6 +544,7 @@
     "W1-GN",
     "W1-BK"
    ],
+   "shield": true,
    "color": "#9a9a96",
    "run": [
     "P1",
@@ -559,8 +582,8 @@
   },
   {
    "id": "W2",
-   "description": "4-conductor shielded, 22 AWG, grey",
-   "part_number": "EL-WR0099",
+   "description": "4-conductor, 22 AWG, foil shield and drain, grey",
+   "part_number": "C0762A",
    "conductors": 4,
    "wires": [
     "W2-RD",
@@ -568,6 +591,7 @@
     "W2-GN",
     "W2-BK"
    ],
+   "shield": true,
    "color": "#9a9a96",
    "run": [
     "P1",
@@ -606,8 +630,8 @@
   },
   {
    "id": "W3",
-   "description": "4-conductor shielded, 22 AWG, grey",
-   "part_number": "EL-WR0099",
+   "description": "4-conductor, 22 AWG, foil shield and drain, grey",
+   "part_number": "C0762A",
    "conductors": 4,
    "wires": [
     "W3-RD",
@@ -615,6 +639,7 @@
     "W3-GN",
     "W3-BK"
    ],
+   "shield": true,
    "color": "#9a9a96",
    "run": [
     "P1",
@@ -657,37 +682,37 @@
    "id": "P1",
    "kind": "connector",
    "x": 276.8,
-   "y": 445.0
+   "y": 437.5
   },
   {
    "id": "B1",
    "kind": "breakout",
    "x": 423.2,
-   "y": 445.0
+   "y": 437.5
   },
   {
    "id": "J1",
    "kind": "connector",
    "x": 745.1,
-   "y": 615.0
+   "y": 607.5
   },
   {
    "id": "B2",
    "kind": "breakout",
    "x": 843.2,
-   "y": 445.0
+   "y": 437.5
   },
   {
    "id": "J2",
    "kind": "connector",
    "x": 1057.8,
-   "y": 275.0
+   "y": 267.5
   },
   {
    "id": "J3",
    "kind": "connector",
    "x": 1263.2,
-   "y": 445.0
+   "y": 437.5
   }
  ],
  "segments": [
@@ -698,7 +723,7 @@
    ],
    "known": true,
    "length": "75 ±3",
-   "path": "M276.8,445.0 L423.2,445.0",
+   "path": "M276.8,437.5 L423.2,437.5",
    "wires": [
     "W1-RD",
     "W1-WH",
@@ -733,7 +758,7 @@
    ],
    "known": true,
    "length": "165 ±3",
-   "path": "M423.2,445.0 C499.7,445.0 499.7,615.0 576.2,615.0 L745.1,615.0",
+   "path": "M423.2,437.5 C499.7,437.5 499.7,607.5 576.2,607.5 L745.1,607.5",
    "wires": [
     "W1-RD",
     "W1-WH",
@@ -775,7 +800,7 @@
    ],
    "known": true,
    "length": "245 ±3",
-   "path": "M423.2,445.0 L843.2,445.0",
+   "path": "M423.2,437.5 L843.2,437.5",
    "wires": [
     "W2-RD",
     "W2-WH",
@@ -806,7 +831,7 @@
    ],
    "known": true,
    "length": "110 ±3",
-   "path": "M843.2,445.0 C902.2,445.0 902.2,275.0 961.2,275.0 L1057.8,275.0",
+   "path": "M843.2,437.5 C902.2,437.5 902.2,267.5 961.2,267.5 L1057.8,267.5",
    "wires": [
     "W2-RD",
     "W2-WH",
@@ -838,7 +863,7 @@
    ],
    "known": true,
    "length": "295 ±3",
-   "path": "M843.2,445.0 L1263.2,445.0",
+   "path": "M843.2,437.5 L1263.2,437.5",
    "wires": [
     "W3-RD",
     "W3-WH",
@@ -863,5 +888,11 @@
     ]
    ]
   }
- ]
+ ],
+ "labels": [],
+ "release": {
+  "errors": 0,
+  "warnings": 3,
+  "for_release": true
+ }
 }

@@ -1,0 +1,254 @@
+{
+ "format": "wire-harness-explorer/1",
+ "title": "XLR MIC CABLE",
+ "number": "T-12",
+ "rev": "A",
+ "units": "mm",
+ "geometry": "schematic",
+ "root": "P1",
+ "connectors": [
+  {
+   "id": "P1",
+   "label": "TO MICROPHONE",
+   "type": "XLR3",
+   "part_number": "NC3FXX",
+   "manufacturer": "Neutrik",
+   "splice": false,
+   "generic": false,
+   "shape": "circular",
+   "gender": "female",
+   "pins": [
+    {
+     "pin": "1",
+     "label": "SHLD"
+    },
+    {
+     "pin": "2",
+     "label": "HOT"
+    },
+    {
+     "pin": "3",
+     "label": "COLD"
+    }
+   ],
+   "face": {
+    "view": "mating face",
+    "round": true,
+    "cavities": {
+     "1": [
+      1.301,
+      0.0
+     ],
+     "2": [
+      0.0,
+      0.0
+     ],
+     "3": [
+      0.65,
+      0.76
+     ]
+    }
+   },
+   "body": null
+  },
+  {
+   "id": "P2",
+   "label": "TO DESK",
+   "type": "XLR3",
+   "part_number": "NC3MXX",
+   "manufacturer": "Neutrik",
+   "splice": false,
+   "generic": false,
+   "shape": "circular",
+   "gender": "male",
+   "pins": [
+    {
+     "pin": "1",
+     "label": "SHLD"
+    },
+    {
+     "pin": "2",
+     "label": "HOT"
+    },
+    {
+     "pin": "3",
+     "label": "COLD"
+    }
+   ],
+   "face": {
+    "view": "mating face",
+    "round": true,
+    "cavities": {
+     "1": [
+      0.0,
+      0.0
+     ],
+     "2": [
+      1.414,
+      0.0
+     ],
+     "3": [
+      0.707,
+      0.707
+     ]
+    }
+   },
+   "body": null
+  }
+ ],
+ "wires": [
+  {
+   "id": "W1-RD",
+   "from": {
+    "connector": "P1",
+    "pin": "2"
+   },
+   "to": {
+    "connector": "P2",
+    "pin": "2"
+   },
+   "signal": "HOT",
+   "gauge": "24 AWG",
+   "color": "RD",
+   "colors": [
+    "#c4453f"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W1",
+   "route": [
+    "P1",
+    "P2"
+   ]
+  },
+  {
+   "id": "W1-WH",
+   "from": {
+    "connector": "P1",
+    "pin": "3"
+   },
+   "to": {
+    "connector": "P2",
+    "pin": "3"
+   },
+   "signal": "COLD",
+   "gauge": "24 AWG",
+   "color": "WH",
+   "colors": [
+    "#eeeeea"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W1",
+   "route": [
+    "P1",
+    "P2"
+   ]
+  },
+  {
+   "id": "W1-SH",
+   "from": {
+    "connector": "P1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "P2",
+    "pin": "1"
+   },
+   "signal": "SHLD",
+   "gauge": "24 AWG",
+   "color": "SR",
+   "colors": [
+    "#c3c3c0"
+   ],
+   "cut_length": "",
+   "twist": "",
+   "cable": "W1",
+   "route": [
+    "P1",
+    "P2"
+   ]
+  }
+ ],
+ "cables": [
+  {
+   "id": "W1",
+   "description": "2-conductor shielded microphone cable, 24 AWG",
+   "part_number": "",
+   "conductors": 3,
+   "wires": [
+    "W1-RD",
+    "W1-WH",
+    "W1-SH"
+   ],
+   "shield": true,
+   "color": "#2f2f2f",
+   "run": [
+    "P1",
+    "P2"
+   ],
+   "breakouts": {
+    "P1": 25,
+    "P2": 25
+   },
+   "cut_length": "3010",
+   "jacket_length": "2950",
+   "ends": [
+    {
+     "node": "P1",
+     "strip_back": "30",
+     "leads": {
+      "W1-RD": "30",
+      "W1-WH": "30",
+      "W1-SH": "30"
+     }
+    },
+    {
+     "node": "P2",
+     "strip_back": "30",
+     "leads": {
+      "W1-RD": "30",
+      "W1-WH": "30",
+      "W1-SH": "30"
+     }
+    }
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "id": "P1",
+   "kind": "connector",
+   "x": 560.0,
+   "y": 491.5
+  },
+  {
+   "id": "P2",
+   "kind": "connector",
+   "x": 980.0,
+   "y": 491.5
+  }
+ ],
+ "segments": [
+  {
+   "nodes": [
+    "P1",
+    "P2"
+   ],
+   "known": true,
+   "length": "3000 ±30",
+   "path": "M560.0,491.5 L980.0,491.5",
+   "wires": [
+    "W1-RD",
+    "W1-WH",
+    "W1-SH"
+   ]
+  }
+ ],
+ "labels": [],
+ "release": {
+  "errors": 0,
+  "warnings": 0,
+  "for_release": true
+ }
+}

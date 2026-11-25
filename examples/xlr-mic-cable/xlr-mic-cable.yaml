@@ -1,0 +1,44 @@
+# A balanced microphone cable: XLR3 female to XLR3 male, pin 2 hot, pin 3 cold, the shield on pin 1
+# at both ends (AES14 / IEC 60268-12). XLR contacts are neither numbered in order round the face
+# nor evenly spaced, so each face states its cavity positions in millimetres, as seen from the
+# mating face. They are the pad positions of Neutrik's vertical PCB receptacles of the same
+# gender (KiCad footprints Jack_XLR_Neutrik_NC3FAV_Vertical and NC3MAV_Vertical), which stand
+# straight behind the contacts.
+drawing: {title: XLR MIC CABLE, number: T-12, rev: A, round_to: 10}
+connectors:
+  P1:
+    label: TO MICROPHONE
+    type: XLR3
+    subtype: female cable connector
+    pn: NC3FXX
+    manufacturer: Neutrik
+    pincount: 3
+    pinlabels: [SHLD, HOT, COLD]
+    gender: female
+    shape: circular
+    face: {view: mating face, cavities: {1: [0, 0], 2: [-7.62, 0], 3: [-3.81, 4.45]}}
+  P2:
+    label: TO DESK
+    type: XLR3
+    subtype: male cable connector
+    pn: NC3MXX
+    manufacturer: Neutrik
+    pincount: 3
+    pinlabels: [SHLD, HOT, COLD]
+    gender: male
+    shape: circular
+    face: {view: mating face, cavities: {1: [0, 0], 2: [7.62, 0], 3: [3.81, 3.81]}}
+cables:
+  W1:
+    desc: 2-conductor shielded microphone cable, 24 AWG
+    gauge: 24 AWG
+    color: BK
+    shield: true
+    breakout: 25
+    conductors:
+      - {color: RD, from: "P1:2", to: "P2:2", signal: HOT}
+      - {color: WH, from: "P1:3", to: "P2:3", signal: COLD}
+      - {drain: true, from: "P1:1", to: "P2:1", signal: SHLD}
+layout:
+  root: P1
+  segments: [[P1, P2, 3000]]

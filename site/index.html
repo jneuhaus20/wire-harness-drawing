@@ -19,6 +19,7 @@
     <a href="#package">Package</a>
     <a href="#checks">Checks</a>
     <a href="#cables">Cables</a>
+    <a href="#pinouts">Pinouts</a>
     <a href="#unknowns">Unknowns</a>
     <a href="#install">Install</a>
     <a href="https://github.com/jneuhaus20/wire-harness-drawing">GitHub</a>
@@ -45,12 +46,24 @@
   <section id="real" class="band" data-example="taz6-y-z">
     <div class="section-head">
       <h2>A harness off a real machine.</h2>
-      <p>LulzBot publishes the drawings for every harness in its TAZ 6 printer. This is the one that runs the Y and both Z motors: a 16-way plug at the control box and three shielded cables, routed along the frame’s lower cross member to the foot of each upright and to the Y motor under the bed.</p>
+      <p>LulzBot publishes the drawings for every harness in its TAZ 6 printer. This is the one that runs the Y and both Z motors: a 16-way plug at the control box and three shielded cables, tied along the frame’s lower rear rail to the Z motor at the foot of each upright and to the Y motor at the back of the bed.</p>
     </div>
     <div class="pair">
       <figure class="photo">
-        <img src="taz6.jpg" width="1600" height="1200" alt="A LulzBot TAZ 6 3D printer: the control box stands at the left of an open black frame, with the bed low in the middle and the Z lead screws rising at each side." loading="lazy">
-        <figcaption>The TAZ 6. The control box is at the left; the Z motors sit at the foot of each upright, under the bed. Photo: LulzBot, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</figcaption>
+        <div class="callouts">
+          <img src="taz6.jpg" width="1600" height="1200" alt="A LulzBot TAZ 6 3D printer: the control box stands at the left of an open black frame, with the bed low in the middle and the Z lead screws rising at each side." loading="lazy">
+          <svg viewBox="0 0 1600 1200" aria-hidden="true">
+            <path d="M330 520 L230 520" /><circle cx="330" cy="520" r="9"/>
+            <path d="M462 940 L462 1090" /><circle cx="462" cy="940" r="9"/>
+            <path d="M690 925 L690 1150" /><circle cx="690" cy="925" r="9"/>
+            <path d="M1158 935 L1158 1090" /><circle cx="1158" cy="935" r="9"/>
+          </svg>
+          <span class="callout" style="left:2%;top:40%">Control box,<br>16-way plug P1</span>
+          <span class="callout" style="left:21%;top:91%">J1 · Z left motor</span>
+          <span class="callout" style="left:38%;top:96%">J2 · Y motor, behind the bed</span>
+          <span class="callout" style="left:63%;top:91%">J3 · Z right motor</span>
+        </div>
+        <figcaption>The TAZ 6 from the front. The cables run along the lower rear rail, behind the bed. Photo: LulzBot, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</figcaption>
       </figure>
       <figure class="explorer-figure">
         <wire-harness-explorer data-model="taz6-y-z"></wire-harness-explorer>
@@ -58,7 +71,7 @@
           <span class="files"><a href="examples/taz6-y-z/taz6-y-z.yaml">source</a> <a href="examples/taz6-y-z/taz6-y-z.sheet1.svg">drawing</a> <a href="examples/taz6-y-z/taz6-y-z.cables.csv">cable list</a></span></figcaption>
       </figure>
     </div>
-    <p class="note">From the route, the generator cuts the three cables to <span class="num" data-bind="taz6-y-z.cables.W1.cut_length"></span>, <span class="num" data-bind="taz6-y-z.cables.W2.cut_length"></span> and <span class="num" data-bind="taz6-y-z.cables.W3.cut_length"></span> mm, the lengths on LulzBot’s drawing, with <span class="num" data-bind="taz6-y-z.cables.W1.ends.0.strip_back"></span> mm of jacket stripped at each end. Redrawn from LulzBot drawing <a href="https://download.lulzbot.com/TAZ/6.0/production_parts/electronics/Wire_Harnesses/External_Cable_Harnesses/">EL-HR0091</a> (© Aleph Objects, Inc., CC BY-SA 4.0); the redrawing is under the same licence.</p>
+    <p class="note">From the route, the generator cuts the three cables to <span class="num" data-bind="taz6-y-z.cables.W1.cut_length"></span>, <span class="num" data-bind="taz6-y-z.cables.W2.cut_length"></span> and <span class="num" data-bind="taz6-y-z.cables.W3.cut_length"></span> mm, the lengths on LulzBot’s drawing, with <span class="num" data-bind="taz6-y-z.cables.W1.ends.0.strip_back"></span> mm of jacket stripped at each end. A test reads LulzBot’s own drawing file and holds the package to it: every length, strip, pin, colour and part. Redrawn from LulzBot drawing <a href="https://download.lulzbot.com/TAZ/6.0/production_parts/electronics/Wire_Harnesses/External_Cable_Harnesses/">EL-HR0091</a> (© Aleph Objects, Inc., CC BY-SA 4.0); the redrawing is under the same licence.</p>
   </section>
 
   <section id="package" class="band" data-example="two-wire">
@@ -85,19 +98,20 @@
     <p class="note">W1 is cut to <span class="num" data-bind="two-wire.wires.W1.cut_length"></span> mm: the branches it runs through, plus any service and termination allowance the source states, rounded up. The package also carries the wiring diagram (drawn by <a href="https://github.com/wireviz/WireViz">WireViz</a>), CSVs for purchasing and the cutting bench, a PDF of every sheet, and the model the 3D view on this page reads.</p>
   </section>
 
-  <section id="checks" class="band" data-example="too-many-branches">
+  <section id="checks" class="band" data-example="crossed-pair">
     <div class="section-head">
       <h2>It checks before it draws.</h2>
-      <p>Every pin a wire lands on exists. Every gauge fits its contact. The wiring agrees with a netlist stated separately in the source. Lengths, tolerances, part numbers and the drawing's own fit on the sheet are checked too. An error stops release: the generator exits non-zero and every sheet is stamped NOT FOR RELEASE.</p>
+      <p>Every pin a wire lands on exists, every gauge suits its contact, and the wiring agrees with a netlist stated separately in the source, so a mistake has to be made twice to get through. Lengths, tolerances, part numbers and the drawing’s fit on its sheet are checked too. An error stops release: the generator exits non-zero and every sheet is stamped NOT FOR RELEASE.</p>
     </div>
     <div class="split">
       <figure class="source">
-        <figcaption><a href="examples/too-many-branches/too-many-branches.checks.txt">too-many-branches.checks.txt</a></figcaption>
-        <pre class="code checks" data-include="examples/too-many-branches/too-many-branches.checks.txt"></pre>
+        <figcaption><a href="examples/crossed-pair/crossed-pair.checks.txt">crossed-pair.checks.txt</a></figcaption>
+        <pre class="code checks" data-include="examples/crossed-pair/crossed-pair.checks.txt"></pre>
+        <figcaption class="after">The wire list crosses SDA and SCL between the plugs. The netlist says where each should go, and the check says how they are wired instead.</figcaption>
       </figure>
       <figure class="sheet">
-        <a href="examples/too-many-branches/too-many-branches.sheet1.svg"><img src="examples/too-many-branches/too-many-branches.sheet1.svg" alt="Sheet 1 of a harness with ten branches off one trunk, crowded past its edges and stamped not for release." loading="lazy"></a>
-        <figcaption>Ten branches off one trunk do not fit one sheet. The report says what collides with what, and how to fix it.</figcaption>
+        <a href="examples/crossed-pair/crossed-pair.sheet2.svg"><img src="examples/crossed-pair/crossed-pair.sheet2.svg" alt="Sheet 2 of the sensor lead: its wire list and connector tables, stamped not for release." loading="lazy"></a>
+        <figcaption>Every sheet of the package carries the mark until the source is fixed.</figcaption>
       </figure>
     </div>
   </section>
@@ -135,37 +149,66 @@
     </div>
   </section>
 
+  <section id="pinouts" class="band" data-example="xlr-mic-cable">
+    <div class="section-head">
+      <h2>Pinouts as the connector really is.</h2>
+      <p>An XLR’s three contacts are neither numbered in order round the face nor evenly spaced, and a female face is the mirror of a male one. The source states each contact’s position from the datasheet, and every pinout, on the drawing and in the 3D view, puts each numbered contact exactly there, seen from the side it names.</p>
+    </div>
+    <div class="split wide-figure">
+      <figure class="explorer-figure">
+        <wire-harness-explorer data-model="xlr-mic-cable" view="2d"></wire-harness-explorer>
+        <figcaption><span>Click either plug to see its face.</span>
+          <span class="files"><a href="examples/xlr-mic-cable/xlr-mic-cable.yaml">source</a> <a href="examples/xlr-mic-cable/xlr-mic-cable.sheet2.svg">tables and pinouts</a></span></figcaption>
+      </figure>
+      <div class="aside">
+        <h3>Checked against the parts</h3>
+        <p>The tests read Neutrik’s XLR and a 9-way D-sub’s footprints from the KiCad library and require every pinout to be those contacts, numbered the same, scaled evenly, never turned or mirrored.</p>
+      </div>
+    </div>
+  </section>
+
   <section id="unknowns" class="band">
     <div class="section-head">
       <h2>Say what isn’t known yet.</h2>
-      <p>Drawings start before every part is chosen. A length can be a minimum or TBD; a connector can be just a pin count and a shape; a colour can be left open. The package shows each as open, carries it into every cut length it touches, and keeps going.</p>
+      <p>Drawings start before every part is chosen. A length can be a minimum or TBD, a colour can be TBD, and a connector can be just a pin count and a shape. The package shows each as open, carries it into every cut length it touches, and keeps going.</p>
     </div>
-    <div class="pair">
-      <figure class="sheet" data-example="unknowns">
-        <a href="examples/unknowns/unknowns.sheet1.svg"><img src="examples/unknowns/unknowns.sheet1.svg" alt="Sheet 1 of a harness with one branch given as a 200 mm minimum and one left TBD." loading="lazy"></a>
-        <figcaption>One branch at least 200 mm, one TBD, and W2’s colour not chosen. <a href="examples/unknowns/unknowns.checks.txt">The report</a> lists the lengths every cut waits on.</figcaption>
+    <div class="pair" data-example="unknowns">
+      <figure class="sheet">
+        <a href="examples/unknowns/unknowns.sheet1.svg"><img src="examples/unknowns/unknowns.sheet1.svg" alt="Sheet 1 of a harness with one branch given as a 200 mm minimum and one left TBD, drawn with break marks." loading="lazy"></a>
+        <figcaption>One branch at least 200 mm, one TBD, each drawn broken. <a href="examples/unknowns/unknowns.checks.txt">The report</a> lists the lengths every cut waits on.</figcaption>
       </figure>
-      <figure class="explorer-figure" data-example="generic-parts">
+      <figure class="explorer-figure">
+        <wire-harness-explorer data-model="unknowns" view="2d"></wire-harness-explorer>
+        <figcaption><span>The same harness. Click W2: its colour is TBD, so it is drawn grey and listed as not chosen.</span>
+          <span class="files"><a href="examples/unknowns/unknowns.yaml">source</a></span></figcaption>
+      </figure>
+    </div>
+    <div class="split wide-figure" data-example="generic-parts">
+      <figure class="explorer-figure">
         <wire-harness-explorer data-model="generic-parts"></wire-harness-explorer>
-        <figcaption><span>P1 is known only as a male circular 4-pin. J1 is a chosen Molex part with its mating face stated.</span>
-          <span class="files"><a href="examples/generic-parts/generic-parts.yaml">source</a></span></figcaption>
+        <figcaption><span>Click P1, then J1.</span>
+          <span class="files"><a href="examples/generic-parts/generic-parts.yaml">source</a> <a href="examples/generic-parts/generic-parts.sheet1.svg">drawing</a></span></figcaption>
       </figure>
+      <div class="aside">
+        <h3>A connector not chosen yet</h3>
+        <p>P1 is known only as a male circular 4-way, so it is drawn generic and its BOM line reads P/N TBD. J1 is a chosen Molex part whose face the source states, so it gets its pinout.</p>
+      </div>
     </div>
   </section>
 
   <section id="routing" class="band" data-example="routed-flat">
     <div class="section-head">
-      <h2>Lay it out, or let it.</h2>
-      <p>Without coordinates the drawing lays itself out: the farthest-reaching run is the trunk and branches alternate either side. Give each node a position, and bends where a branch goes round something, and sheet 1 is drawn to a standard scale.</p>
+      <h2>An automatic layout, or your own route in 2D or 3D.</h2>
+      <p>Give no coordinates and the generator lays the harness out flat and not to scale: the farthest-reaching run is the trunk, branches alternate either side, and a crowded harness is drawn tighter until it fits its sheet. Give every node a position in 2D, with bends where a branch goes round something, and sheet 1 is that route at a standard scale. Give positions in 3D, as the TAZ 6 harness does, and sheet 1 is its plan view while the 3D view shows the route in space.</p>
     </div>
-    <div class="split">
+    <div class="pair">
+      <figure class="sheet" data-example="ten-branches">
+        <a href="examples/ten-branches/ten-branches.sheet1.svg"><img src="examples/ten-branches/ten-branches.sheet1.svg" alt="Sheet 1 of a harness with ten branches off one trunk, laid out automatically and drawn tight enough to fit." loading="lazy"></a>
+        <figcaption>Automatic: ten branches off one trunk, drawn tighter to fit one sheet. <a href="examples/ten-branches/ten-branches.yaml">Source</a>.</figcaption>
+      </figure>
       <figure class="sheet">
         <a href="examples/routed-flat/routed-flat.sheet1.svg"><img src="examples/routed-flat/routed-flat.sheet1.svg" alt="Sheet 1 of a routed harness drawn to scale, with one branch bent around an obstacle." loading="lazy"></a>
-        <figcaption>Drawn to scale, with the E1 branch bent round an obstacle.</figcaption>
-      </figure>
-      <figure class="source">
-        <figcaption><a href="examples/routed-flat/routed-flat.yaml">routed-flat.yaml</a></figcaption>
-        <pre class="code" data-include="examples/routed-flat/routed-flat.yaml"></pre>
+        <figcaption>Your route in 2D: drawn to scale, with the E1 branch bent round an obstacle. <a href="examples/routed-flat/routed-flat.yaml">Source</a>.</figcaption>
       </figure>
     </div>
   </section>
@@ -178,14 +221,15 @@
     <div class="install">
       <div class="card">
         <h3>Claude Code</h3>
-        <p>In the CLI, an IDE, or the desktop app’s Code tab, add the marketplace and install the plugin:</p>
-        <pre class="command"><code>/plugin marketplace add jneuhaus20/wire-harness-drawing</code><button type="button" class="copy" aria-label="Copy command">Copy</button></pre>
-        <pre class="command"><code>/plugin install wire-harness-drawing@wire-harness-drawing</code><button type="button" class="copy" aria-label="Copy command">Copy</button></pre>
-        <p class="small">Turn on auto-update for the marketplace under <code>/plugin</code> › Marketplaces to get new releases on their own.</p>
+        <p>In a terminal, with Claude Code 2.1.292 or later:</p>
+        <pre class="command"><code>claude plugin install wire-harness-drawing --marketplace jneuhaus20/wire-harness-drawing</code><button type="button" class="copy" aria-label="Copy command">Copy</button></pre>
+        <p class="small">That installs it for the terminal, the desktop app’s Code tab and VS Code alike. Or, in the desktop app, open Customize › Plugins › Add › Add marketplace, enter <code>jneuhaus20/wire-harness-drawing</code>, then add Wire harness drawing to this computer.</p>
+        <p class="small">New releases arrive on their own once auto-update is on: in a <code>claude</code> session, <code>/plugin</code> › Marketplaces › wire-harness-drawing.</p>
       </div>
       <div class="card">
         <h3>Claude apps and claude.ai</h3>
-        <p>Download the skill zip from the <a href="https://github.com/jneuhaus20/wire-harness-drawing/releases/latest">latest release</a> and upload it under Customize › Skills. Upload each new release to update.</p>
+        <p>Download the skill zip from the <a href="https://github.com/jneuhaus20/wire-harness-drawing/releases/latest">latest release</a>. In Customize › Skills, choose + › Create skill › Upload a skill, and upload the zip.</p>
+        <p class="small">Skills need code execution, under Settings › Capabilities. Upload each new release to update.</p>
       </div>
       <div class="card">
         <h3>The generator on its own</h3>
@@ -193,6 +237,10 @@
         <pre class="command"><code>python3 scripts/harnessgen.py harness.yaml</code><button type="button" class="copy" aria-label="Copy command">Copy</button></pre>
       </div>
     </div>
+    <aside class="caution">
+      <h3>Check before you build</h3>
+      <p>Claude writes the source and this generator draws it; both make mistakes, and the checks catch many but not all. Until a person has checked a drawing against the datasheets and the design, every sheet says so. Never send a package to a shop unchecked.</p>
+    </aside>
   </section>
 
   <section class="band limits">
@@ -200,8 +248,8 @@
       <h2>Where it stops</h2>
     </div>
     <ul>
-      <li>One sheet holds about ten branches. Past that, split the harness into sub-harnesses joined at an in-line connector; the checks tell you when.</li>
-      <li>A shield is drawn as its drain wire plus a covering. Overbraid termination goes in the notes.</li>
+      <li>Sheet 1 is one A3 sheet. A crowded harness is drawn tighter to fit it; one too big even then is reported, and is best split into sub-harnesses joined at an in-line connector.</li>
+      <li>A cable’s shield is drawn on the cable and its drain wire listed as a conductor. Overbraid termination goes in the notes.</li>
       <li>Routed drawings are to a standard scale, not a full-size formboard print.</li>
       <li>The drawing follows common practice for harness drawings and IPC/WHMA-A-620 workmanship classes. Your shop’s own drawing standard still governs.</li>
     </ul>

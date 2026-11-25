@@ -1,5 +1,6 @@
 """A colour is read however a person would write it, and kept as its IEC 60757 code."""
 import csv
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -49,6 +50,15 @@ class ColorInSourceTest(unittest.TestCase):
         directory = self.generate(source)
         self.assertIn("WARN   W2: colour 'BLURPLE' is not a colour this drawing knows; drawn grey",
                       (directory / "harness.checks.txt").read_text())
+
+    def test_a_colour_still_to_be_decided_is_not_reported_and_has_no_colour(self) -> None:
+        source = example_text("two-wire").replace("color: RD}", "color: TBD}")
+        directory = self.generate(source)
+        self.assertNotIn("colour", (directory / "harness.checks.txt").read_text())
+        rows = list(csv.DictReader((directory / "harness.wirelist.csv").read_text().splitlines()))
+        self.assertEqual(rows[1]["color"], "TBD")
+        model = json.loads((directory / "harness.harness.json").read_text())
+        self.assertEqual(model["wires"][1]["colors"], [])
 
     def test_a_colour_left_out_is_not_reported(self) -> None:
         source = example_text("two-wire").replace(", color: RD}", "}")

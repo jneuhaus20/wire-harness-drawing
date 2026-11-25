@@ -5,7 +5,7 @@ import { test } from "node:test";
 
 const root = new URL("..", import.meta.url);
 const componentPath = new URL("skills/wire-harness-drawing/explorer/wire-harness-explorer.js", root);
-const { boxMesh, buildPlan, buildScene, pinoutSvg, planSvg, samplePath, version } = await import(componentPath);
+const { bodyMesh, boxMesh, buildPlan, buildScene, cableEndsTable, pinoutSvg, planSvg, samplePath, version, zoomedViewBox } = await import(componentPath);
 const example = JSON.parse(readFileSync(new URL("examples/sensor-branch/sensor-branch.harness.json", root), "utf8"));
 const routed = JSON.parse(process.env.ROUTED_MODEL);
 
@@ -128,4 +128,104 @@ test("the initial view fits the whole harness in a frame of any shape, without l
     assert.ok(Math.max(...reach) <= 1, `aspect ${aspect}: a corner is out of view`);
     assert.ok(Math.max(...reach) >= 0.75, `aspect ${aspect}: the harness fills too little of the view`);
   }
+});
+
+test("the pinout popover puts each numbered contact where the model's face does, scaled evenly", () => {
+  const xlr = JSON.parse(readFileSync(new URL("examples/xlr-mic-cable/xlr-mic-cable.harness.json", root), "utf8"));
+  for (const connector of xlr.connectors) {
+    const svg = pinoutSvg(connector, xlr, null);
+    const circles = [...svg.matchAll(/<circle cx="([-\d.]+)" cy="([-\d.]+)" r="10"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+    const labels = [...svg.matchAll(/<text[^>]*>([^<]+)<\/text>/g)].map((m) => m[1]);
+    const face = connector.face.cavities;
+    const [a, b] = Object.keys(face);
+    const drawn = Object.fromEntries(labels.map((label, i) => [label, circles[i]]));
+    const scale = Math.hypot(drawn[b][0] - drawn[a][0], drawn[b][1] - drawn[a][1]) / Math.hypot(face[b][0] - face[a][0], face[b][1] - face[a][1]);
+    for (const [pin, [x, y]] of Object.entries(face)) {
+      assert.ok(near(drawn[pin], [drawn[a][0] + scale * (x - face[a][0]), drawn[a][1] + scale * (y - face[a][1])], 0.01), `${connector.id} pin ${pin}`);
+    }
+  }
+});
+
+test("zooming the 2D view keeps the point under the pointer where it is", () => {
+  const box = [0, 0, 400, 200];
+  const zoomed = zoomedViewBox(box, 0.5, [100, 50]);
+  assert.deepEqual(zoomed, [50, 25, 200, 100]);
+  const back = zoomedViewBox(zoomed, 2, [100, 50]);
+  assert.deepEqual(back, box);
+});
+
+test("a cable's ends table reads End, Lead, Strip, To, Conductors, one group of rows per end", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/split-cable/split-cable.harness.json", root), "utf8"));
+  const [cable] = model.cables;
+  const html = cableEndsTable(cable, model);
+  const headings = [...html.matchAll(/<th>([^<]+)<\/th>/g)].map((m) => m[1]);
+  assert.deepEqual(headings, ["End", "Lead (mm)", "Strip (mm)", "To", "Conductors"]);
+  assert.equal([...html.matchAll(/<tbody class="end">/g)].length, cable.ends.length);
+  const firstRow = html.match(/<tbody class="end"><tr>(.*?)<\/tr>/s)[1];
+  assert.deepEqual([...firstRow.matchAll(/<td>([^<]*)/g)].slice(0, 3).map((m) => m[1]), ["P1", "40", "40"]);
+});
+
+test("a shielded cable shows its shield where the jacket ends, in 3D and in 2D", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/twist-and-cable/twist-and-cable.harness.json", root), "utf8"));
+  const [cable] = model.cables;
+  assert.equal(cable.shield, true);
+  const scene = buildScene(model);
+  const [jacket] = scene.jackets;
+  assert.equal(jacket.shield, true);
+  assert.equal(scene.shieldBands.length, 2, "a band of shield at each end of the jacket");
+  const plain = buildScene({ ...model, cables: [{ ...cable, shield: false }] });
+  assert.equal(plain.shieldBands.length, 0);
+  assert.match(planSvg(model, buildPlan(model)), /class="shield"/);
+  assert.doesNotMatch(planSvg({ ...model, cables: [{ ...cable, shield: false }] }, buildPlan({ ...model, cables: [{ ...cable, shield: false }] })), /class="shield"/);
+});
+
+test("a stated body is drawn at its size and colour; an unstated one is drawn plain and says so", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/taz6-y-z/taz6-y-z.harness.json", root), "utf8"));
+  const stated = { ...model, connectors: model.connectors.map((c) => c.id === "J1" ? { ...c, body: { shape: "box", length: 6.35, width: 13.8, height: 4.5, color: "#ece6d6" } } : { ...c, body: null }) };
+  const scene = buildScene(stated);
+  const j1 = scene.bodies.find((b) => b.connector.id === "J1"), j2 = scene.bodies.find((b) => b.connector.id === "J2");
+  assert.deepEqual(j1.size, [6.35, 4.5, 13.8]);
+  assert.equal(j1.stated, true);
+  assert.deepEqual(j1.color.map((v) => Math.round(v * 255)), [0xec, 0xe6, 0xd6]);
+  assert.equal(j2.stated, false);
+  assert.ok(Math.min(...j2.color) > 0.4, "an unstated body is a plain mid grey, not black");
+  const dsub = buildScene({ ...stated, connectors: stated.connectors.map((c) => c.id === "J1" ? { ...c, body: { ...c.body, shape: "dsub" } } : c) });
+  assert.ok(bodyMesh(dsub.bodies.find((b) => b.connector.id === "J1")).positions.length > bodyMesh(j1).positions.length);
+});
+
+test("the 2D view draws every loose wire in its colour along each bundle it runs in, not only where it fans out", () => {
+  for (const model of [example, routed]) {
+    const svg = planSvg(model, buildPlan(model));
+    for (const wire of model.wires.filter((w) => w.colors.length && !w.cable)) {
+      const strands = [...svg.matchAll(new RegExp(`<path[^>]*data-strand="${wire.id}"[^>]*>`, "g"))].map((m) => m[0]);
+      assert.equal(strands.length, wire.route.length - 1, `${wire.id}: one strand per segment of its route`);
+      assert.ok(strands.every((path) => path.includes(`stroke="${wire.colors[0]}"`)), `${wire.id} is drawn in ${wire.colors[0]}`);
+    }
+  }
+});
+
+test("the 2D view names every breakout, and gives each connector its label under its designator", () => {
+  const svg = planSvg(example, buildPlan(example));
+  for (const node of example.nodes.filter((n) => n.kind === "breakout")) {
+    assert.match(svg, new RegExp(`<text[^>]*class="breakout"[^>]*>${node.id}</text>`), node.id);
+  }
+  for (const connector of example.connectors.filter((c) => c.label && !c.splice)) {
+    assert.ok(svg.includes(`class="caption">${connector.label}</text>`), connector.id);
+  }
+});
+
+test("the 2D view shows each label where sheet 1 draws it", () => {
+  const svg = planSvg(example, buildPlan(example));
+  assert.ok(example.labels.length > 0);
+  for (const label of example.labels) {
+    assert.match(svg, new RegExp(`<g class="label"[^>]*data-label="${label.text}"[^>]*>[^]*?x="${label.x}" y="${label.y}"`), label.text);
+  }
+});
+
+test("2D text keeps its size on screen however the drawing is scaled to fit", async () => {
+  const { planUnit } = await import(componentPath);
+  assert.equal(planUnit([0, 0, 1000, 500], 500, 500), 2, "a wide box fits by its width");
+  assert.equal(planUnit([0, 0, 1000, 500], 2000, 500), 1, "a tall stage fits by its height");
+  const svg = planSvg(example, buildPlan(example));
+  assert.doesNotMatch(svg, /<text[^>]*font-size=/, "no text carries its size in drawing units");
 });

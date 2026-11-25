@@ -1,0 +1,21 @@
+# A sensor lead whose wire list crosses SDA and SCL. The netlist, stated separately from the wires,
+# catches it: the checks report it, the generator exits with an error, and every sheet is marked
+# not for release.
+drawing: {title: SENSOR LEAD, number: T-13, rev: A}
+connectors:
+  P1: {type: KK 254, pn: 22-01-3047, manufacturer: Molex, pincount: 4, pinlabels: [GND, +5V, SCL, SDA]}
+  J1: {type: KK 254, pn: 22-01-3047, manufacturer: Molex, pincount: 4, pinlabels: [GND, +5V, SCL, SDA]}
+wires:
+  - {id: W1, from: "P1:1", to: "J1:1", signal: GND, gauge: 24 AWG, color: BK}
+  - {id: W2, from: "P1:2", to: "J1:2", signal: +5V, gauge: 24 AWG, color: RD}
+  - {id: W3, from: "P1:3", to: "J1:4", signal: SCL, gauge: 24 AWG, color: YE, signal_differs_ok: true}
+  - {id: W4, from: "P1:4", to: "J1:3", signal: SDA, gauge: 24 AWG, color: GN, signal_differs_ok: true}
+layout:
+  root: P1
+  segments: [[P1, J1, 400]]
+expect:
+  nets:
+    GND: ["P1:1", "J1:1"]
+    +5V: ["P1:2", "J1:2"]
+    SCL: ["P1:3", "J1:3"]
+    SDA: ["P1:4", "J1:4"]

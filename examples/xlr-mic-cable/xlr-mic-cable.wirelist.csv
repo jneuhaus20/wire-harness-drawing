@@ -1,0 +1,4 @@
+wire,from,from_pin,to,to_pin,signal,gauge,color,cut_length,lead_a,lead_b,twist,cable,strip_a,strip_b,path
+W1-RD,P1,2,P2,2,HOT,24 AWG,RD,,30,30,,W1,,,P1 > P2
+W1-WH,P1,3,P2,3,COLD,24 AWG,WH,,30,30,,W1,,,P1 > P2
+W1-SH,P1,1,P2,1,SHLD,24 AWG,SR,,30,30,,W1,,,P1 > P2

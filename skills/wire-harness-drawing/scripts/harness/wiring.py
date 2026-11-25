@@ -3,14 +3,14 @@ import base64
 import re
 import shutil
 import subprocess
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from pathlib import Path
 
 import yaml
 
 from harness.frame import close_sheet, frame
 from harness.routing import Route
-from harness.source import HarnessSource, color_parts, conventions, is_splice, pin_label, pins_of, wire_end
+from harness.source import chosen_color, HarnessSource, color_parts, conventions, is_splice, pin_label, pins_of, wire_end
 from harness.svg import sheet_height, sheet_width
 
 
@@ -23,8 +23,8 @@ def twist_name(wire_count: int) -> str:
 def wireviz_conductors(drawing: dict, wires: list[dict], routes: list[Route]) -> dict:
     """The conductor attributes WireViz draws for a group of wires."""
     attributes = {"wirelabels": [wire["id"] for wire in wires]}
-    if all(wire.get("color") for wire in wires):
-        attributes["colors"] = ["".join(color_parts(wire.get("color"))) for wire in wires]
+    if all(chosen_color(wire) for wire in wires):
+        attributes["colors"] = ["".join(color_parts(chosen_color(wire))) for wire in wires]
     else:  # colours not chosen yet: count only, no stand-in colour
         attributes["wirecount"] = len(wires)
     gauges = {str(wire.get("gauge", "")) for wire in wires}
@@ -87,6 +87,7 @@ def wireviz_source(source: HarnessSource, routes: list[Route]) -> dict:
                 "connectors": {designator: wireviz_connector(connector) for designator, connector in connectors.items()},
                 "cables": {}, "connections": []}
     groups = OrderedDict()
+    ranks = root_distances(source, routes)
     for wire, route in zip(source["wires"], routes):
         (start, start_pin), (end, end_pin) = wire_end(wire["from"]), wire_end(wire["to"])
         if wire.get("cable"):
@@ -110,14 +111,40 @@ def wireviz_source(source: HarnessSource, routes: list[Route]) -> dict:
             name = f"{start}-{end}" if f"{start}-{end}" not in document["cables"] else f"{start}-{end} {gauge}".strip()
             cable = wireviz_bundle(drawing, wires, member_routes)
         document["cables"][name] = cable
-        document["connections"] += cable_connections(connectors, name, members)
+        document["connections"] += cable_connections(connectors, name, members, ranks)
     return document
 
 
-def cable_connections(connectors: dict, cable_name: str, members: list[tuple]) -> list[list]:
-    """The WireViz connection sets that join one cable's conductors to their pins."""
+# WireViz lays the diagram out left to right in the order each connection names its ends. Every
+# connection is written from the end nearer the root to the end farther from it, as the harness
+# is laid out, so no wire loops back over a connector's table.
+def root_distances(source: HarnessSource, routes: list[Route]) -> dict[str, int]:
+    """How many segments each node is from the layout's root, along the routes."""
+    neighbours = defaultdict(set)
+    for route in routes:
+        nodes = route.node_names()
+        for a, b in zip(nodes, nodes[1:]):
+            neighbours[a].add(b)
+            neighbours[b].add(a)
+    root = source["layout"].get("root")
+    distances, frontier = {root: 0}, [root]
+    while frontier:
+        reached = []
+        for node in frontier:
+            for after in sorted(neighbours[node]):
+                if after not in distances:
+                    distances[after] = distances[node] + 1
+                    reached.append(after)
+        frontier = reached
+    return distances
+
+
+def cable_connections(connectors: dict, cable_name: str, members: list[tuple], ranks: dict[str, int]) -> list[list]:
+    """The WireViz connection sets that join one cable's conductors to their pins, each from its end nearer the root."""
     by_connectors = OrderedDict()
     for position, (_, _, start, start_pin, end, end_pin) in enumerate(members, 1):
+        if ranks.get(start, 0) > ranks.get(end, 0):
+            start, start_pin, end, end_pin = end, end_pin, start, start_pin
         by_connectors.setdefault((start, end), []).append((position, start_pin, end_pin))
     connections = []
     for (start, end), conductors in by_connectors.items():

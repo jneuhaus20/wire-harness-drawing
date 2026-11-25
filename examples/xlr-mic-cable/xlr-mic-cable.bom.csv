@@ -1,0 +1,4 @@
+find,qty,unit,pn,description,manufacturer,refs
+1,1,EA,NC3FXX,"XLR3 female cable connector, 3 pos",Neutrik,P1
+2,1,EA,NC3MXX,"XLR3 male cable connector, 3 pos",Neutrik,P2
+3,3.01,m,,"2-conductor shielded microphone cable, 24 AWG",,W1

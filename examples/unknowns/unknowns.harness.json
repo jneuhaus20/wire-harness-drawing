@@ -27,7 +27,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J1",
@@ -45,7 +46,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J2",
@@ -63,7 +65,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   }
  ],
  "wires": [
@@ -104,7 +107,7 @@
    },
    "signal": "",
    "gauge": "24 AWG",
-   "color": "",
+   "color": "TBD",
    "colors": [],
    "cut_length": "TBD",
    "twist": "",
@@ -122,25 +125,25 @@
    "id": "P1",
    "kind": "connector",
    "x": 350.0,
-   "y": 387.0
+   "y": 379.5
   },
   {
    "id": "B1",
    "kind": "breakout",
    "x": 770.0,
-   "y": 387.0
+   "y": 379.5
   },
   {
    "id": "J1",
    "kind": "connector",
    "x": 1190.0,
-   "y": 387.0
+   "y": 379.5
   },
   {
    "id": "J2",
    "kind": "connector",
    "x": 1190.0,
-   "y": 557.0
+   "y": 549.5
   }
  ],
  "segments": [
@@ -151,7 +154,7 @@
    ],
    "known": true,
    "length": "300 ±5",
-   "path": "M350.0,387.0 L770.0,387.0",
+   "path": "M350.0,379.5 L770.0,379.5",
    "wires": [
     "W1",
     "W2"
@@ -164,7 +167,7 @@
    ],
    "known": false,
    "length": "≥200",
-   "path": "M770.0,387.0 L1190.0,387.0",
+   "path": "M770.0,379.5 L1190.0,379.5",
    "wires": [
     "W1"
    ]
@@ -176,10 +179,16 @@
    ],
    "known": false,
    "length": "TBD",
-   "path": "M770.0,387.0 C846.5,387.0 846.5,557.0 923.0,557.0 L1190.0,557.0",
+   "path": "M770.0,379.5 C846.5,379.5 846.5,549.5 923.0,549.5 L1190.0,549.5",
    "wires": [
     "W2"
    ]
   }
- ]
+ ],
+ "labels": [],
+ "release": {
+  "errors": 0,
+  "warnings": 3,
+  "for_release": true
+ }
 }

@@ -11,6 +11,7 @@ cables:
     pn: C-4
     gauge: 24 AWG
     color: BK
+    shield: true
     conductors:
       - {color: RD, from: "P1:2", to: "J2:1", signal: A+}
       - {color: BK, from: "P1:3", to: "J2:2", signal: A-}

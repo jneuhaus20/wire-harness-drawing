@@ -1,0 +1,209 @@
+{
+ "format": "wire-harness-explorer/1",
+ "title": "SENSOR LEAD",
+ "number": "T-13",
+ "rev": "A",
+ "units": "mm",
+ "geometry": "schematic",
+ "root": "P1",
+ "connectors": [
+  {
+   "id": "P1",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "22-01-3047",
+   "manufacturer": "Molex",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": "GND"
+    },
+    {
+     "pin": "2",
+     "label": "+5V"
+    },
+    {
+     "pin": "3",
+     "label": "SCL"
+    },
+    {
+     "pin": "4",
+     "label": "SDA"
+    }
+   ],
+   "face": null,
+   "body": null
+  },
+  {
+   "id": "J1",
+   "label": "",
+   "type": "KK 254",
+   "part_number": "22-01-3047",
+   "manufacturer": "Molex",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": "GND"
+    },
+    {
+     "pin": "2",
+     "label": "+5V"
+    },
+    {
+     "pin": "3",
+     "label": "SCL"
+    },
+    {
+     "pin": "4",
+     "label": "SDA"
+    }
+   ],
+   "face": null,
+   "body": null
+  }
+ ],
+ "wires": [
+  {
+   "id": "W1",
+   "from": {
+    "connector": "P1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "1"
+   },
+   "signal": "GND",
+   "gauge": "24 AWG",
+   "color": "BK",
+   "colors": [
+    "#2f2f2f"
+   ],
+   "cut_length": "400",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W2",
+   "from": {
+    "connector": "P1",
+    "pin": "2"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "2"
+   },
+   "signal": "+5V",
+   "gauge": "24 AWG",
+   "color": "RD",
+   "colors": [
+    "#c4453f"
+   ],
+   "cut_length": "400",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W3",
+   "from": {
+    "connector": "P1",
+    "pin": "3"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "4"
+   },
+   "signal": "SCL",
+   "gauge": "24 AWG",
+   "color": "YE",
+   "colors": [
+    "#e2c54b"
+   ],
+   "cut_length": "400",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "J1"
+   ]
+  },
+  {
+   "id": "W4",
+   "from": {
+    "connector": "P1",
+    "pin": "4"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "3"
+   },
+   "signal": "SDA",
+   "gauge": "24 AWG",
+   "color": "GN",
+   "colors": [
+    "#4e9a5f"
+   ],
+   "cut_length": "400",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "J1"
+   ]
+  }
+ ],
+ "cables": [],
+ "nodes": [
+  {
+   "id": "P1",
+   "kind": "connector",
+   "x": 560.0,
+   "y": 491.5
+  },
+  {
+   "id": "J1",
+   "kind": "connector",
+   "x": 980.0,
+   "y": 491.5
+  }
+ ],
+ "segments": [
+  {
+   "nodes": [
+    "P1",
+    "J1"
+   ],
+   "known": true,
+   "length": "400 ±10",
+   "path": "M560.0,491.5 L980.0,491.5",
+   "wires": [
+    "W1",
+    "W2",
+    "W3",
+    "W4"
+   ]
+  }
+ ],
+ "labels": [],
+ "release": {
+  "errors": 1,
+  "warnings": 0,
+  "for_release": false
+ }
+}

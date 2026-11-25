@@ -1,8 +1,8 @@
 """Reject source values the generator cannot compute with, before anything is computed."""
 import re
 
-from harness.source import (Findings, HarnessSource, connector_genders, connector_shapes, face_layouts, face_views,
-                            format_length, iec_color_code, is_number, pins_of, unit_conventions)
+from harness.source import (Findings, body_color, body_shapes, HarnessSource, connector_genders, connector_shapes, face_layouts, face_views,
+                            format_length, iec_color_code, is_number, undecided_colors, pins_of, unit_conventions)
 
 
 # Reject each value the rest of the generator cannot compute with, and remove it from the
@@ -12,6 +12,7 @@ def validate_source(source: HarnessSource, findings: Findings) -> None:
     """Report and remove values in the source that are the wrong kind of thing."""
     validate_drawing(source["drawing"], findings)
     validate_connectors(source["connectors"], findings)
+    validate_cables(source["cables"], findings)
     read_colors(source, findings)
     expand_cables(source, findings)
     validate_wires(source, findings)
@@ -78,12 +79,36 @@ def validate_connectors(connectors: dict, findings: Findings) -> None:
             findings.error(f"{designator}: shape '{connector.pop('shape')}' is not {' or '.join(connector_shapes)}")
         if "gender" in connector and connector["gender"] not in connector_genders:
             findings.error(f"{designator}: gender '{connector.pop('gender')}' is not {' or '.join(connector_genders)}")
+        if "body" in connector:
+            problems = body_problems(designator, connector["body"])
+            for problem in problems:
+                findings.error(problem)
+            if problems:
+                connector.pop("body")
         if "face" in connector:
             problems = face_problems(designator, connector)
             for problem in problems:
                 findings.error(problem)
             if problems:
                 connector.pop("face")
+
+
+# A body is drawn only as its datasheet states it; one with any problem is dropped, and the
+# connector is drawn as a body not stated.
+def body_problems(designator: str, body) -> list[str]:
+    """What is wrong with a connector's stated body."""
+    if not isinstance(body, dict):
+        return [f"{designator}: body must be a mapping with shape, length, width, height and color"]
+    problems = []
+    if body.get("shape", "box") not in body_shapes:
+        problems.append(f"{designator}: body shape '{body['shape']}' is not {', '.join(body_shapes[:-1])} or {body_shapes[-1]}")
+    sizes = ("length", "diameter") if body.get("shape") == "cylinder" else ("length", "width", "height")
+    for size in sizes:
+        if not (is_number(body.get(size)) and float(body[size]) > 0):
+            problems.append(f"{designator}: body {size} must be a number above 0")
+    if "color" in body and body_color(body["color"]) is None:
+        problems.append(f"{designator}: body colour '{body['color']}' is not a colour name or #rrggbb")
+    return problems
 
 
 # A face states one layout that places every pin, seen from a known side. A face with any
@@ -120,6 +145,44 @@ def face_problems(designator: str, connector: dict) -> list[str]:
     return problems
 
 
+# A cable lists its conductors, each a mapping with its ends, and its breakout as one length or a
+# length per jacket end. Version 1.0 took a conductor count; a count, or any other value that is
+# not a list, is reported and the cable is left with no conductors, so nothing is guessed.
+def validate_cables(cables: dict, findings: Findings) -> None:
+    """Check each cable's conductor list and breakout lengths."""
+    for cable_id, cable in cables.items():
+        conductors = cable.get("conductors")
+        if conductors is not None and not isinstance(conductors, list):
+            findings.error(f"cable {cable_id}: conductors must be a list of conductors, each with from and to, not {conductors}")
+            cable["conductors"] = []
+            cable["conductors_rejected"] = True
+        kept = []
+        for position, conductor in enumerate(cable.get("conductors") or [], 1):
+            if isinstance(conductor, dict):
+                kept.append(conductor)
+            else:
+                findings.error(f"cable {cable_id}: conductor {position} must be a mapping with from and to, not '{conductor}'")
+                cable["conductors_rejected"] = True
+        if "conductors" in cable:
+            cable["conductors"] = kept
+        validate_breakout(cable_id, cable, findings)
+
+
+def validate_breakout(cable_id: str, cable: dict, findings: Findings) -> None:
+    """A breakout is a length of 0 or more, or a mapping of jacket end to such a length."""
+    if "breakout" not in cable:
+        return
+    breakout = cable["breakout"]
+    if isinstance(breakout, dict):
+        for node, length in list(breakout.items()):
+            if not (is_number(length) and length >= 0):
+                findings.error(f"cable {cable_id}: breakout at {node} must be a number of 0 or more, not '{length}'")
+                breakout.pop(node)
+    elif not (is_number(breakout) and breakout >= 0):
+        findings.error(f"cable {cable_id}: breakout must be a number of 0 or more, not '{breakout}'")
+        cable.pop("breakout")
+
+
 # A colour is read however it is written (BLK, black, WHT/BLU) and kept as its IEC code, so a
 # conductor named by colour gets the same name however its colour was spelled. One that is not
 # a colour is kept as written, reported, and drawn grey; one left out is simply not known yet.
@@ -127,6 +190,9 @@ def read_colors(source: HarnessSource, findings: Findings) -> None:
     """Replace each wire, cable and conductor colour with its IEC code, reporting any that is not a colour."""
     def read(owner: dict, name: str) -> None:
         if owner.get("color") in (None, ""):
+            return
+        if str(owner["color"]).strip().upper() in undecided_colors:
+            owner["color"] = str(owner["color"]).strip().upper()
             return
         code = iec_color_code(owner["color"])
         if code is None:
@@ -141,7 +207,8 @@ def read_colors(source: HarnessSource, findings: Findings) -> None:
             read(conductor, f"cable {cable_id}: conductor {position}")
 
 
-# A cable is one item; its conductors are named within it, by colour or number (W5-RD, W5-1).
+# A cable is one item; its conductors are named within it, by colour or number (W5-RD, W5-1), and its
+# shield's drain wire as SH (W5-SH), bare tinned copper.
 # Each conductor becomes a wire of the cable for the checks, the netlist and the tables, so a
 # wire's own cable key, from the older form, is refused rather than guessed at.
 def expand_cables(source: HarnessSource, findings: Findings) -> None:
@@ -153,11 +220,14 @@ def expand_cables(source: HarnessSource, findings: Findings) -> None:
             wire.pop("cable")
     for cable_id, cable in source["cables"].items():
         for position, conductor in enumerate(cable.get("conductors") or [], 1):
-            name = conductor.get("color", conductor.get("number"))
+            if conductor.get("drain"):
+                name, conductor = "SH", {"color": "SR", **conductor}
+            else:
+                name = conductor.get("color", conductor.get("number"))
             if name is None:
                 findings.error(f"cable {cable_id}: conductor {position} needs a color or a number")
                 continue
-            wire = {key: value for key, value in conductor.items() if key != "number"}
+            wire = {key: value for key, value in conductor.items() if key not in ("number", "drain")}
             wire.update(id=f"{cable_id}-{name}", cable=cable_id)
             if "gauge" in cable and "gauge" not in wire:
                 wire["gauge"] = cable["gauge"]

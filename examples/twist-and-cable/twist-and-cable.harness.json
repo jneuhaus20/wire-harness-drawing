@@ -35,7 +35,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   },
   {
    "id": "J1",
@@ -65,7 +66,8 @@
      "label": ""
     }
    ],
-   "face": null
+   "face": null,
+   "body": null
   }
  ],
  "wires": [
@@ -176,6 +178,7 @@
     "C1-RD",
     "C1-BK"
    ],
+   "shield": true,
    "color": null,
    "run": [
     "P1",
@@ -212,13 +215,13 @@
    "id": "P1",
    "kind": "connector",
    "x": 560.0,
-   "y": 484.0
+   "y": 476.5
   },
   {
    "id": "J1",
    "kind": "connector",
    "x": 980.0,
-   "y": 484.0
+   "y": 476.5
   }
  ],
  "segments": [
@@ -229,7 +232,7 @@
    ],
    "known": true,
    "length": "400 ±10",
-   "path": "M560.0,484.0 L980.0,484.0",
+   "path": "M560.0,476.5 L980.0,476.5",
    "wires": [
     "W1",
     "W2",
@@ -237,5 +240,11 @@
     "C1-BK"
    ]
   }
- ]
+ ],
+ "labels": [],
+ "release": {
+  "errors": 0,
+  "warnings": 0,
+  "for_release": true
+ }
 }

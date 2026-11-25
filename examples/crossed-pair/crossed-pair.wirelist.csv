@@ -1,0 +1,5 @@
+wire,from,from_pin,to,to_pin,signal,gauge,color,cut_length,lead_a,lead_b,twist,cable,strip_a,strip_b,path
+W1,P1,1,J1,1,GND,24 AWG,BK,400,,,,,,,P1 > J1
+W2,P1,2,J1,2,+5V,24 AWG,RD,400,,,,,,,P1 > J1
+W3,P1,3,J1,4,SCL,24 AWG,YE,400,,,,,,,P1 > J1
+W4,P1,4,J1,3,SDA,24 AWG,GN,400,,,,,,,P1 > J1
