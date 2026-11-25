@@ -1,5 +1,5 @@
 """The harness model the explorer component draws: one JSON document per harness, built from the same analysis as the drawing."""
-from harness.formboard import segment_dimension_label, segment_path, sheet_placement
+from harness.formboard import segment_dimension_label, segment_path
 from harness.pinout import scaled_positions
 from harness.source import body_color, chosen_color, format_length, color_parts, display_color, is_generic, is_splice, pin_label, pins_of, wire_end
 
@@ -79,7 +79,7 @@ def harness_model(analysis) -> dict:
     """The explorer's model of an analysed harness."""
     source, tree, routes = analysis.source, analysis.tree, analysis.routes
     drawing = source["drawing"]
-    placement = sheet_placement(source, tree, analysis.spacing)
+    placement = analysis.sheet_layout.placement
     connectors = source["connectors"]
     wires_by_segment = {}
     for wire, route in zip(source["wires"], routes):

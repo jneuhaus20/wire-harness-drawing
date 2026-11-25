@@ -127,6 +127,22 @@ def balloon_stack(x, y, numbers, target_x, target_y, quantities=None) -> str:
     return "".join(out)
 
 
+# A row of find-number balloons left to right; the first carries the leader to (target_x,
+# target_y), and a quantity such as "4X" follows the last balloon.
+def balloon_row(x, y, numbers, target_x, target_y, quantities=None) -> str:
+    """Draw find-number balloons side by side with one leader."""
+    out = [line(x - balloon_radius, y, target_x, target_y, 0.7),
+           arrowhead(target_x, target_y, math.atan2(target_y - y, target_x - x + balloon_radius))]
+    for index, number in enumerate(numbers):
+        balloon_x = x + index * balloon_pitch
+        out.append(f'<circle cx="{balloon_x:.1f}" cy="{y:.1f}" r="{balloon_radius}" fill="white" stroke="{ink}" stroke-width="1"/>'
+                   + text(balloon_x, y + 4, number, 11, "middle"))
+        quantity = (quantities or {}).get(number)
+        if quantity:
+            out.append(text(balloon_x + balloon_radius + 3, y + 4, quantity, 10))
+    return "".join(out)
+
+
 # ---------- Tables ----------
 
 cell_padding = 3

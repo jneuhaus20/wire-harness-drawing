@@ -9,7 +9,7 @@ from harness.bom import BomLine, build_bom
 from harness.cables import CableCut, breakout_misnamings, cable_cuts, conductor_leads
 from harness.checks import check_harness
 from harness.explorer_model import harness_model
-from harness.formboard import SheetLayout, Spacing, drawn_to_scale, formboard_sheet, sheet_misfits, spacings
+from harness.formboard import SheetLayout, Spacing, drawn_to_scale, formboard_sheet, sheet_collisions, sheet_misfits, spacings
 from harness.routing import HarnessTree, Route, build_tree, route_wires
 from harness.source import format_length, Findings, HarnessSource, load_source, wire_end
 from harness.tables import table_sheet_bodies, table_sheets
@@ -50,20 +50,28 @@ def analyse(source: HarnessSource) -> Analysis:
         if misfits:
             findings.error("harness drawing does not fit sheet 1 even drawn at its tightest: " + "; ".join(misfits)
                            + ". Shorten its text, or split it into sub-harnesses joined at an in-line connector")
+        elif sheet_collisions(layout):
+            findings.error("sheet 1 draws " + "; ".join(sheet_collisions(layout))
+                           + ". Shorten its text, move its labels, or split it into sub-harnesses joined at an in-line connector")
     return Analysis(source, findings, tree, routes, bom, cuts, spacing, layout)
 
 
-# A drawing not to scale is drawn tighter until it fits its sheet; one that does not fit even at
-# the tightest spacing is drawn at that spacing, and what does not fit is reported.
+# A drawing not to scale is drawn tighter until it fits its sheet with nothing drawn over
+# anything else. Failing that, the loosest spacing at which it fits is kept and what overlaps
+# is reported; one that does not fit even at the tightest is drawn at that spacing, and what
+# does not fit is reported.
 def fitting_spacing(source: HarnessSource, tree: HarnessTree, routes: list[Route],
                     bom: list[BomLine]) -> tuple[Spacing, SheetLayout, list[str]]:
-    """The loosest spacing at which sheet 1 fits, its layout, and what does not fit at the one chosen."""
-    for spacing in spacings:
+    """The loosest spacing at which sheet 1 fits cleanly, its layout, and what does not fit at the one chosen."""
+    fitting = None
+    for spacing in ([spacings[0]] if drawn_to_scale(tree) else spacings):
         layout = formboard_sheet(source, tree, routes, bom, 1, 0, spacing)[1]
         misfits = sheet_misfits(layout)
-        if not misfits or drawn_to_scale(tree):
+        if not misfits and not sheet_collisions(layout):
             return spacing, layout, misfits
-    return spacing, layout, misfits
+        if not misfits and fitting is None:
+            fitting = (spacing, layout, misfits)
+    return fitting or (spacing, layout, misfits)
 
 
 def write_bom_csv(path: Path, bom: list[BomLine]) -> None:
@@ -149,7 +157,8 @@ def write_package(analysis: Analysis, output_directory: Path, base: str, *, with
             print("NOTE  ", failure)
     bodies = table_sheet_bodies(source, routes, bom, analysis.cable_cuts)
     sheet_count = 1 + len(bodies) + (1 if diagram_path else 0)
-    sheets = [formboard_sheet(source, analysis.tree, routes, bom, sheet_count, errors, analysis.spacing)[0]]
+    sheets = [formboard_sheet(source, analysis.tree, routes, bom, sheet_count, errors, analysis.spacing,
+                              analysis.sheet_layout.placement)[0]]
     sheets += table_sheets(source, bodies, 2, sheet_count, errors)
     if diagram_path:
         sheets.append(wiring_sheet(source, diagram_path, sheet_count, sheet_count, errors))

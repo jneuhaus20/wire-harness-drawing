@@ -8,8 +8,7 @@ from tests.generator import example_source
 from tests.test_geometry import routed_harness
 from tests.test_output_integrity import generate, svg_texts, two_wire_harness
 
-from harness.formboard import formboard_sheet  # noqa: E402  (tests.generator puts scripts/ on the path)
-from harness.source import display_colors
+from harness.source import display_colors  # noqa: E402  (tests.generator puts scripts/ on the path)
 from harness.package import analyse
 from harness.source import load_source
 from harness.wiring import wireviz_source
@@ -17,9 +16,7 @@ from harness.wiring import wireviz_source
 
 def lay_out_sheet_one(source: Path):
     """Run the generator's pipeline on a source and return sheet 1's layout record."""
-    analysis = analyse(load_source(source))
-    _, layout = formboard_sheet(analysis.source, analysis.tree, analysis.routes, analysis.bom, 1, 0)
-    return layout
+    return analyse(load_source(source)).sheet_layout
 
 
 def boxes_overlap(first, second) -> bool:

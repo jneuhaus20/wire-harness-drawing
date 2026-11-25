@@ -6,7 +6,7 @@ from tests.generator import example_directory, example_source
 from tests.test_output_integrity import generate, two_wire_harness
 
 from harness.explorer_model import harness_model  # noqa: E402  (tests.generator puts scripts/ on the path)
-from harness.formboard import formboard_sheet, sheet_placement
+from harness.formboard import formboard_sheet
 from harness.package import analyse
 from harness.source import display_colors, load_source
 
@@ -26,7 +26,7 @@ class ExampleModelTest(unittest.TestCase):
         self.assertEqual([w["id"] for w in self.model["wires"]], [w["id"] for w in self.analysis.source["wires"]])
 
     def test_the_2d_placement_is_sheet_ones(self) -> None:
-        placement = sheet_placement(self.analysis.source, self.analysis.tree)
+        placement = self.analysis.sheet_layout.placement
         for node in self.model["nodes"]:
             self.assertEqual((node["x"], node["y"]), (round(placement.x[node["id"]], 1), round(placement.y[node["id"]], 1)))
 
@@ -58,7 +58,8 @@ class ExampleModelTest(unittest.TestCase):
     def test_it_carries_each_label_where_sheet_one_draws_it(self) -> None:
         _, layout = formboard_sheet(self.analysis.source, self.analysis.tree, self.analysis.routes, self.analysis.bom, 1, 0,
                                     self.analysis.spacing)
-        drawn = {name.removeprefix("label "): box for name, box in layout.texts if name.startswith("label ") and name.count(" ") == 2}
+        drawn = {name.removeprefix("label ").split(" at ")[0]: box for name, box in layout.texts
+                 if name.startswith("label ") and name.count(" at ") == 1 and not name.endswith(("dimension", "balloon"))}
         self.assertEqual([label["text"] for label in self.model["labels"]], ["P1 CTRL", "J1 SNS-A", "J2 SNS-B", "J3 SPI"])
         for label in self.model["labels"]:
             box = drawn[label["text"]]
