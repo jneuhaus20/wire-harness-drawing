@@ -894,5 +894,11 @@
     ]
    ]
   }
- ]
+ ],
+ "labels": [],
+ "release": {
+  "errors": 0,
+  "warnings": 3,
+  "for_release": true
+ }
 }

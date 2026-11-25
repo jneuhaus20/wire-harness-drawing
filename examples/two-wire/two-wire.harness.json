@@ -133,5 +133,11 @@
     "W2"
    ]
   }
- ]
+ ],
+ "labels": [],
+ "release": {
+  "errors": 0,
+  "warnings": 2,
+  "for_release": true
+ }
 }

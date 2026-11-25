@@ -8,8 +8,7 @@ from tests.generator import example_source
 from tests.test_geometry import routed_harness
 from tests.test_output_integrity import generate, svg_texts, two_wire_harness
 
-from harness.formboard import formboard_sheet  # noqa: E402  (tests.generator puts scripts/ on the path)
-from harness.source import display_colors
+from harness.source import display_colors  # noqa: E402  (tests.generator puts scripts/ on the path)
 from harness.package import analyse
 from harness.source import load_source
 from harness.wiring import wireviz_source
@@ -17,9 +16,7 @@ from harness.wiring import wireviz_source
 
 def lay_out_sheet_one(source: Path):
     """Run the generator's pipeline on a source and return sheet 1's layout record."""
-    analysis = analyse(load_source(source))
-    _, layout = formboard_sheet(analysis.source, analysis.tree, analysis.routes, analysis.bom, 1, 0)
-    return layout
+    return analyse(load_source(source)).sheet_layout
 
 
 def boxes_overlap(first, second) -> bool:
@@ -175,6 +172,15 @@ class WiringDiagramTest(unittest.TestCase):
         layout_names = {node for segment in load_source(example_source)["layout"]["segments"] for node in segment[:2]}
         self.assertFalse(names & layout_names, names & layout_names)
         self.assertIn("SP1-J1", names)
+
+    # WireViz lays its diagram out left to right in the order each connection names its ends, so a
+    # wire listed from the far end would loop back over the connector tables.
+    def test_every_connection_runs_away_from_the_root(self) -> None:
+        source = two_wire_harness.replace('{id: W2, from: "P1:2", to: "J1:2"', '{id: W2, from: "J1:2", to: "P1:2"')
+        self.assertIn('from: "J1:2", to: "P1:2"', source)
+        for connection in self.wireviz_source(source)["connections"]:
+            ends = [next(iter(end)) if isinstance(end, dict) else end for end in (connection[0], connection[-1])]
+            self.assertEqual(ends, ["P1", "J1"])
 
     def test_a_cable_is_drawn_as_that_cable(self) -> None:
         source = two_wire_harness.split("wires:")[0] + """cables:

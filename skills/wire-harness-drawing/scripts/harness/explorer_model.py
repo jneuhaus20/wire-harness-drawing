@@ -1,5 +1,5 @@
 """The harness model the explorer component draws: one JSON document per harness, built from the same analysis as the drawing."""
-from harness.formboard import segment_dimension_label, segment_path, sheet_placement
+from harness.formboard import segment_dimension_label, segment_path
 from harness.pinout import scaled_positions
 from harness.source import body_color, chosen_color, format_length, color_parts, display_color, is_generic, is_splice, pin_label, pins_of, wire_end
 
@@ -76,14 +76,14 @@ def world_point(point: tuple[float, float, float]) -> list[float]:
     return [int(v) if float(v).is_integer() else v for v in (x, height, y)]
 
 
-# Placement and bundle paths come from sheet 1's layout, so the explorer's 2D view is the
-# drawing's. With routing geometry each segment also carries its route in true units for the
+# Placement, bundle paths and labels come from sheet 1's layout, so the explorer's 2D view is the
+# drawing's. The release state is the checks': a harness whose checks failed says so. With routing geometry each segment also carries its route in true units for the
 # 3D view; without it the model says geometry "schematic" and the 3D view lays the 2D layout flat.
 def harness_model(analysis) -> dict:
     """The explorer's model of an analysed harness."""
     source, tree, routes = analysis.source, analysis.tree, analysis.routes
     drawing = source["drawing"]
-    placement = sheet_placement(source, tree, analysis.spacing)
+    placement = analysis.sheet_layout.placement
     connectors = source["connectors"]
     wires_by_segment = {}
     for wire, route in zip(source["wires"], routes):
@@ -103,9 +103,14 @@ def harness_model(analysis) -> dict:
               "x": round(placement.x[node], 1), "y": round(placement.y[node], 1)} for node in tree.order]
     cuts = {cut.cable: cut for cut in analysis.cable_cuts}
     cables = [cable_entry(source, cable_id, cable, cuts.get(cable_id)) for cable_id, cable in source["cables"].items()]
+    findings = analysis.findings.items
+    release = {"errors": sum(1 for severity, _ in findings if severity == "ERROR"),
+               "warnings": sum(1 for severity, _ in findings if severity == "WARN")}
+    release["for_release"] = release["errors"] == 0
+    labels = analysis.sheet_layout.labels if analysis.sheet_layout else []
     return {"format": model_format, "title": drawing.get("title", ""), "number": drawing.get("number", ""),
             "rev": drawing.get("rev", ""), "units": drawing.get("units", "mm"),
             "geometry": f"{tree.geometry.dimensions}d" if tree.geometry else "schematic", "root": tree.root,
             "connectors": [connector_entry(designator, connector) for designator, connector in connectors.items()],
             "wires": [wire_entry(source, wire, route) for wire, route in zip(source["wires"], routes)],
-            "cables": cables, "nodes": nodes, "segments": segments}
+            "cables": cables, "nodes": nodes, "segments": segments, "labels": labels, "release": release}

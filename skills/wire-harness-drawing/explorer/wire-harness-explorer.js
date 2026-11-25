@@ -1,4 +1,4 @@
-// <wire-harness-explorer> 1.1.0 — an interactive 2D/3D view of one wire harness.
+// <wire-harness-explorer> 1.2.0 — an interactive 2D/3D view of one wire harness.
 //
 // One self-contained ES module with no dependencies. Load it once per page, then give each
 // element its harness model (the <name>.harness.json the wire-harness-drawing generator
@@ -8,7 +8,7 @@
 // Attributes: view="3d" | "2d" (default 3d), theme="light" | "dark" (default: follows the page).
 // The component does no I/O: every number it shows comes from the model.
 
-const version = "1.1.0";
+const version = "1.2.0";
 const modelFormat = "wire-harness-explorer/1";
 
 // ---------- Vector and matrix helpers (column-major 4×4) ----------
@@ -497,17 +497,29 @@ function planSvg(model, plan) {
   // A conductor is under its sheath in the segments of its cable's run, and loose beyond them.
   const sheathed = new Set((model.cables || []).flatMap((cable) => (cable.run || []).slice(0, -1).flatMap((node, i) =>
     cable.wires.flatMap((id) => [`${id}|${node}|${cable.run[i + 1]}`, `${id}|${cable.run[i + 1]}|${node}`]))));
+  // Each loose wire runs the length of the bundle in its own colour, side by side in the order
+  // it lies in the bed, so a wire can be followed from end to end.
+  const wiresById = Object.fromEntries(model.wires.map((wire) => [wire.id, wire]));
   for (const segment of plan.segments) {
-    const loose = segment.wires.filter((id) => !sheathed.has(`${id}|${segment.nodes[0]}|${segment.nodes[1]}`));
+    const loose = segment.order.filter((id) => !sheathed.has(`${id}|${segment.nodes[0]}|${segment.nodes[1]}`));
     if (!loose.length) continue;
-    const thickness = 1.6 * Math.sqrt(loose.length);
     const sides = loose.map((id) => segment.placement[id].centre[0]);
     const side = sides.length === segment.wires.length ? 0 : (Math.min(...sides) + Math.max(...sides)) / 2;
-    const d = side ? polylineData(offsetPolyline(segment.polyline, segment.polyline.map(() => [side, 0])).map(([x, , z]) => [x, z])) : segment.path;
+    const along = (offset) => polylineData(offsetPolyline(segment.polyline, segment.polyline.map(() => [offset, 0])).map(([x, , z]) => [x, z]));
+    const d = side ? along(side) : segment.path;
+    const strand = Math.min(2.4, 30 / loose.length), width = strand * loose.length;
+    const strands = loose.map((id, index) => {
+      const wire = wiresById[id], path = along(side + (index - (loose.length - 1) / 2) * strand);
+      if (!wire.colors.length) return `<path d="${path}" fill="none" stroke="var(--muted)" stroke-width="${(strand * 0.8).toFixed(2)}" stroke-dasharray="3 3" data-strand="${escapeHtml(id)}"/>`;
+      const [base, stripe] = wire.colors;
+      return `<path d="${path}" fill="none" stroke="${base}" stroke-width="${(strand * 0.85).toFixed(2)}" data-strand="${escapeHtml(id)}"/>`
+        + (stripe ? `<path d="${path}" fill="none" stroke="${stripe}" stroke-width="${(strand * 0.4).toFixed(2)}" stroke-dasharray="3 4"/>` : "");
+    }).join("");
     const key = `${segment.nodes[0]}|${segment.nodes[1]}`;
     parts.push(`<g class="bundle" data-segment="${escapeHtml(key)}"><path d="${d}" fill="none" stroke="transparent" stroke-width="14"/>
-      <path d="${d}" fill="none" stroke="var(--bundle-edge)" stroke-width="${(3 + thickness).toFixed(1)}" stroke-linecap="round"/>
-      <path d="${d}" fill="none" stroke="var(--bundle)" stroke-width="${(1 + thickness).toFixed(1)}" stroke-linecap="round"/></g>`);
+      <path d="${d}" fill="none" stroke="var(--bundle-edge)" stroke-width="${(width + 2.5).toFixed(1)}" stroke-linecap="round"/>
+      <path d="${d}" fill="none" stroke="var(--bundle)" stroke-width="${(width + 0.5).toFixed(1)}" stroke-linecap="round"/>
+      <g class="strands">${strands}</g></g>`);
   }
   for (const wire of model.wires) {
     const paths = model.segments.filter((segment) => segment.wires.includes(wire.id)).map((segment) => segment.path);
@@ -527,10 +539,16 @@ function planSvg(model, plan) {
   for (const segment of plan.segments) {
     const [x, , z] = pointAlong(segment.polyline, runLengths(segment.polyline).at(-1) / 2);
     const unknown = segment.known ? "" : ' font-style="italic"';
-    parts.push(`<text x="${x.toFixed(1)}" y="${(z + 18).toFixed(1)}" text-anchor="middle" class="length"${unknown}>${escapeHtml(segment.length)}</text>`);
+    parts.push(`<text x="${x.toFixed(1)}" y="${z.toFixed(1)}" dy="1.6em" text-anchor="middle" class="length"${unknown}>${escapeHtml(segment.length)}</text>`);
   }
   for (const node of plan.nodes.filter((n) => n.kind === "breakout")) {
-    parts.push(`<circle cx="${node.x}" cy="${node.y}" r="4" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.2"/>`);
+    parts.push(`<circle cx="${node.x}" cy="${node.y}" r="4" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.2"/>
+      <text x="${node.x}" y="${node.y}" dx="-.5em" dy="-.6em" text-anchor="end" class="breakout">${escapeHtml(node.id)}</text>`);
+  }
+  // Each label as a sleeve across its bundle, where sheet 1 draws it, its text on it.
+  for (const label of model.labels || []) {
+    parts.push(`<g class="label" data-label="${escapeHtml(label.text)}"><rect x="${label.x - 4}" y="${label.y - 7}" width="8" height="14" rx="1.5" stroke-width="1"/>
+      <text x="${label.x}" y="${label.y}" dy=".35em" text-anchor="middle">${escapeHtml(label.text)}</text></g>`);
   }
   for (const body of plan.bodies) {
     const id = escapeHtml(body.connector.id);
@@ -539,7 +557,7 @@ function planSvg(model, plan) {
       const lift = (plan.spliceLevel[body.connector.id] || 0) * 22, y = node.y - lift;
       const stem = lift ? `<line x1="${node.x}" y1="${node.y}" x2="${node.x}" y2="${y}" stroke="var(--ink)" stroke-width="1"/>` : "";
       parts.push(`<g class="connector" data-connector="${id}">${stem}<rect x="${node.x - 7}" y="${y - 7}" width="14" height="14" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.2" transform="rotate(45 ${node.x} ${y})"/>
-        <text x="${lift ? node.x + 12 : node.x}" y="${lift ? y + 4 : y - 15}" text-anchor="${lift ? "start" : "middle"}" class="name">${id}</text></g>`);
+        <text x="${lift ? node.x + 10 : node.x}" y="${lift ? y : y - 9}" dy="${lift ? ".35em" : "0"}" text-anchor="${lift ? "start" : "middle"}" class="name">${id}</text></g>`);
       continue;
     }
     const [cx, , cz] = body.centre;
@@ -549,7 +567,8 @@ function planSvg(model, plan) {
     const round = body.connector.shape === "circular" ? 12 : 3;
     parts.push(`<g class="connector" data-connector="${id}"><rect x="${cx - bodyLength / 2}" y="${cz - bodyWidth / 2}" width="${bodyLength}" height="${bodyWidth}" rx="${round}"
       fill="${generic ? "var(--ground)" : "var(--panel)"}" stroke="var(--ink)" stroke-width="1.2"${generic ? ' stroke-dasharray="5 3"' : ""} transform="rotate(${angle.toFixed(1)} ${cx} ${cz})"/>
-      <text x="${cx}" y="${cz + bodyWidth / 2 + 16}" text-anchor="middle" class="name">${id}</text></g>`);
+      <text x="${cx}" y="${cz + bodyWidth / 2 + 3}" dy="1em" text-anchor="middle" class="name">${id}</text>${body.connector.label
+        ? `<text x="${cx}" y="${cz + bodyWidth / 2 + 3}" dy="2.35em" text-anchor="middle" class="caption">${escapeHtml(body.connector.label)}</text>` : ""}</g>`);
   }
   return `<svg class="plan" role="img" aria-label="2D layout of the ${escapeHtml(model.title)} harness" viewBox="${box.join(" ")}"
     preserveAspectRatio="xMidYMid meet">${parts.join("")}</svg>`;
@@ -754,6 +773,27 @@ void main() {
   gl_FragColor = vec4(pow(lit + highlight, vec3(1.0 / 1.1)), alpha);
 }`;
 
+// A browser keeps only about 16 WebGL contexts a page and drops the oldest past that, so every
+// explorer on a page draws with one shared context, on a canvas of its own: it renders its meshes
+// there and copies the picture onto its own canvas. The context is made when the first 3D view is
+// drawn and released when the last explorer leaves the page; a 2D-only page makes none.
+let shared = null;
+
+function sharedRenderer() {
+  if (!shared || shared.renderer.gl?.isContextLost()) {
+    shared = { renderer: new Renderer(document.createElement("canvas")), users: new Set() };
+  }
+  return shared;
+}
+
+function releaseRenderer(user) {
+  if (!shared) return;
+  shared.users.delete(user);
+  if (shared.users.size) return;
+  shared.renderer.gl?.getExtension("WEBGL_lose_context")?.loseContext();
+  shared = null;
+}
+
 class Renderer {
   constructor(canvas) {
     this.canvas = canvas;
@@ -772,10 +812,10 @@ class Renderer {
     this.program = program;
     this.location = Object.fromEntries(["position", "normal", "color"].map((name) => [name, gl.getAttribLocation(program, name)]));
     this.uniform = Object.fromEntries(["viewProjection", "eye", "tint", "tintAmount", "dimAmount", "alpha"].map((name) => [name, gl.getUniformLocation(program, name)]));
-    this.meshes = [];
   }
 
-  upload(id, mesh, alpha = 1) {
+  // Each explorer keeps its own list of uploaded meshes.
+  upload(meshes, id, mesh, alpha = 1) {
     const gl = this.gl;
     const buffer = (data, target = gl.ARRAY_BUFFER) => {
       const handle = gl.createBuffer();
@@ -784,7 +824,7 @@ class Renderer {
       return handle;
     };
     const large = mesh.positions.length / 3 > 65535;
-    this.meshes.push({
+    meshes.push({
       id, alpha, count: mesh.indices.length, indexType: large ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT,
       position: buffer(new Float32Array(mesh.positions)), normal: buffer(new Float32Array(mesh.normals)),
       color: buffer(new Float32Array(mesh.colors)),
@@ -792,14 +832,16 @@ class Renderer {
     });
   }
 
-  clear() {
-    for (const mesh of this.meshes) for (const key of ["position", "normal", "color", "index"]) this.gl.deleteBuffer(mesh[key]);
-    this.meshes = [];
+  clear(meshes) {
+    for (const mesh of meshes) for (const key of ["position", "normal", "color", "index"]) this.gl.deleteBuffer(mesh[key]);
+    meshes.length = 0;
   }
 
-  draw(viewProjection, eye, selected, highlight) {
+  // Draw a list of meshes at the given size, onto the shared canvas.
+  draw(meshes, width, height, viewProjection, eye, selected, highlight) {
     const gl = this.gl;
-    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    if (this.canvas.width !== width || this.canvas.height !== height) { this.canvas.width = width; this.canvas.height = height; }
+    gl.viewport(0, 0, width, height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
@@ -810,7 +852,7 @@ class Renderer {
     gl.uniform3fv(this.uniform.eye, eye);
     gl.uniform3fv(this.uniform.tint, highlight);
     const shown = (mesh) => (selected.size && !selected.has(mesh.id) ? mesh.alpha * 0.45 : mesh.alpha);
-    const ordered = [...this.meshes].sort((a, b) => shown(b) - shown(a));
+    const ordered = [...meshes].sort((a, b) => shown(b) - shown(a));
     for (const mesh of ordered) {
       gl.depthMask(shown(mesh) >= 1);
       const isSelected = selected.has(mesh.id);
@@ -900,18 +942,27 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6p
 .popover .na { font-style: italic; color: var(--muted); }
 .popover.small { padding: 6px; }
 .popover { max-height: calc(100% - 12px); overflow: auto; }
-.popover h3 { cursor: move; user-select: none; padding-right: 18px; }
+.popover .head { display: flex; align-items: flex-start; gap: 6px; }
+.popover .head h3 { flex: 1; min-width: 0; overflow-wrap: anywhere; cursor: move; user-select: none; }
 .popover table + table { margin-top: 14px; }
 .popover p.mono { margin: 0 0 8px; }
 .popover table.ends tbody.end + tbody.end tr:first-child td { border-top: 2px solid var(--muted); }
 svg.plan { cursor: grab; }
 svg.plan.panning { cursor: grabbing; }
 .swatch { display: inline-block; width: 18px; height: 8px; border-radius: 4px; border: 1px solid var(--line); vertical-align: middle; }
-.close { position: absolute; top: 4px; right: 6px; border: 0; background: none; padding: 2px 4px; color: var(--muted); }
+.close { flex: none; margin: -3px -4px 0 0; border: 0; background: none; padding: 2px 4px; color: var(--muted); }
+.release { display: inline-block; margin-top: 4px; font: 600 11px "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .05em;
+  color: #c4302b; border: 1.5px solid #c4302b; border-radius: 4px; padding: 1px 6px; }
 .notice { margin: 0; }
-svg.plan text { font-family: "IBM Plex Mono", ui-monospace, monospace; fill: var(--ink); }
-svg.plan text.name { font-size: 13px; font-weight: 600; }
-svg.plan text.length { font-size: 10px; fill: var(--muted); }
+svg.plan text { font-family: "IBM Plex Mono", ui-monospace, monospace; fill: var(--ink); paint-order: stroke; stroke: var(--ground);
+  stroke-width: calc(3px * var(--u, 1)); stroke-linejoin: round; }
+svg.plan text.name { font-size: calc(13px * var(--u, 1)); font-weight: 600; }
+svg.plan text.caption { font-size: calc(10.5px * var(--u, 1)); fill: var(--muted); }
+svg.plan text.breakout { font-size: calc(10.5px * var(--u, 1)); fill: var(--muted); }
+svg.plan text.length { font-size: calc(10.5px * var(--u, 1)); fill: var(--muted); }
+svg.plan .label text { font-size: calc(10.5px * var(--u, 1)); stroke: var(--panel); }
+svg.plan .label rect { fill: var(--panel); stroke: var(--ink); }
+svg.plan .strands { pointer-events: none; }
 svg.plan .wire, svg.plan .connector, svg.plan .bundle, svg.plan .jacket { cursor: pointer; }
 svg.plan .route:not(.lit) { display: none; }
 svg.plan.selecting .wire:not(.lit), svg.plan.selecting .connector:not(.lit), svg.plan.selecting .bundle:not(.lit),
@@ -977,16 +1028,38 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
 
   disconnectedCallback() {
     this._resizeObserver?.disconnect();
-    this._visibility?.disconnect();
+    this._releaseMeshes();
+    releaseRenderer(this);
   }
 
   attributeChangedCallback() { if (this._stage) this._showView(); }
 
   get view() { return this.getAttribute("view") === "2d" ? "2d" : "3d"; }
+  // Frameworks such as React 19 set a property the element defines rather than its attribute.
+  set view(value) { this.setAttribute("view", value === "2d" ? "2d" : "3d"); }
+
+  // The shared renderer, with this explorer's meshes on it; null where WebGL is not available.
+  _gl() {
+    const current = sharedRenderer();
+    if (!current.renderer.gl) return null;
+    current.users.add(this);
+    if (this._meshOwner !== current) {
+      this._meshes = [];
+      this._meshOwner = current;
+      this._uploadScene(current.renderer);
+    }
+    return current.renderer;
+  }
+
+  _releaseMeshes() {
+    if (this._meshOwner && this._meshOwner === shared && !shared.renderer.gl.isContextLost()) shared.renderer.clear(this._meshes);
+    this._meshOwner = null;
+  }
 
   _render() {
     if (!this.isConnected || !this._model) return;
     const model = this._model;
+    this._releaseMeshes();
     if (model.format !== modelFormat) {
       this.shadowRoot.innerHTML = `<p>wire-harness-explorer ${version} cannot read a model of format ${escapeHtml(String(model.format))}.</p>`;
       return;
@@ -995,7 +1068,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
       <div class="frame">
         <header>
           <div><div class="eyebrow">${escapeHtml(model.number)} · ${contentsText(model)} · rev ${escapeHtml(model.rev)}</div>
-            <p class="title">${escapeHtml(model.title)}</p></div>
+            <p class="title">${escapeHtml(model.title)}</p>${releaseMark(model)}</div>
           <div class="views" role="group" aria-label="View">
             <button data-view="3d">3D</button><button data-view="2d">2D</button><button data-reset>Reset view</button>
           </div>
@@ -1034,8 +1107,6 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
         : cable ? { kind: "cable", id: cable.dataset.cable } : bundle ? { kind: "segment", id: bundle.dataset.segment } : null;
       this._select(hit, event.clientX - bounds.left, event.clientY - bounds.top);
     });
-    this._renderer = new Renderer(this._canvas);
-    this._uploadScene();
     this._frame();
     this._bindPointer();
     this._resizeObserver = new ResizeObserver(() => this._draw());
@@ -1056,10 +1127,8 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     this._select(null);
   }
 
-  _uploadScene() {
-    const renderer = this._renderer;
-    if (!renderer.gl) return;
-    renderer.clear();
+  _uploadScene(renderer) {
+    const meshes = this._meshes;
     // A striped wire carries its stripe as a helix round the insulation, as a tracer stripe
     // runs, so it shows from every side.
     const sides = 12, stripePitch = this._scene.sizes.wire * 14;
@@ -1067,18 +1136,18 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
       const distances = runLengths(points);
       const color = colors.length > 1
         ? (i, k) => (((k / sides + distances[i] / stripePitch) % 1) < 0.34 ? colors[1] : colors[0]) : colors[0];
-      renderer.upload(`wire:${wire.id}`, tubeMesh(points, this._scene.sizes.wire, sides, color));
+      renderer.upload(meshes, `wire:${wire.id}`, tubeMesh(points, this._scene.sizes.wire, sides, color));
     }
     for (const jacket of this._scene.jackets) {
-      renderer.upload(`cable:${jacket.cable}`, tubeMesh(jacket.points, jacket.radius, 20, jacket.color ? hexToRgb(jacket.color) : [0.27, 0.27, 0.28]));
+      renderer.upload(meshes, `cable:${jacket.cable}`, tubeMesh(jacket.points, jacket.radius, 20, jacket.color ? hexToRgb(jacket.color) : [0.27, 0.27, 0.28]));
     }
     // Shield foil and braid: tinned copper, striped across so it reads as braid, not insulation.
     this._scene.shieldBands.forEach((band, index) => {
-      renderer.upload(`shield:${band.cable}:${index}`, tubeMesh(band.points, band.radius, 20, (i, k) => (k % 2 ? [0.78, 0.78, 0.76] : [0.58, 0.58, 0.56])));
+      renderer.upload(meshes, `shield:${band.cable}:${index}`, tubeMesh(band.points, band.radius, 20, (i, k) => (k % 2 ? [0.78, 0.78, 0.76] : [0.58, 0.58, 0.56])));
     });
     for (const body of this._scene.bodies) {
       const mesh = bodyMesh(body.kind === "splice" ? { ...body, color: [0.72, 0.72, 0.7] } : body);
-      renderer.upload(`connector:${body.connector.id}`, mesh, body.placeholder ? 0.4 : 1);
+      renderer.upload(meshes, `connector:${body.connector.id}`, mesh, body.placeholder ? 0.4 : body.connector.generic ? 0.55 : 1);
     }
     const lineWidth = this._scene.sizes.wire * 0.45;
     const gridMeshes = this._scene.grid.lines.map(([a, b]) => {
@@ -1086,13 +1155,13 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
       return { positions: [...subtract(a, across), ...add(a, across), ...add(b, across), ...subtract(b, across)],
                normals: [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0], colors: Array(4).fill([0.62, 0.62, 0.6]).flat(), indices: [0, 1, 2, 0, 2, 3] };
     });
-    if (gridMeshes.length) renderer.upload("grid", mergeMeshes(gridMeshes), 0.5);
+    if (gridMeshes.length) renderer.upload(meshes, "grid", mergeMeshes(gridMeshes), 0.5);
     const plumbs = this._scene.grid.plumbs.map(([a, b]) => tubeMesh([a, b], lineWidth * 0.6, 6, [0.62, 0.62, 0.6]));
-    if (plumbs.length) renderer.upload("plumbs", mergeMeshes(plumbs), 0.45);
+    if (plumbs.length) renderer.upload(meshes, "plumbs", mergeMeshes(plumbs), 0.45);
     const radius = this._scene.sizes.breakout;
     const nodeMeshes = this._scene.breakouts.map((point) => tubeMesh([add(point, [-radius * 0.6, 0, 0]), add(point, [radius * 0.6, 0, 0])],
       radius, 16, [0.95, 0.95, 0.93]));
-    if (nodeMeshes.length) renderer.upload("breakouts", mergeMeshes(nodeMeshes));
+    if (nodeMeshes.length) renderer.upload(meshes, "breakouts", mergeMeshes(nodeMeshes));
   }
 
   // Frame the whole harness: aim at the centre of its bounding box from far enough away to fit it.
@@ -1127,13 +1196,20 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
         element.classList.toggle("lit", this._selected.has(key));
       }
     }
-    if (!this._renderer?.gl || !this._stage || this.view === "2d") return;
+    if (this._planSvg && this.view === "2d") this._scalePlanText();
+    if (!this._stage || this.view === "2d") return;
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     const width = Math.round(this._stage.clientWidth * ratio), height = Math.round(this._stage.clientHeight * ratio);
+    if (!width || !height) return;
+    const renderer = this._gl();
+    if (!renderer) return;
     if (this._canvas.width !== width || this._canvas.height !== height) { this._canvas.width = width; this._canvas.height = height; }
     const { eye, viewProjection, width: cssWidth, height: cssHeight } = this._matrices();
     const highlight = hexToRgb(getComputedStyle(this).getPropertyValue("--select").trim() || "#ffb000");
-    this._renderer.draw(viewProjection, eye, this._selected, highlight);
+    renderer.draw(this._meshes, width, height, viewProjection, eye, this._selected, highlight);
+    const picture = this._canvas.getContext("2d");
+    picture.clearRect(0, 0, width, height);
+    picture.drawImage(renderer.canvas, 0, 0);
     this._labels.replaceChildren(...this._scene.bodies.filter((body) => body.kind === "connector").map((body) => {
       const [x, y, z] = transformPoint(viewProjection, add(body.centre, [0, body.size[1] / 2 + 4, 0]));
       const tag = document.createElement("span");
@@ -1226,7 +1302,14 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
   // Plan units per screen pixel: the viewBox is fitted whole into the stage.
   _planUnit() {
     const bounds = this._planSvg.getBoundingClientRect();
-    return Math.max(this._planBox[2] / Math.max(bounds.width, 1), this._planBox[3] / Math.max(bounds.height, 1));
+    return planUnit(this._planBox, bounds.width, bounds.height);
+  }
+
+  // Text in the 2D view keeps one size on screen however the drawing is scaled or zoomed: its
+  // size in drawing units follows the units per pixel.
+  _scalePlanText() {
+    const bounds = this._planSvg.getBoundingClientRect();
+    if (bounds.width && bounds.height) this._planSvg.style.setProperty("--u", String(this._planUnit()));
   }
 
   _zoomPlan(factor, clientX, clientY) {
@@ -1235,6 +1318,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     const point = [x + width / 2 + (clientX - bounds.left - bounds.width / 2) * unit, y + height / 2 + (clientY - bounds.top - bounds.height / 2) * unit];
     this._planBox = zoomedViewBox(this._planBox, factor, point);
     this._planSvg.setAttribute("viewBox", this._planBox.join(" "));
+    this._scalePlanText();
   }
 
   _pan(dx, dy) {
@@ -1388,8 +1472,18 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     const popover = document.createElement("div");
     popover.className = `popover ${className}`;
     popover.setAttribute("role", "dialog");
-    popover.innerHTML = `<button class="close" aria-label="Close">×</button>${html}`;
-    popover.querySelector(".close").addEventListener("click", () => this._select(null));
+    popover.innerHTML = html;
+    // The close button sits beside the heading, in its own room, so the heading never runs under it.
+    const head = document.createElement("div"), close = document.createElement("button");
+    head.className = "head";
+    close.className = "close";
+    close.setAttribute("aria-label", "Close");
+    close.textContent = "×";
+    close.addEventListener("click", () => this._select(null));
+    const heading = popover.querySelector("h3");
+    popover.prepend(head);
+    if (heading) head.append(heading);
+    head.append(close);
     // Drag a popover by its heading to see what it covers.
     popover.addEventListener("pointerdown", (event) => {
       if (!event.target.closest("h3")) return;
@@ -1538,6 +1632,18 @@ function conductorLeads(model, wire) {
   return [leadAt(wire.from.connector), leadAt(wire.to.connector)];
 }
 
+// A harness whose checks found errors is not for release, and its explorer says so as its sheets do.
+function releaseMark(model) {
+  const errors = model.release?.errors || 0;
+  if (!errors) return "";
+  return `<div class="release" role="status">NOT FOR RELEASE · ${errors} check error${errors === 1 ? "" : "s"}</div>`;
+}
+
+// Drawing units per screen pixel when a viewBox is fitted whole into a box of the given size.
+function planUnit([, , width, height], screenWidth, screenHeight) {
+  return Math.max(width / Math.max(screenWidth, 1), height / Math.max(screenHeight, 1));
+}
+
 // What a harness is made of, counted the way it is built: loose wires, and cables as one each.
 function contentsText(model) {
   const loose = model.wires.filter((wire) => !wire.cable).length, cables = (model.cables || []).length;
@@ -1553,4 +1659,4 @@ if (globalThis.customElements && !customElements.get("wire-harness-explorer")) {
   customElements.define("wire-harness-explorer", WireHarnessExplorer);
 }
 
-export { WireHarnessExplorer, version, samplePath, buildScene, buildPlan, planSvg, pinoutSvg, boxMesh, fitDistance, viewBasis, fieldOfView, zoomedViewBox, cableEndsTable, bodyMesh, decodeMesh };
+export { WireHarnessExplorer, version, planUnit, samplePath, buildScene, buildPlan, planSvg, pinoutSvg, boxMesh, fitDistance, viewBasis, fieldOfView, zoomedViewBox, cableEndsTable, bodyMesh, decodeMesh };
