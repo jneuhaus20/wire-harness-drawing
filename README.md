@@ -4,6 +4,8 @@ A Claude skill that turns one YAML description of a wire harness into the drawin
 
 [`examples/sensor-branch/sensor-branch.pdf`](examples/sensor-branch/sensor-branch.pdf) is the package generated from [`examples/sensor-branch/sensor-branch.yaml`](examples/sensor-branch/sensor-branch.yaml). Every folder in [`examples/`](examples/) is a harness the tests generate and the site shows.
 
+**[See it on the project site](https://jneuhaus20.github.io/wire-harness-drawing/)**: every example with its drawing, its checks, and a 3D view you can turn.
+
 ## What it writes
 
 | File | Contents |

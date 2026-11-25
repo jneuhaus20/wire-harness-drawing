@@ -15,6 +15,7 @@ from build_release import frontmatter, upload_problems, uploadable_frontmatter_k
 skill_name = "wire-harness-drawing"
 skill_directory = repository / "skills" / skill_name
 build_script = repository / "tools" / "build_release.py"
+site_address = "https://jneuhaus20.github.io/wire-harness-drawing/"
 
 
 def plugin_manifest() -> dict:
@@ -34,6 +35,10 @@ class PluginManifestTest(unittest.TestCase):
         self.assertTrue(marketplace["name"])
         self.assertTrue(marketplace["owner"]["name"])
         self.assertEqual([(entry["name"], entry["source"]) for entry in marketplace["plugins"]], [(skill_name, "./")])
+
+    def test_the_plugin_and_the_readme_point_at_the_project_site(self) -> None:
+        self.assertEqual(plugin_manifest()["homepage"], site_address)
+        self.assertIn(f"]({site_address})", (repository / "README.md").read_text().split("## ")[0])
 
     def test_the_licence_is_mit(self) -> None:
         self.assertIn("MIT License", (repository / "LICENSE").read_text())
