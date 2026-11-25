@@ -1520,11 +1520,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     }).join("");
     const heading = [connector.id, connector.label, connector.generic ? `generic ${connector.pins.length}-pin` : connector.part_number]
       .filter(Boolean).map(escapeHtml).join(" · ");
-    const units = escapeHtml(this._model.units || "mm"), body = connector.body;
-    const bodyLine = connector.splice ? "" : body?.shape === "model" ? `<p class="mono">Body from the maker's 3D model</p>` : body
-      ? `<p class="mono">Body ${body.shape === "cylinder" ? `Ø${body.width} × ${body.length}` : `${body.length} × ${body.width} × ${body.height}`} ${units}</p>`
-      : `<p class="na">Body not stated: drawn as a placeholder.</p>`;
-    this._place(this._popover("", `<h3>${heading}</h3>${bodyLine}${pinoutSvg(connector, this._model, null)}
+    this._place(this._popover("", `<h3>${heading}</h3>${bodyNote(connector, this._model.units || "mm")}${pinoutSvg(connector, this._model, null)}
       <table><thead><tr><th>Pin</th><th>Signal</th><th>Wire</th><th>Colour</th><th>To</th></tr></thead><tbody>${rows}</tbody></table>`),
       this._bodyBox((this.view === "2d" ? this._plan : this._scene).bodies.find((b) => b.connector.id === id)));
   }
@@ -1615,6 +1611,17 @@ function cableEndsTable(cable, model) {
   return `<table class="ends"><thead><tr><th>End</th><th>Lead (${units})</th><th>Strip (${units})</th><th>To</th><th>Conductors</th></tr></thead>${ends}</table>`;
 }
 
+// What a connector's popover says about its body: nothing when it is the maker's model or a
+// splice; when the body is only its datasheet outline, or not stated, a note saying so, since
+// the 3D view would otherwise pass it off as the real part.
+function bodyNote(connector, units) {
+  const body = connector.body;
+  if (connector.splice || body?.shape === "model") return "";
+  if (!body) return `<p class="na">Body not stated: drawn as a placeholder.</p>`;
+  const size = body.shape === "cylinder" ? `Ø${body.width} × ${body.length}` : `${body.length} × ${body.width} × ${body.height}`;
+  return `<p class="na">Body drawn as its outline only, ${size} ${escapeHtml(units)}.</p>`;
+}
+
 function swatch(wire) {
   if (!wire.colors?.length) return '<span class="na">not chosen</span>';
   const fill = wire.colors.length > 1
@@ -1663,4 +1670,4 @@ if (globalThis.customElements && !customElements.get("wire-harness-explorer")) {
   customElements.define("wire-harness-explorer", WireHarnessExplorer);
 }
 
-export { WireHarnessExplorer, version, planUnit, samplePath, buildScene, buildPlan, planSvg, pinoutSvg, boxMesh, fitDistance, viewBasis, fieldOfView, zoomedViewBox, cableEndsTable, bodyMesh, decodeMesh };
+export { WireHarnessExplorer, version, planUnit, samplePath, buildScene, buildPlan, planSvg, pinoutSvg, boxMesh, fitDistance, viewBasis, fieldOfView, zoomedViewBox, cableEndsTable, bodyMesh, bodyNote, decodeMesh };

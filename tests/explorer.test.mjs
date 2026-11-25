@@ -5,7 +5,7 @@ import { test } from "node:test";
 
 const root = new URL("..", import.meta.url);
 const componentPath = new URL("skills/wire-harness-drawing/explorer/wire-harness-explorer.js", root);
-const { bodyMesh, decodeMesh, boxMesh, buildPlan, buildScene, cableEndsTable, pinoutSvg, planSvg, samplePath, version, zoomedViewBox } = await import(componentPath);
+const { bodyMesh, bodyNote, decodeMesh, boxMesh, buildPlan, buildScene, cableEndsTable, pinoutSvg, planSvg, samplePath, version, zoomedViewBox } = await import(componentPath);
 const example = JSON.parse(readFileSync(new URL("examples/sensor-branch/sensor-branch.harness.json", root), "utf8"));
 const routed = JSON.parse(process.env.ROUTED_MODEL);
 
@@ -275,4 +275,11 @@ test("a model in one plain colour takes the body's stated colour", () => {
   const tinted = { ...model, connectors: model.connectors.map((c) => c.id === "J1" ? { ...c, body: { shape: "model", mesh, rotate: [0, 90, 0], color: "#ece6d6" } } : c) };
   const body = buildScene(tinted).bodies.find((b) => b.connector.id === "J1");
   assert.deepEqual(body.model.colors[0].map((v) => Math.round(v * 255)), [0xec, 0xe6, 0xd6]);
+});
+
+test("a connector's popover notes its body only where the drawing could mislead: an outline or a placeholder", () => {
+  assert.equal(bodyNote({ body: { shape: "model", mesh: {} } }, "mm"), "");
+  assert.equal(bodyNote({ splice: true }, "mm"), "");
+  assert.match(bodyNote({ body: { shape: "box", length: 12.7, width: 10.72, height: 6.63 } }, "mm"), /outline only, 12\.7 × 10\.72 × 6\.63 mm/);
+  assert.match(bodyNote({ body: null }, "mm"), /not stated/);
 });
