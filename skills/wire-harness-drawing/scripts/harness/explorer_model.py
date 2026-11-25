@@ -28,7 +28,10 @@ def body_entry(body: dict | None) -> dict | None:
         return None
     if body.get("mesh"):
         rotate = [float(angle) for angle in body.get("rotate", [0, 0, 0])]
-        return {"shape": "model", "mesh": body["mesh"], "rotate": [int(a) if a.is_integer() else a for a in rotate]}
+        entry = {"shape": "model", "mesh": body["mesh"], "rotate": [int(a) if a.is_integer() else a for a in rotate]}
+        if body.get("color"):
+            entry["color"] = body_color(body["color"])
+        return entry
     sizes = {"diameter": "width"} if body.get("shape") == "cylinder" else {}
     entry = {"shape": body.get("shape", "box"), "length": float(body["length"])}
     for key in (("diameter",) if body.get("shape") == "cylinder" else ("width", "height")):

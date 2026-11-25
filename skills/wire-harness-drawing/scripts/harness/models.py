@@ -80,6 +80,20 @@ def converted_mesh(path: Path) -> tuple[dict | None, str | None]:
     return json.loads(cached.read_text()), None
 
 
+# A mesh the converter has already written (its .json) is read as it is, so a harness can carry
+# its connectors' meshes beside its source and build where no converter is installed.
+def read_mesh(path: Path) -> tuple[dict | None, str | None]:
+    """A converted mesh file, or None and why not."""
+    import json
+    try:
+        mesh = json.loads(path.read_text())
+    except ValueError:
+        return None, f"{path.name} is not a mesh file"
+    if mesh.get("format") != "wire-harness-mesh/1":
+        return None, f"{path.name} is not a wire-harness-mesh/1 file"
+    return mesh, None
+
+
 # A body's model is the file it names, or else a model the cache holds for the connector's part
 # number. Its mesh joins the body; a model that cannot be found or converted leaves the body as
 # its datasheet states it, or a placeholder when it states nothing else.
@@ -93,7 +107,7 @@ def attach_models(source: HarnessSource, findings: Findings) -> None:
         fallback = "drawn from its datasheet body" if "shape" in body else "drawn as a placeholder"
         if named and path is None:
             findings.warn(f"{designator}: body model {named} not found; {fallback}")
-        mesh, problem = converted_mesh(path) if path else (None, None)
+        mesh, problem = (read_mesh(path) if path.suffix.lower() == ".json" else converted_mesh(path)) if path else (None, None)
         if problem:
             findings.info(f"{designator}: body model not converted: {problem}; {fallback}")
         if mesh:

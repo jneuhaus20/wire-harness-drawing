@@ -590,7 +590,9 @@ function connectorBody(segments, centre, connector, sizes, lift) {
   // gives; one not stated is a faint placeholder box sized from its pin count, and says so.
   const stated = Boolean(connector.body);
   if (connector.body?.shape === "model") {
+    // A model in one plain colour (many makers' models carry none) takes the body's stated colour.
     const model = turnedModel(connector.body.mesh, connector.body.rotate);
+    if (connector.body.color && connector.body.mesh.palette.length === 1) model.colors = model.colors.map(() => hexToRgb(connector.body.color));
     const size = [model.max[0] - model.min[0], model.max[2] - model.min[2], model.max[1] - model.min[1]].map((v) => v * sizes.bodyScale);
     return { connector, kind: "connector", centre: add(near, scale(axis, size[0] / 2)), axis, size, stated, shape: "model", model,
              scale: sizes.bodyScale, color: [0.6, 0.6, 0.6] };
@@ -763,12 +765,14 @@ precision mediump float;
 varying vec3 vNormal; varying vec3 vColor; varying vec3 vPosition;
 uniform vec3 eye; uniform vec3 tint; uniform float tintAmount; uniform float dimAmount; uniform float alpha;
 void main() {
+  vec3 view = normalize(eye - vPosition);
+  // Lit from whichever side faces the eye: a maker's model need not wind its triangles consistently.
   vec3 n = normalize(vNormal);
+  n = dot(n, view) < 0.0 ? -n : n;
   vec3 key = normalize(vec3(-0.35, 0.85, 0.4));
   float hemisphere = 0.5 + 0.5 * n.y;
   vec3 base = mix(mix(vColor, vec3(0.52), dimAmount), tint, tintAmount);
   vec3 lit = base * (0.32 + 0.22 * hemisphere + 0.62 * max(dot(n, key), 0.0));
-  vec3 view = normalize(eye - vPosition);
   float highlight = pow(max(dot(n, normalize(key + view)), 0.0), 40.0) * 0.22;
   gl_FragColor = vec4(pow(lit + highlight, vec3(1.0 / 1.1)), alpha);
 }`;
@@ -1147,7 +1151,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     });
     for (const body of this._scene.bodies) {
       const mesh = bodyMesh(body.kind === "splice" ? { ...body, color: [0.72, 0.72, 0.7] } : body);
-      renderer.upload(meshes, `connector:${body.connector.id}`, mesh, body.placeholder ? 0.4 : body.connector.generic ? 0.55 : 1);
+      renderer.upload(meshes, `connector:${body.connector.id}`, mesh, body.placeholder ? 0.4 : body.connector.generic && !body.stated ? 0.55 : 1);
     }
     const lineWidth = this._scene.sizes.wire * 0.45;
     const gridMeshes = this._scene.grid.lines.map(([a, b]) => {
