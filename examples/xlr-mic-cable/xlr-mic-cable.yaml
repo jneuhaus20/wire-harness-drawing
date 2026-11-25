@@ -17,6 +17,7 @@ connectors:
     gender: female
     shape: circular
     face: {view: mating face, cavities: {1: [0, 0], 2: [-7.62, 0], 3: [-3.81, 4.45]}}
+    body: {shape: cylinder, length: 72.94, diameter: 20.3, color: nickel}   # envelope measured from Neutrik's 3D model
   P2:
     label: TO DESK
     type: XLR3
@@ -28,6 +29,7 @@ connectors:
     gender: male
     shape: circular
     face: {view: mating face, cavities: {1: [0, 0], 2: [7.62, 0], 3: [3.81, 3.81]}}
+    body: {shape: cylinder, length: 69.64, diameter: 20.33, color: nickel}   # envelope measured from Neutrik's 3D model
 cables:
   W1:
     desc: 2-conductor shielded microphone cable, 24 AWG

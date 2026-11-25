@@ -102,6 +102,8 @@ def body_problems(designator: str, body) -> list[str]:
     problems = []
     if body.get("shape", "box") not in body_shapes:
         problems.append(f"{designator}: body shape '{body['shape']}' is not {', '.join(body_shapes[:-1])} or {body_shapes[-1]}")
+    if "model" in body and "shape" not in body:
+        return problems
     sizes = ("length", "diameter") if body.get("shape") == "cylinder" else ("length", "width", "height")
     for size in sizes:
         if not (is_number(body.get(size)) and float(body[size]) > 0):

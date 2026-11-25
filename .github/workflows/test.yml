@@ -20,7 +20,11 @@ jobs:
       - run: pip install pyyaml cairosvg pypdf wireviz==0.4.1 playwright
       # The explorer's browser tests need a browser; without one they are skipped, so install it here.
       - run: python -m playwright install --with-deps chromium
+      # The STEP converter, so the model tests run; the skill installs it on first use the same way.
+      - run: npm install --prefix "$RUNNER_TEMP/converter" occt-import-js@0.0.23
       - run: python -m unittest
+        env:
+          WIRE_HARNESS_CONVERTER: ${{ runner.temp }}/converter
 
   # The repository installs as a Claude Code plugin marketplace: check its manifests as Claude Code does.
   plugin:

@@ -108,7 +108,10 @@ connectors:
                            # optional, from the datasheet drawing, in the drawing's units: length along the mating
                            # axis, width across the contacts (cylinder: diameter instead of width and height);
                            # color by name (natural, black, nickel, tin, zinc, white, grey, red, ...) or #rrggbb.
-                           # The 3D view draws the body at that size and colour; without it, a plain box, and says so.
+                           # The 3D view draws the body at that size and colour; without it, a faint placeholder.
+    # or the maker's 3D model (see "Connector bodies" below):
+    body: {model: "${KICAD10_3DMODEL_DIR}/Connector_JST.3dshapes/JST_PH_B6B-PH-K_1x06_P2.00mm_Vertical.step",
+           rotate: [0, 90, 0]}   # degrees about x, then y, then z: after it, the mating face points +x and the top +z
     mpn: str   notes: str  # passed through to the WireViz diagram
   SP1: {type: splice, desc: str, pn: str}   # wires end at "SP1"
 
@@ -159,6 +162,20 @@ items:                     # everything else on the BOM
 expect:
   nets: {GND: ["P1:1", "J1:1"], ...}
 ```
+
+## Connector bodies
+
+The 3D view draws each connector body from the best source there is, in this order. Never guess a dimension.
+
+1. **The maker's 3D model.** Search the maker's part page for the part number's STEP model (Molex, TE, JST, Amphenol, Neutrik and most others publish one).
+   - Ask the user before downloading it, naming the file, the site and its size. Save it as `~/.cache/wire-harness-drawing/models/<part number>.step`; the generator finds it there by the connector's `pn`, for every harness that uses the part.
+   - If the download needs a login or a licence click, give the user the exact link and ask them to download it. Then move it out of their Downloads folder: the newest `.step`, `.stp` or `.zip` for that part (unzip it first) to `models/<part number>.step` in the cache, and anything that came with it to `downloads/` there. Leave nothing behind in Downloads.
+   - A board-side part may already be in KiCad's library, or in the user's own: name it with `body: {model: ...}`, using `${KICAD10_3DMODEL_DIR}` or a path relative to the harness source.
+   - Set `rotate` so the mating face points +x and the top +z; open the explorer and check it.
+   - The generator converts the model once with `scripts/model_mesh.mjs` and bakes a compact mesh (at most 8,000 triangles) into `harness.json`; the STEP file stays in the cache. Never commit a maker's STEP file, and read the maker's terms before publishing a harness that carries its mesh: Molex's models come through TraceParts, whose terms forbid posting them on a website, and TE's allow personal, non-commercial use only. For anything published, measure the model's envelope into a datasheet body instead.
+   - The converter needs Node.js and occt-import-js. If the generator reports it is not installed, ask the user once, then run `npm install --prefix ~/.cache/wire-harness-drawing/converter occt-import-js`.
+2. **The datasheet body**: `shape`, `length`, `width`, `height` and `color` read from the maker's drawing. The 3D view draws the cavities of a stated `face` on it.
+3. **Nothing stated**: a faint placeholder, labelled as one in the explorer.
 
 ## Interactive explorer
 

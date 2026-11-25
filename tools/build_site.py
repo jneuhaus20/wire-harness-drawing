@@ -11,10 +11,12 @@ The page's examples are filled in at build time from what the generator wrote:
 import argparse
 import html
 import json
+import os
 import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 repository = Path(__file__).resolve().parent.parent
@@ -50,7 +52,9 @@ def generate_example(source: Path, target: Path, no_wireviz: bool) -> bool:
     target.mkdir(parents=True)
     shutil.copy(source, target / source.name)
     command = [sys.executable, str(generator), str(source), "-o", str(target)] + (["--no-wireviz"] if no_wireviz else [])
-    process = subprocess.run(command, capture_output=True, text=True)
+    # An empty model cache: the published site never carries a maker's model from this machine's cache.
+    with tempfile.TemporaryDirectory() as cache:
+        process = subprocess.run(command, capture_output=True, text=True, env={**os.environ, "WIRE_HARNESS_CACHE": cache})
     if "Traceback" in process.stderr:
         print(process.stderr, file=sys.stderr)
         return False
