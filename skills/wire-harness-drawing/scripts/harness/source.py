@@ -73,6 +73,7 @@ def load_source(path: Path) -> HarnessSource:
     for section, empty in section_defaults.items():
         if source.get(section) is None:
             source[section] = empty()
+    source["_folder"] = str(Path(path).resolve().parent)  # where relative model paths are read from
     return source
 
 

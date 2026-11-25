@@ -13,6 +13,7 @@ from harness.formboard import Spacing, drawn_to_scale, formboard_sheet, sheet_mi
 from harness.routing import HarnessTree, Route, build_tree, route_wires
 from harness.source import format_length, Findings, HarnessSource, load_source, wire_end
 from harness.tables import table_sheet_bodies, table_sheets
+from harness.models import attach_models
 from harness.validation import validate_source
 from harness.wiring import render_wiring_diagram, wireviz_available, wireviz_source, wiring_sheet
 
@@ -36,6 +37,7 @@ def analyse(source: HarnessSource) -> Analysis:
     """Every finding about a source, and the model the outputs are built from."""
     findings = Findings()
     validate_source(source, findings)
+    attach_models(source, findings)
     tree = build_tree(source, findings)
     routes = route_wires(source, tree)
     check_harness(source, tree, routes, findings)

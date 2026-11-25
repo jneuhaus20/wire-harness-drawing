@@ -19,7 +19,11 @@ jobs:
           python-version: "3.13"
       - run: sudo apt-get install -y graphviz
       - run: pip install pyyaml cairosvg pypdf wireviz==0.4.1
+      # The STEP converter, so the model tests run; the skill installs it on first use the same way.
+      - run: npm install --prefix "$RUNNER_TEMP/converter" occt-import-js@0.0.23
       - run: python -m unittest
+        env:
+          WIRE_HARNESS_CONVERTER: ${{ runner.temp }}/converter
       - run: python tools/build_release.py --output dist --tag "$GITHUB_REF_NAME"
       - run: gh release create "$GITHUB_REF_NAME" dist/*.zip --verify-tag --generate-notes --title "$GITHUB_REF_NAME"
         env:

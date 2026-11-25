@@ -5,7 +5,7 @@ import { test } from "node:test";
 
 const root = new URL("..", import.meta.url);
 const componentPath = new URL("skills/wire-harness-drawing/explorer/wire-harness-explorer.js", root);
-const { bodyMesh, boxMesh, buildPlan, buildScene, cableEndsTable, pinoutSvg, planSvg, samplePath, version, zoomedViewBox } = await import(componentPath);
+const { bodyMesh, decodeMesh, boxMesh, buildPlan, buildScene, cableEndsTable, pinoutSvg, planSvg, samplePath, version, zoomedViewBox } = await import(componentPath);
 const example = JSON.parse(readFileSync(new URL("examples/sensor-branch/sensor-branch.harness.json", root), "utf8"));
 const routed = JSON.parse(process.env.ROUTED_MODEL);
 
@@ -191,4 +191,42 @@ test("a stated body is drawn at its size and colour; an unstated one is drawn pl
   assert.ok(Math.min(...j2.color) > 0.4, "an unstated body is a plain mid grey, not black");
   const dsub = buildScene({ ...stated, connectors: stated.connectors.map((c) => c.id === "J1" ? { ...c, body: { ...c.body, shape: "dsub" } } : c) });
   assert.ok(bodyMesh(dsub.bodies.find((b) => b.connector.id === "J1")).positions.length > bodyMesh(j1).positions.length);
+});
+
+test("a maker's model is decoded at its true size, turned so its mating face leads, and set behind its node", () => {
+  const mesh = JSON.parse(readFileSync(new URL("tests/fixtures/ph-mesh.json", root), "utf8"));
+  const decoded = decodeMesh(mesh);
+  assert.equal(decoded.indices.length / 3, mesh.triangles);
+  const xs = [], ys = [], zs = [];
+  for (let i = 0; i < decoded.positions.length; i += 3) { xs.push(decoded.positions[i]); ys.push(decoded.positions[i + 1]); zs.push(decoded.positions[i + 2]); }
+  assert.ok(Math.abs(Math.min(...xs) - mesh.min[0]) < 0.01 && Math.abs(Math.max(...zs) - mesh.max[2]) < 0.01);
+  // KiCad's vertical header mates along +z; turned 90° about y, its mating face leads along +x
+  // and its width (model x) stands up.
+  const model = JSON.parse(readFileSync(new URL("examples/taz6-y-z/taz6-y-z.harness.json", root), "utf8"));
+  const withModel = { ...model, connectors: model.connectors.map((c) => c.id === "J1" ? { ...c, body: { shape: "model", mesh, rotate: [0, 90, 0] } } : c) };
+  const body = buildScene(withModel).bodies.find((b) => b.connector.id === "J1");
+  const height = mesh.max[2] - mesh.min[2], width = mesh.max[0] - mesh.min[0], depth = mesh.max[1] - mesh.min[1];
+  assert.ok(near(body.size, [height, width, depth], 0.02), `size ${body.size}`);
+  const built = bodyMesh(body);
+  const along = (p) => (p[0] - body.centre[0]) * body.axis[0] + (p[1] - body.centre[1]) * body.axis[1] + (p[2] - body.centre[2]) * body.axis[2];
+  const points = [];
+  for (let i = 0; i < built.positions.length; i += 3) points.push(built.positions.slice(i, i + 3));
+  assert.ok(Math.abs(Math.min(...points.map(along)) + body.size[0] / 2) < 0.02, "the rear of the model is at the node");
+});
+
+test("a body not stated is a placeholder, drawn faint", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/two-wire/two-wire.harness.json", root), "utf8"));
+  const body = buildScene(model).bodies.find((b) => b.connector.id === "P1");
+  assert.equal(body.placeholder, true);
+});
+
+test("a datasheet body shows its cavities on its mating face, laid out as the face states", () => {
+  const source = JSON.parse(readFileSync(new URL("examples/sensor-branch/sensor-branch.harness.json", root), "utf8"));
+  const model = { ...source, connectors: source.connectors.map((c) => c.id === "J1" ? { ...c, body: { shape: "box", length: 12, width: 12, height: 5, color: "#ece6d6" } } : c) };
+  const j1 = model.connectors.find((c) => c.id === "J1");
+  assert.ok(j1.face, "the example states J1's face");
+  const body = buildScene(model).bodies.find((b) => b.connector.id === "J1");
+  const plain = bodyMesh({ ...body, connector: { ...body.connector, face: null } });
+  const withFace = bodyMesh(body);
+  assert.equal((withFace.positions.length - plain.positions.length) / 3, 24 * Object.keys(j1.face.cavities).length, "one small box per cavity");
 });

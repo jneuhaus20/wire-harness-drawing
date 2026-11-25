@@ -1,4 +1,5 @@
 """Shared access to the generator under test."""
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -22,14 +23,15 @@ sys.path.insert(0, str(skill_directory / "scripts"))
 
 # Run the generator the way a user does, as a subprocess, so the tests exercise the
 # command line and the exit code along with the outputs.
-def run_generator(source: Path, output_directory: Path, *options: str) -> subprocess.CompletedProcess[str]:
-    """Run harnessgen.py on a harness source and return the finished process."""
+def run_generator(source: Path, output_directory: Path, *options: str, env: dict | None = None) -> subprocess.CompletedProcess[str]:
+    """Run harnessgen.py on a harness source and return the finished process; env adds to the environment."""
     command = [sys.executable, str(generator_script), str(source), "-o", str(output_directory), *options]
-    return subprocess.run(command, capture_output=True, text=True)
+    return subprocess.run(command, capture_output=True, text=True, env={**os.environ, **(env or {})})
 
 
-def run_generator_on_text(source_text: str, output_directory: Path, *options: str) -> subprocess.CompletedProcess[str]:
+def run_generator_on_text(source_text: str, output_directory: Path, *options: str,
+                          env: dict | None = None) -> subprocess.CompletedProcess[str]:
     """Write a harness source into output_directory as harness.yaml and run the generator on it."""
     source = output_directory / "harness.yaml"
     source.write_text(source_text)
-    return run_generator(source, output_directory, *options)
+    return run_generator(source, output_directory, *options, env=env)

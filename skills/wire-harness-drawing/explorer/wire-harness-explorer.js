@@ -567,31 +567,101 @@ function connectorBody(segments, centre, connector, sizes, lift) {
   if (connector.splice) {
     return { connector, kind: "splice", centre: add(centre, [0, lift, 0]), axis, size: [sizes.splice, sizes.wire * 3.2, sizes.wire * 3.2] };
   }
-  // A body the source states from its datasheet is drawn at that size and colour; one not stated
-  // is a plain grey box sized from its pin count, and its popover says so.
+  // A body is its maker's model when the model carries one, else the size and colour its datasheet
+  // gives; one not stated is a faint placeholder box sized from its pin count, and says so.
   const stated = Boolean(connector.body);
+  if (connector.body?.shape === "model") {
+    const model = turnedModel(connector.body.mesh, connector.body.rotate);
+    const size = [model.max[0] - model.min[0], model.max[2] - model.min[2], model.max[1] - model.min[1]].map((v) => v * sizes.bodyScale);
+    return { connector, kind: "connector", centre: add(near, scale(axis, size[0] / 2)), axis, size, stated, shape: "model", model,
+             scale: sizes.bodyScale, color: [0.6, 0.6, 0.6] };
+  }
   const width = sizes.bodyWidth(connector.pins.length);
   const size = stated ? [connector.body.length, connector.body.height, connector.body.width].map((value) => value * sizes.bodyScale)
     : [sizes.bodyLength, connector.shape === "circular" ? width : sizes.bodyHeight, width];
-  const color = stated ? hexToRgb(connector.body.color) : connector.generic ? [0.86, 0.86, 0.84] : [0.55, 0.55, 0.54];
-  return { connector, kind: "connector", centre: add(near, scale(axis, size[0] / 2)), axis, size, color, stated,
+  const color = stated ? hexToRgb(connector.body.color) : [0.92, 0.92, 0.9];
+  return { connector, kind: "connector", centre: add(near, scale(axis, size[0] / 2)), axis, size, color, stated, placeholder: !stated,
            shape: stated ? connector.body.shape : connector.shape === "circular" ? "cylinder" : "box" };
+}
+
+// A model's mesh as the converter packs it: positions quantised to 16 bits across its bounds,
+// indices, and a palette colour for each triangle.
+function decodeMesh(mesh) {
+  const bytes = (text) => Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
+  const quantised = new Uint16Array(bytes(mesh.positions).buffer);
+  const positions = new Float32Array(quantised.length);
+  quantised.forEach((q, i) => { const axis = i % 3; positions[i] = mesh.min[axis] + (q / 65535) * (mesh.max[axis] - mesh.min[axis]); });
+  const indexBytes = bytes(mesh.indices).buffer;
+  const indices = mesh.index_bytes === 4 ? new Uint32Array(indexBytes) : new Uint16Array(indexBytes);
+  const colors = [...bytes(mesh.triangle_colors)].map((k) => mesh.palette[k].map((v) => v / 255));
+  return { positions, indices, colors };
+}
+
+// Turn a model by its rotation (degrees about x, then y, then z) so its mating face leads along
+// +x and its top is +z, and find its bounds so turned.
+function turnedModel(mesh, rotate = [0, 0, 0]) {
+  const decoded = decodeMesh(mesh);
+  const [ax, ay, az] = rotate.map((degrees) => (degrees * Math.PI) / 180);
+  const turn = ([x, y, z]) => {
+    [y, z] = [y * Math.cos(ax) - z * Math.sin(ax), y * Math.sin(ax) + z * Math.cos(ax)];
+    [x, z] = [x * Math.cos(ay) + z * Math.sin(ay), -x * Math.sin(ay) + z * Math.cos(ay)];
+    [x, y] = [x * Math.cos(az) - y * Math.sin(az), x * Math.sin(az) + y * Math.cos(az)];
+    return [x, y, z];
+  };
+  const points = [];
+  for (let i = 0; i < decoded.positions.length; i += 3) points.push(turn([decoded.positions[i], decoded.positions[i + 1], decoded.positions[i + 2]]));
+  const min = [0, 1, 2].map((axis) => Math.min(...points.map((p) => p[axis]))), max = [0, 1, 2].map((axis) => Math.max(...points.map((p) => p[axis])));
+  return { points, indices: decoded.indices, colors: decoded.colors, min, max };
 }
 
 // A body's mesh: a box, a cylinder, or a D-sub (backshell, flange and D-shaped shell, mating end
 // outermost, in the proportions of a size-1 shell with its cable clamp).
 function bodyMesh(body) {
   const { centre, axis, size, color } = body;
+  if (body.shape === "model") return modelMesh(body);
   if (body.kind === "splice" || body.shape === "cylinder") {
     return tubeMesh([subtract(centre, scale(axis, size[0] / 2)), add(centre, scale(axis, size[0] / 2))], size[2] / 2, 24, color);
   }
-  if (body.shape !== "dsub") return boxMesh(centre, axis, size, color);
+  if (body.shape !== "dsub") return mergeMeshes([boxMesh(centre, axis, size, color), ...cavityMeshes(body)]);
   const [length, height, width] = size, back = subtract(centre, scale(axis, length / 2));
   const piece = (from, to, h, w) => boxMesh(add(back, scale(axis, (from + to) / 2 * length)), axis, [(to - from) * length, h, w], color);
   return mergeMeshes([piece(0, 0.87, height, width * 0.81), piece(0.87, 0.89, height * 0.8, width), piece(0.89, 1, height * 0.53, width * 0.55)]);
 }
 
 // ---------- Meshes ----------
+
+// The cavities of a datasheet body's mating face, as its face states them (seen from the front,
+// x right and y down), fitted within the face: a small dark square at each, at the mating end.
+function cavityMeshes(body) {
+  const face = body.connector?.face;
+  if (!face || !body.stated || body.kind !== "connector") return [];
+  const [x, y, z] = bodyFrame(body.axis), [length, height, width] = body.size;
+  const cavities = Object.values(face.cavities);
+  const spanX = Math.max(...cavities.map(([cx]) => cx)), spanY = Math.max(...cavities.map(([, cy]) => cy));
+  const pitch = Math.min((width * 0.8) / Math.max(spanX, 1), (height * 0.8) / Math.max(spanY, 1));
+  const side = Math.min(pitch * 0.55, width * 0.2, height * 0.5);
+  const end = add(body.centre, scale(x, length / 2));
+  return cavities.map(([cx, cy]) => {
+    const across = (cx - spanX / 2) * pitch, up = -(cy - spanY / 2) * pitch;
+    return boxMesh(add(end, add(scale(z, -across), scale(y, up))), body.axis, [side * 0.3, side, side], [0.12, 0.12, 0.12]);
+  });
+}
+
+// A model placed on its body: model x along the body's axis, model z up, model y across (so the
+// turn is a rotation, never a mirror), its rear at the node. Each triangle is flat-shaded.
+function modelMesh(body) {
+  const [x, y, z] = bodyFrame(body.axis), { model } = body, s = body.scale;
+  const middle = [0, 1, 2].map((axis) => (model.min[axis] + model.max[axis]) / 2);
+  const place = (p) => add(body.centre, add(add(scale(x, (p[0] - middle[0]) * s), scale(y, (p[2] - middle[2]) * s)), scale(z, -(p[1] - middle[1]) * s)));
+  const positions = [], normals = [], colors = [], indices = [];
+  for (let t = 0; t < model.indices.length / 3; t++) {
+    const corners = [0, 1, 2].map((k) => place(model.points[model.indices[3 * t + k]]));
+    const normal = normalize(cross(subtract(corners[1], corners[0]), subtract(corners[2], corners[0])));
+    for (const corner of corners) { positions.push(...corner); normals.push(...normal); colors.push(...model.colors[t]); }
+    indices.push(3 * t, 3 * t + 1, 3 * t + 2);
+  }
+  return { positions, normals, colors, indices };
+}
 
 function tubeMesh(points, radius, sides, color) {
   const positions = [], normals = [], colors = [], indices = [];
@@ -1008,7 +1078,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     });
     for (const body of this._scene.bodies) {
       const mesh = bodyMesh(body.kind === "splice" ? { ...body, color: [0.72, 0.72, 0.7] } : body);
-      renderer.upload(`connector:${body.connector.id}`, mesh, body.connector.generic ? 0.55 : 1);
+      renderer.upload(`connector:${body.connector.id}`, mesh, body.placeholder ? 0.4 : 1);
     }
     const lineWidth = this._scene.sizes.wire * 0.45;
     const gridMeshes = this._scene.grid.lines.map(([a, b]) => {
@@ -1353,9 +1423,9 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     const heading = [connector.id, connector.label, connector.generic ? `generic ${connector.pins.length}-pin` : connector.part_number]
       .filter(Boolean).map(escapeHtml).join(" · ");
     const units = escapeHtml(this._model.units || "mm"), body = connector.body;
-    const bodyLine = connector.splice ? "" : body
+    const bodyLine = connector.splice ? "" : body?.shape === "model" ? `<p class="mono">Body from the maker's 3D model</p>` : body
       ? `<p class="mono">Body ${body.shape === "cylinder" ? `Ø${body.width} × ${body.length}` : `${body.length} × ${body.width} × ${body.height}`} ${units}</p>`
-      : `<p class="na">Body size not stated: drawn as a plain box.</p>`;
+      : `<p class="na">Body not stated: drawn as a placeholder.</p>`;
     this._place(this._popover("", `<h3>${heading}</h3>${bodyLine}${pinoutSvg(connector, this._model, null)}
       <table><thead><tr><th>Pin</th><th>Signal</th><th>Wire</th><th>Colour</th><th>To</th></tr></thead><tbody>${rows}</tbody></table>`),
       this._bodyBox((this.view === "2d" ? this._plan : this._scene).bodies.find((b) => b.connector.id === id)));
@@ -1483,4 +1553,4 @@ if (globalThis.customElements && !customElements.get("wire-harness-explorer")) {
   customElements.define("wire-harness-explorer", WireHarnessExplorer);
 }
 
-export { WireHarnessExplorer, version, samplePath, buildScene, buildPlan, planSvg, pinoutSvg, boxMesh, fitDistance, viewBasis, fieldOfView, zoomedViewBox, cableEndsTable, bodyMesh };
+export { WireHarnessExplorer, version, samplePath, buildScene, buildPlan, planSvg, pinoutSvg, boxMesh, fitDistance, viewBasis, fieldOfView, zoomedViewBox, cableEndsTable, bodyMesh, decodeMesh };
