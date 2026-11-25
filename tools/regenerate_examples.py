@@ -4,6 +4,7 @@
 Usage:  python3 tools/regenerate_examples.py
 Review the diff before committing: every change in it is a change to what the generator draws.
 """
+import os
 import shutil
 import subprocess
 import sys
@@ -20,8 +21,11 @@ def main() -> int:
         name, folder = source.stem, source.parent
         with tempfile.TemporaryDirectory() as scratch:
             full, pinned = Path(scratch) / "full", Path(scratch) / "pinned"
-            subprocess.run([sys.executable, str(generator), str(source), "-o", str(full)], capture_output=True)
-            subprocess.run([sys.executable, str(generator), str(source), "-o", str(pinned), "--no-wireviz"], capture_output=True)
+            # An empty model cache: published examples never carry a maker's model from this machine's cache.
+            environment = {**os.environ, "WIRE_HARNESS_CACHE": str(Path(scratch) / "cache")}
+            subprocess.run([sys.executable, str(generator), str(source), "-o", str(full)], capture_output=True, env=environment)
+            subprocess.run([sys.executable, str(generator), str(source), "-o", str(pinned), "--no-wireviz"], capture_output=True,
+                           env=environment)
             for suffix in committed:
                 if (full / f"{name}.{suffix}").exists():
                     shutil.copy(full / f"{name}.{suffix}", folder / f"{name}.{suffix}")

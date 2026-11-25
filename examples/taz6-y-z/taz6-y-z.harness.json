@@ -84,7 +84,13 @@
     }
    ],
    "face": null,
-   "body": null
+   "body": {
+    "shape": "box",
+    "length": 24.26,
+    "width": 42.67,
+    "height": 5.99,
+    "color": "#2b2b2b"
+   }
   },
   {
    "id": "J1",

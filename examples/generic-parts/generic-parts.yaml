@@ -3,7 +3,8 @@ drawing: {title: GENERIC, number: T-5, rev: A}
 connectors:
   P1: {pincount: 4, shape: circular, gender: male}
   J1: {type: KK 254, pincount: 4, pn: 22-01-3047, manufacturer: Molex, gender: female,
-       face: {grid: [1, 4], view: mating face}}
+       face: {grid: [1, 4], view: mating face},
+       body: {shape: box, length: 12.7, width: 10.72, height: 6.63, color: natural}}   # envelope measured from Molex's 3D model
 wires:
   - {id: W1, from: "P1:1", to: "J1:1", gauge: 24 AWG, color: BK}
   - {id: W2, from: "P1:2", to: "J1:2", gauge: 24 AWG, color: RD}

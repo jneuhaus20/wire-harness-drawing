@@ -88,7 +88,13 @@
      ]
     }
    },
-   "body": null
+   "body": {
+    "shape": "box",
+    "length": 12.7,
+    "width": 10.72,
+    "height": 6.63,
+    "color": "#ece6d6"
+   }
   }
  ],
  "wires": [

@@ -42,6 +42,7 @@ connectors:
     gender: female
     face: {grid: [1, 4], view: mating face}
     contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
+    body: {shape: box, length: 12.7, width: 10.72, height: 6.63, color: natural}   # envelope measured from Molex's 3D model; natural nylon
     strip: 3
     awg: [22, 30]
   J2:
@@ -55,6 +56,7 @@ connectors:
     gender: female
     face: {grid: [1, 4], view: mating face}
     contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
+    body: {shape: box, length: 12.7, width: 10.72, height: 6.63, color: natural}   # envelope measured from Molex's 3D model; natural nylon
     strip: 3
   J3:
     label: SPI DEVICE
@@ -67,6 +69,7 @@ connectors:
     gender: female
     face: {grid: [1, 5], view: mating face}
     contact: {desc: "KK 254 crimp, 22-30 AWG", pn: 08-50-0114, manufacturer: Molex}
+    body: {shape: box, length: 12.7, width: 13.26, height: 6.63, color: natural}   # envelope measured from Molex's 3D model; natural nylon
     strip: 3
   E1:
     label: CHASSIS GND
