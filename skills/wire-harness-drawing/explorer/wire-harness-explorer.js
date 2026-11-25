@@ -163,8 +163,8 @@ function compareKeys(a, b) {
 // viewer, y up). Each wire runs as its own tube along its route, in its place in each segment's
 // bed; a wire that ends at a splice rises out of the bed into the splice sleeve above it. Each
 // connector is a body beyond its node, pointing away from its bundle.
-function buildScene(model) {
-  const sizes = sceneSizes(model);
+function buildScene(model, overrides = {}) {
+  const sizes = { ...sceneSizes(model), ...overrides };
   const routed = model.geometry !== "schematic";
   const positions = {};
   const connectors = Object.fromEntries(model.connectors.map((connector) => [connector.id, connector]));
@@ -268,13 +268,11 @@ function floorGrid(bounds, model, positions) {
 // strip-back length where the conductors leave it for their connectors. The conductors inside
 // are not drawn through it; only where they leave it.
 function cableSheaths(model, segmentByKey, sizes) {
-  return (model.cables || []).filter((cable) => cable.wires.length).map((cable) => {
-    const members = cable.wires.map((id) => model.wires.find((wire) => wire.id === id));
-    const legsOf = (wire) => wire.route.slice(0, -1).map((node, i) => [node, wire.route[i + 1]]);
-    const shared = legsOf(members[0]).filter(([a, b]) => members.every((wire) => legsOf(wire).some(([c, d]) => (a === c && b === d) || (a === d && b === c))));
+  return (model.cables || []).filter((cable) => cable.run && cable.run.length > 1).map((cable) => {
     const points = [];
     let radius = sizes.wire * 2;
-    for (const [a, b] of shared) {
+    for (let i = 0; i + 1 < cable.run.length; i++) {
+      const [a, b] = [cable.run[i], cable.run[i + 1]];
       const forward = segmentByKey.get(`${a}|${b}`);
       const segment = forward || segmentByKey.get(`${b}|${a}`);
       const sheath = segment.cables[cable.id];
@@ -283,9 +281,12 @@ function cableSheaths(model, segmentByKey, sizes) {
       const line = offsetPolyline(along, along.map(() => [sheath.offset[0] * (forward ? 1 : -1), sheath.offset[1]]));
       points.push(...(points.length ? line.slice(1) : line));
     }
+    // The model gives the breakout in drawing units; the schematic layout is not to scale, so
+    // there the jacket stops a fixed distance short, enough for the conductors to be seen leaving.
     const total = runLengths(points).at(-1) || 0;
-    const exit = Math.min(sizes.exit, total / 3);
-    return { cable: cable.id, points: trimPolyline(points, exit, total - exit), radius, color: cable.color };
+    const stop = (node) => (cable.breakouts[node] ? (model.geometry === "schematic" ? sizes.exit : cable.breakouts[node]) : 0);
+    const from = Math.min(stop(cable.run[0]), total / 3), to = total - Math.min(stop(cable.run.at(-1)), total / 3);
+    return { cable: cable.id, points: trimPolyline(points, from, to), radius, color: cable.color };
   }).filter((sheath) => sheath.points.length > 1);
 }
 
@@ -433,7 +434,8 @@ function offsetPolyline(points, offsets) {
 const fanLength = 26;
 
 function buildPlan(model) {
-  const scene = buildScene({ ...model, geometry: "schematic" });
+  // In 2D a cable's jacket runs right up to where its conductors fan into their connector.
+  const scene = buildScene({ ...model, geometry: "schematic" }, { exit: fanLength + 2 });
   const nodes = Object.fromEntries(model.nodes.map((node) => [node.id, [node.x, node.y]]));
   const fans = [];
   for (const body of scene.bodies.filter((b) => b.kind === "connector")) {
@@ -456,6 +458,10 @@ function buildPlan(model) {
   return { fans, sheaths, bodies: scene.bodies, nodes: model.nodes, segments: scene.segments, spliceLevel: scene.spliceLevel };
 }
 
+function polylineData(points) {
+  return points.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+}
+
 function stripePaths(d, wire, width, extra = "") {
   if (!wire.colors.length) return `<path d="${d}" fill="none" stroke="var(--muted)" stroke-width="${width}" stroke-dasharray="5 4"${extra}/>`;
   const [base, stripe] = wire.colors;
@@ -469,12 +475,22 @@ function planSvg(model, plan) {
   const box = [Math.min(...xs) - margin, Math.min(...ys) - margin, Math.max(...xs) - Math.min(...xs) + 2 * margin,
     Math.max(...ys) - Math.min(...ys) + 2 * margin];
   const parts = [];
+  // Loose wires make the bundle, drawn beside any cable sheath that shares the segment; a
+  // segment that carries only cables has no loose bundle.
+  // A conductor is under its sheath in the segments of its cable's run, and loose beyond them.
+  const sheathed = new Set((model.cables || []).flatMap((cable) => (cable.run || []).slice(0, -1).flatMap((node, i) =>
+    cable.wires.flatMap((id) => [`${id}|${node}|${cable.run[i + 1]}`, `${id}|${cable.run[i + 1]}|${node}`]))));
   for (const segment of plan.segments) {
-    const thickness = 1.6 * Math.sqrt(Math.max(segment.wires.length, 1));
+    const loose = segment.wires.filter((id) => !sheathed.has(`${id}|${segment.nodes[0]}|${segment.nodes[1]}`));
+    if (!loose.length) continue;
+    const thickness = 1.6 * Math.sqrt(loose.length);
+    const sides = loose.map((id) => segment.placement[id].centre[0]);
+    const side = sides.length === segment.wires.length ? 0 : (Math.min(...sides) + Math.max(...sides)) / 2;
+    const d = side ? polylineData(offsetPolyline(segment.polyline, segment.polyline.map(() => [side, 0])).map(([x, , z]) => [x, z])) : segment.path;
     const key = `${segment.nodes[0]}|${segment.nodes[1]}`;
-    parts.push(`<g class="bundle" data-segment="${escapeHtml(key)}"><path d="${segment.path}" fill="none" stroke="transparent" stroke-width="14"/>
-      <path d="${segment.path}" fill="none" stroke="var(--bundle-edge)" stroke-width="${(3 + thickness).toFixed(1)}" stroke-linecap="round"/>
-      <path d="${segment.path}" fill="none" stroke="var(--bundle)" stroke-width="${(1 + thickness).toFixed(1)}" stroke-linecap="round"/></g>`);
+    parts.push(`<g class="bundle" data-segment="${escapeHtml(key)}"><path d="${d}" fill="none" stroke="transparent" stroke-width="14"/>
+      <path d="${d}" fill="none" stroke="var(--bundle-edge)" stroke-width="${(3 + thickness).toFixed(1)}" stroke-linecap="round"/>
+      <path d="${d}" fill="none" stroke="var(--bundle)" stroke-width="${(1 + thickness).toFixed(1)}" stroke-linecap="round"/></g>`);
   }
   for (const wire of model.wires) {
     const paths = model.segments.filter((segment) => segment.wires.includes(wire.id)).map((segment) => segment.path);
@@ -484,8 +500,8 @@ function planSvg(model, plan) {
   for (const sheath of plan.sheaths) {
     const d = sheath.points.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
     parts.push(`<g class="jacket" data-cable="${escapeHtml(sheath.cable)}"><path d="${d}" fill="none" stroke="transparent" stroke-width="14"/>
-      <path d="${d}" fill="none" stroke="var(--ink)" stroke-width="${(sheath.radius * 1.4 + 2).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="${d}" fill="none" stroke="${sheath.color || "var(--sheath)"}" stroke-width="${(sheath.radius * 1.4).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/></g>`);
+      <path d="${d}" fill="none" stroke="var(--bundle-edge)" stroke-width="${(sheath.radius * 1.05 + 2).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="${d}" fill="none" stroke="${sheath.color ? `color-mix(in srgb, ${sheath.color} 70%, var(--bundle))` : "var(--sheath)"}" stroke-width="${(sheath.radius * 1.05).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/></g>`);
   }
   for (const { wire, d } of plan.fans) {
     parts.push(`<g class="wire" data-wire="${escapeHtml(wire.id)}"><path d="${d}" fill="none" stroke="transparent" stroke-width="7"/>${stripePaths(d, wire, 2)}</g>`);
@@ -838,7 +854,7 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     this.shadowRoot.innerHTML = `<style>${styles}</style>
       <div class="frame">
         <header>
-          <div><div class="eyebrow">${escapeHtml(model.number)} · ${model.wires.length} wires · rev ${escapeHtml(model.rev)}</div>
+          <div><div class="eyebrow">${escapeHtml(model.number)} · ${contentsText(model)} · rev ${escapeHtml(model.rev)}</div>
             <p class="title">${escapeHtml(model.title)}</p></div>
           <div class="views" role="group" aria-label="View">
             <button data-view="3d">3D</button><button data-view="2d">2D</button><button data-reset>Reset view</button>
@@ -1119,13 +1135,30 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
   }
 
   // A cable's popover lists its conductors; picking one selects it, lighting the sheath with it.
+  // A cable is cut as one item: its popover gives the cut and jacket lengths, and at each end
+  // the jacket to strip back and the leads, grouped by the connector they go to.
   _cablePopover(cable, x, y) {
-    const rows = cable.wires.map((id) => this._model.wires.find((w) => w.id === id)).map((w) =>
-      `<tr data-pick="${escapeHtml(w.id)}"><td>${escapeHtml(w.id)}</td><td>${swatch(w)}</td><td>${escapeHtml(w.signal)}</td>
-        <td>${escapeHtml(w.from.connector)}:${escapeHtml(w.from.pin)} → ${escapeHtml(w.to.connector)}:${escapeHtml(w.to.pin)}</td></tr>`).join("");
-    const heading = [cable.id, cable.description, cable.part_number, `${cable.conductors} conductors`].filter(Boolean).map(escapeHtml).join(" · ");
-    this._place(this._picking(this._popover("", `<h3>${heading}</h3>
-      <table><thead><tr><th>Wire</th><th>Colour</th><th>Circuit</th><th>From → to</th></tr></thead><tbody>${rows}</tbody></table>`)), [x - 6, y - 6, x + 6, y + 6]);
+    const wires = cable.wires.map((id) => this._model.wires.find((w) => w.id === id));
+    const endRows = (cable.ends || []).flatMap((end) => {
+      const groups = new Map();
+      for (const wire of wires) {
+        const key = `${endBeyond(wire.route, end.node, cable.run)}|${end.leads[wire.id]}`;
+        groups.set(key, [...(groups.get(key) || []), wire]);
+      }
+      return [...groups.entries()].map(([key, members], index) => {
+        const [connector, lead] = key.split("|");
+        return `<tr>${index ? "<td></td><td></td>" : `<td>${escapeHtml(end.node)}</td><td>${escapeHtml(end.strip_back)}</td>`}
+          <td>${escapeHtml(connector)}</td><td>${members.map((w) => swatch(w)).join(" ")}</td><td>${escapeHtml(lead)}</td></tr>`;
+      });
+    }).join("");
+    const heading = [cable.id, cable.description, cable.part_number].filter(Boolean).map(escapeHtml).join(" · ");
+    const summary = cable.cut_length ? `<p class="mono">Cut <b>${escapeHtml(cable.cut_length)}</b> · jacket ${escapeHtml(cable.jacket_length)} · ${cable.conductors} conductors</p>` : "";
+    const conductorRows = wires.map((w) => `<tr data-pick="${escapeHtml(w.id)}"><td>${escapeHtml(w.id)}</td><td>${swatch(w)}</td>
+      <td>${escapeHtml(w.signal)}</td><td>${escapeHtml(w.from.connector)}:${escapeHtml(w.from.pin)} → ${escapeHtml(w.to.connector)}:${escapeHtml(w.to.pin)}</td></tr>`).join("");
+    this._place(this._picking(this._popover("", `<h3>${heading}</h3>${summary}
+      <table><thead><tr><th>End</th><th>Strip</th><th>To</th><th>Conductors</th><th>Lead</th></tr></thead><tbody>${endRows}</tbody></table>
+      <table><thead><tr><th>Conductor</th><th>Colour</th><th>Circuit</th><th>From → to</th></tr></thead><tbody>${conductorRows}</tbody></table>`)),
+      [x - 6, y - 6, x + 6, y + 6]);
   }
 
   // A bundle's popover lists the wires in it; picking a row selects that wire.
@@ -1224,13 +1257,15 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
     const plan = this.view === "2d";
     const points = this._scene.wires.find((entry) => entry.wire.id === id).points;
     const [mx, my] = plan ? [x, y] : toScreen(points[Math.floor(points.length / 2)]);
+    const leads = conductorLeads(this._model, wire);
     // Wire ends at a splice have no popover of their own: the splice's sleeve shows them meeting.
     const ends = [wire.from, wire.to].map((end) => ({ end, body: (plan ? this._plan : this._scene).bodies.find((b) => b.connector.id === end.connector) }))
       .filter(({ body }) => body && body.kind === "connector").map((entry) => ({ ...entry, box: this._bodyBox(entry.body) }));
     this._place(this._popover("", `<h3>${escapeHtml(wire.id)} · ${escapeHtml(wire.signal || "")}</h3>
-      <table><thead><tr><th>From</th><th>To</th><th>Gauge</th><th>Colour</th><th>Cut</th></tr></thead>
+      <table><thead><tr><th>From</th><th>To</th><th>Gauge</th><th>Colour</th><th>${leads ? "Leads" : "Cut"}</th></tr></thead>
       <tbody><tr><td>${escapeHtml(wire.from.connector)}:${escapeHtml(wire.from.pin)}</td><td>${escapeHtml(wire.to.connector)}:${escapeHtml(wire.to.pin)}</td>
-      <td>${escapeHtml(wire.gauge) || '<span class="na">not stated</span>'}</td><td>${swatch(wire)}</td><td>${escapeHtml(wire.cut_length)}</td></tr></tbody></table>`),
+      <td>${escapeHtml(wire.gauge) || '<span class="na">not stated</span>'}</td><td>${swatch(wire)}</td>
+      <td>${leads ? `${escapeHtml(leads[0])} / ${escapeHtml(leads[1])} <span class="na">(in ${escapeHtml(wire.cable)})</span>` : escapeHtml(wire.cut_length)}</td></tr></tbody></table>`),
       [mx - 10, my - 10, mx + 10, my + 10], ends.map(({ box }) => box));
     for (const { end, body, box } of ends) {
       const connector = body.connector;
@@ -1273,6 +1308,27 @@ function swatch(wire) {
   const fill = wire.colors.length > 1
     ? `repeating-linear-gradient(90deg, ${wire.colors[0]} 0 5px, ${wire.colors[1]} 5px 8px)` : wire.colors[0];
   return `<span class="swatch" style="background:${fill}"></span> ${escapeHtml(wire.color)}`;
+}
+
+// The end of a conductor's route that lies beyond the given end of its cable's jacket run.
+function endBeyond(route, runEnd, run) {
+  const inner = runEnd === run[0] ? run[1] : run.at(-2);
+  return route.indexOf(inner) > route.indexOf(runEnd) ? route[0] : route.at(-1);
+}
+
+// A conductor's leads beyond its cable's jacket, at its from end and its to end.
+function conductorLeads(model, wire) {
+  const cable = (model.cables || []).find((c) => c.id === wire.cable);
+  if (!cable?.ends) return null;
+  const leadAt = (connector) => cable.ends.find((end) => endBeyond(wire.route, end.node, cable.run) === connector)?.leads[wire.id] ?? "";
+  return [leadAt(wire.from.connector), leadAt(wire.to.connector)];
+}
+
+// What a harness is made of, counted the way it is built: loose wires, and cables as one each.
+function contentsText(model) {
+  const loose = model.wires.filter((wire) => !wire.cable).length, cables = (model.cables || []).length;
+  const plural = (count, word) => `${count} ${word}${count === 1 ? "" : "s"}`;
+  return [loose || !cables ? plural(loose, "wire") : "", cables ? plural(cables, "cable") : ""].filter(Boolean).join(" · ");
 }
 
 function escapeHtml(value) {

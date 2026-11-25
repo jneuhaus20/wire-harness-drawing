@@ -50,10 +50,7 @@ def wireviz_bundle(drawing: dict, wires: list[dict], routes: list[Route]) -> dic
 def wireviz_cable(drawing: dict, cable: dict, wires: list[dict], routes: list[Route]) -> dict:
     """A multi-conductor cable in WireViz."""
     attributes = wireviz_conductors(drawing, wires, routes)
-    conductors = cable.get("conductors") or len(wires)
-    if conductors != len(wires):
-        attributes.pop("colors", None)
-    attributes["wirecount"] = conductors
+    attributes["wirecount"] = len(wires)
     attributes.update({key: cable[key] for key in ("pn", "manufacturer", "mpn") if key in cable})
     if cable.get("desc"):
         attributes["type"] = cable["desc"]

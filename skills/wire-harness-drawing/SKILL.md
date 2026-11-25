@@ -19,7 +19,8 @@ From one `harness.yaml`, `scripts/harnessgen.py` (in this skill's directory) wri
 | `*.sheet2.svg` and up | BOM (find no., qty or AR with computed length, TBD where a length runs through a TBD segment, unit, P/N, description, mfr, refs), wire list (from-to, BOM find number, strip length at each end, signal, gauge, colour, cut length, twist/cable), one table per connector (every cavity, empty ones marked). Flows onto extra sheets as needed. |
 | last sheet | WireViz wiring diagram (connector pin tables, wires coloured and labelled; each twist group a named bundle, each harness cable drawn as that cable with its P/N and shield), embedded. |
 | `*.pdf` | All sheets combined. |
-| `*.bom.csv`, `*.wirelist.csv` | Same data for purchasing and cut/strip/crimp work (wire list includes routing path). |
+| `*.bom.csv`, `*.wirelist.csv` | Same data for purchasing and cut/strip/crimp work (wire list includes routing path; a cable's conductors carry their lead at each end instead of a cut length). |
+| `*.cables.csv` | One row per cable: cut length, jacket length, and the jacket to strip back at each end. |
 | `*.harness.json` | The harness model the interactive explorer draws (see [explorer/README.md](explorer/README.md)). |
 | `*.wireviz.yaml`, `*.wiring.svg`, `*.wiring.png` | The generated WireViz input and WireViz's own render of it, in case someone wants to tweak the diagram by hand. |
 
@@ -95,12 +96,23 @@ connectors:
     mpn: str   notes: str  # passed through to the WireViz diagram
   SP1: {type: splice, desc: str, pn: str}   # wires end at "SP1"
 
-cables:                    # optional multi-conductor cables
-  C1: {desc, pn, manufacturer, conductors: 4, color: BK}   # color: jacket colour code, drawn by the explorer
+cables:                    # optional multi-conductor cables: each is one item, its designator a W-number
+  W5:
+    desc: str   pn: str   manufacturer: str
+    gauge: "24 AWG"        # conductors inherit it
+    color: BK              # jacket colour code
+    breakout: 40           # jacket stops this short of a connector it runs up to (default 40 mm / 1.5 in)
+    conductors:            # named by colour or number within the cable: W5-RD, W5-1
+      - {color: RD, from: "P1:2", to: "J2:1", signal: A+}
+      - {number: 2, from: "P1:3", to: "J2:2", signal: A-, color: BK}
+  # The jacket covers the run all conductors share. The generator gives the cable's cut length,
+  # its jacket length, the jacket to strip back at each end, and each conductor's lead beyond it
+  # (a cable that splits to two connectors at one end gets a lead per group). Conductors are not
+  # listed in wires:, and a wire's cable key is refused.
 
 wires:                     # the from-to list, one row per conductor
   - {id: W1, from: "P1:1", to: "J1:1", signal: GND, gauge: "22 AWG", color: BK,
-     twist: T1, cable: C1, length: (override), pn, type, note,
+     twist: T1, length: (override), pn, type, note,
      signal_differs_ok: true}   # accept a signal name that differs from the pin label
     # gauge TBD or color omitted while undecided: the diagram shows a wire count, no stand-in colour
 

@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 from tests.generator import repository
+from tests.test_cables import split_cable_harness
 from tests.test_geometry import routed_harness
 
 from harness.explorer_model import harness_model  # noqa: E402  (tests.generator puts scripts/ on the path)
@@ -20,12 +21,17 @@ connectors:
   P1: {type: KK 254, pn: A-1, pincount: 4}
   J1: {type: KK 254, pn: A-2, pincount: 4}
 cables:
-  C1: {desc: 2-conductor shielded, pn: C-2, conductors: 2, shield: true}
+  C1:
+    desc: 2-conductor shielded
+    pn: C-2
+    shield: true
+    gauge: 24 AWG
+    conductors:
+      - {color: RD, from: "P1:3", to: "J1:3"}
+      - {color: BK, from: "P1:4", to: "J1:4"}
 wires:
   - {id: W1, from: "P1:1", to: "J1:1", gauge: 24 AWG, color: WH, twist: T1}
   - {id: W2, from: "P1:2", to: "J1:2", gauge: 24 AWG, color: GN, twist: T1}
-  - {id: W3, from: "P1:3", to: "J1:3", gauge: 24 AWG, color: RD, cable: C1}
-  - {id: W4, from: "P1:4", to: "J1:4", gauge: 24 AWG, color: BK, cable: C1}
 layout:
   root: P1
   segments: [[P1, J1, 400]]
@@ -67,7 +73,7 @@ def model_of(source_text: str) -> str:
 class ExplorerComponentTest(unittest.TestCase):
     def test_the_component_passes_its_javascript_tests(self) -> None:
         models = {"ROUTED_MODEL": model_of(routed_harness), "TWISTED_MODEL": model_of(twisted_cable_harness),
-                  "STACKED_MODEL": model_of(stacked_splice_harness)}
+                  "STACKED_MODEL": model_of(stacked_splice_harness), "SPLIT_MODEL": model_of(split_cable_harness)}
         process = subprocess.run(["node", "--test", str(repository / "tests" / "explorer.test.mjs")], capture_output=True,
                                  text=True, env={**models, "PATH": shutil.which("node").rsplit("/", 1)[0]})
         self.assertEqual(process.returncode, 0, process.stdout + process.stderr)

@@ -104,11 +104,11 @@ class BomBuilder:
 
 # Lines come in a fixed order: each connector with its contacts and accessories (splices
 # alone), then cables, loose wires, and the source's other items.
-def build_bom(source: HarnessSource, tree: HarnessTree, routes: list[Route]) -> list[BomLine]:
+def build_bom(source: HarnessSource, tree: HarnessTree, routes: list[Route], cuts: list) -> list[BomLine]:
     """The BOM lines, numbered."""
     builder = BomBuilder()
     add_connector_parts(builder, source)
-    add_cables_and_wires(builder, source, routes)
+    add_cables_and_wires(builder, source, routes, cuts)
     add_items(builder, source, tree)
     return builder.numbered()
 
@@ -148,20 +148,17 @@ def purchased_length(source: HarnessSource, length: float | None) -> float | Non
     return None if length is None else length / conventions(source["drawing"])["lengths_per_purchase_unit"]
 
 
-# A cable is bought at its longest conductor; a loose wire is bought by type, gauge, colour
-# and part number together.
-def add_cables_and_wires(builder: BomBuilder, source: HarnessSource, routes: list[Route]) -> None:
+# A cable is bought at its cut length; a loose wire is bought by type, gauge, colour and part
+# number together.
+def add_cables_and_wires(builder: BomBuilder, source: HarnessSource, routes: list[Route], cuts: list) -> None:
     """Add each cable and each loose wire as lengths."""
     purchase_unit = conventions(source["drawing"])["purchase_unit"]
+    cut_lengths = {cut.cable: cut.cut_length for cut in cuts}
     for cable_id, cable in source["cables"].items():
-        cable_routes = [route for wire, route in zip(source["wires"], routes) if wire.get("cable") == cable_id]
-        cable_lengths = [route.cut_length for route in cable_routes]
-        longest = None if None in cable_lengths else max(cable_lengths or [0])
-        least = [route.cut_length if route.cut_length is not None else route.minimum_cut_length for route in cable_routes]
         builder.add("cable", (cable.get("pn", cable_id),), description=cable.get("desc", "Cable"),
                     part_number=cable.get("pn", ""), manufacturer=cable.get("manufacturer", ""),
-                    quantity=purchased_length(source, longest), unit=purchase_unit, refs=[cable_id], as_required=True,
-                    minimum=purchased_length(source, None if None in least else max(least or [0])))
+                    quantity=purchased_length(source, cut_lengths.get(cable_id)), unit=purchase_unit, refs=[cable_id],
+                    as_required=True)
     for wire, route in zip(source["wires"], routes):
         if wire.get("cable"):
             continue

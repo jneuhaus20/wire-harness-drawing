@@ -171,8 +171,20 @@ class WiringDiagramTest(unittest.TestCase):
         self.assertEqual(self.wireviz_source(two_wire_harness)["cables"]["B1"]["length"], 0.5)
 
     def test_a_cable_is_drawn_as_that_cable(self) -> None:
-        source = two_wire_harness.replace("color: BK}", "color: BK, cable: C1}").replace("color: RD}", "color: RD, cable: C1}")
-        source += "cables:\n  C1: {desc: 2-conductor shielded, pn: 1234-02, manufacturer: Alpha, conductors: 2, shield: true}\n"
+        source = two_wire_harness.split("wires:")[0] + """cables:
+  C1:
+    desc: 2-conductor shielded
+    pn: 1234-02
+    manufacturer: Alpha
+    shield: true
+    gauge: 24 AWG
+    conductors:
+      - {color: BK, from: "P1:1", to: "J1:1", signal: GND}
+      - {color: RD, from: "P1:2", to: "J1:2", signal: VCC}
+layout:
+  root: P1
+  segments: [[P1, J1, 500]]
+"""
         wireviz = self.wireviz_source(source)
         cable = wireviz["cables"]["C1"]
         self.assertNotEqual(cable.get("category"), "bundle")

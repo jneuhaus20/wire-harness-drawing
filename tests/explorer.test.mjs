@@ -96,3 +96,16 @@ test("splices at the same place stack instead of overlapping", () => {
   assert.equal(Math.round(first.centre[0]), Math.round(second.centre[0]));
   assert.ok(Math.abs(first.centre[1] - second.centre[1]) >= scene.sizes.wire * 3, "one sleeve sits above the other");
 });
+
+test("a split cable's sheath runs to where its conductors part and stops short of its connector end", () => {
+  const split = JSON.parse(process.env.SPLIT_MODEL);
+  const scene = buildScene(split);
+  const [sheath] = scene.jackets;
+  const b2 = scene.positions.B2, p1 = scene.positions.P1;
+  assert.ok(Math.abs(sheath.points.at(-1)[0] - b2[0]) < 1 && Math.abs(sheath.points.at(-1)[2] - b2[2]) < scene.sizes.pitch * 3, "ends at B2");
+  assert.ok(Math.abs(sheath.points[0][0] - p1[0]) >= scene.sizes.exit * 0.9, "stops short of P1");
+  const svg = planSvg(split, buildPlan(split));
+  assert.ok(svg.includes('data-cable="W5"'));
+  assert.equal((svg.match(/data-segment="B2\|J2"/g) || []).length, 1, "beyond the jacket the conductors are a loose bundle");
+  assert.equal((svg.match(/data-segment="B1\|B2"/g) || []).length, 0, "under the jacket they are not drawn as a bundle");
+});

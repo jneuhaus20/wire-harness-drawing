@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 
 from harness.bom import BomLine, find_numbers
+from harness.cables import CableCut, conductor_leads
 from harness.frame import close_sheet, frame
 from harness.pinout import Figure, pinout_figure
 from harness.routing import Route
@@ -25,10 +26,12 @@ def bom_table(bom: list[BomLine]) -> TableContent:
 
 
 def wire_list_table(source: HarnessSource, routes: list[Route], bom: list[BomLine]) -> TableContent:
-    """One row per wire: its find number, both ends with strip lengths, signal, gauge, colour and cut length."""
+    """One row per loose wire: its find number, both ends with strip lengths, signal, gauge, colour and cut length."""
     connectors = source["connectors"]
     rows = []
     for wire, route in zip(source["wires"], routes):
+        if wire.get("cable"):
+            continue
         (start, start_pin), (end, end_pin) = wire_end(wire["from"]), wire_end(wire["to"])
         finds = find_numbers(bom, "cable", wire["cable"]) if wire.get("cable") else find_numbers(bom, "wire", wire["id"])
         rows.append([wire["id"], ", ".join(map(str, finds)), start, start_pin,
@@ -40,6 +43,28 @@ def wire_list_table(source: HarnessSource, routes: list[Route], bom: list[BomLin
                ("SIGNAL", 110, "l"), ("TO", 46, "c"), ("PIN", 34, "c"), ("STRIP", 44, "c"), ("GAUGE", 62, "c"),
                ("COLOR", 50, "c"), ("CUT LEN", 58, "c"), ("TWIST/CBL", 64, "c"), ("NOTE", 120, "l")]
     return TableContent("WIRE LIST (FROM–TO)", columns, rows)
+
+
+# A cable is listed once, as it is cut, with its conductors under it: each conductor's ends,
+# and its lead beyond the jacket at each end.
+def cable_list_table(source: HarnessSource, bom: list[BomLine], cuts: list[CableCut]) -> TableContent:
+    """One row per cable with its cut lengths, then a row per conductor with its leads."""
+    rows = []
+    for cut in cuts:
+        cable = source["cables"][cut.cable]
+        a, b = cut.ends
+        rows.append([cut.cable, ", ".join(map(str, find_numbers(bom, "cable", cut.cable))), a.node, "", "", b.node, "", "",
+                     cable.get("desc", ""), cable.get("color", ""), format_length(cut.cut_length), format_length(cut.jacket_length),
+                     format_length(a.strip_back()), format_length(b.strip_back())])
+        for wire in (w for w in source["wires"] if w.get("cable") == cut.cable):
+            (start, start_pin), (end, end_pin) = wire_end(wire["from"]), wire_end(wire["to"])
+            lead_from, lead_to = conductor_leads(cuts, wire)
+            rows.append([wire["id"], "", start, start_pin, lead_from, end, end_pin, lead_to, wire.get("signal", ""),
+                         wire.get("color", ""), "", "", "", ""])
+    columns = [("CABLE", 56, "c"), ("FIND", 36, "c"), ("FROM", 44, "c"), ("PIN", 30, "c"), ("LEAD", 40, "c"), ("TO", 44, "c"),
+               ("PIN", 30, "c"), ("LEAD", 40, "c"), ("SIGNAL / DESC", 130, "l"), ("COLOR", 46, "c"), ("CUT LEN", 52, "c"),
+               ("JACKET", 52, "c"), ("STRIP A", 50, "c"), ("STRIP B", 50, "c")]
+    return TableContent("CABLE LIST", columns, rows)
 
 
 def connector_tables(source: HarnessSource) -> list[TableContent | Figure]:
@@ -154,6 +179,7 @@ def table_sheets(source: HarnessSource, bodies: list[list[str]], first_sheet: in
             for index, body in enumerate(bodies)]
 
 
-def table_sheet_bodies(source: HarnessSource, routes: list[Route], bom: list[BomLine]) -> list[list[str]]:
-    """The BOM, wire list and connector tables, flowed onto sheets."""
-    return flow_tables([bom_table(bom), wire_list_table(source, routes, bom), *connector_tables(source)])
+def table_sheet_bodies(source: HarnessSource, routes: list[Route], bom: list[BomLine], cuts: list[CableCut]) -> list[list[str]]:
+    """The BOM, wire list, cable list and connector tables, flowed onto sheets."""
+    cables = [cable_list_table(source, bom, cuts)] if cuts else []
+    return flow_tables([bom_table(bom), wire_list_table(source, routes, bom), *cables, *connector_tables(source)])

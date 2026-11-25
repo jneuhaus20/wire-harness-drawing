@@ -1,7 +1,7 @@
 """The harness model the explorer component draws: one JSON document per harness, built from the same analysis as the drawing."""
 from harness.formboard import segment_dimension_label, segment_path, sheet_placement
 from harness.pinout import scaled_positions
-from harness.source import color_parts, display_color, is_generic, is_splice, pin_label, pins_of, wire_end
+from harness.source import format_length, color_parts, display_color, is_generic, is_splice, pin_label, pins_of, wire_end
 
 model_format = "wire-harness-explorer/1"
 
@@ -20,6 +20,26 @@ def connector_entry(designator: str, connector: dict) -> dict:
             "pins": [{"pin": pin, "label": pin_label(connector, pin)} for pin in pins_of(connector)], "face": face}
 
 
+# A cable is one item: its jacket's run and where along it the jacket stops, its cut length,
+# and at each end the jacket to strip back and each conductor's lead beyond it.
+def cable_entry(source: dict, cable_id: str, cable: dict, cut) -> dict:
+    """One cable as the explorer draws it."""
+    conductors = [wire["id"] for wire in source["wires"] if wire.get("cable") == cable_id]
+    entry = {"id": cable_id, "description": cable.get("desc", ""), "part_number": cable.get("pn", ""),
+             "conductors": len(conductors), "wires": conductors,
+             "color": display_color(color_parts(cable["color"])[0]) if cable.get("color") else None}
+    if cut:
+        entry.update(run=cut.run, breakouts={end.node: whole(end.breakout) for end in cut.ends},
+                     cut_length=format_length(cut.cut_length), jacket_length=format_length(cut.jacket_length),
+                     ends=[{"node": end.node, "strip_back": format_length(end.strip_back()),
+                            "leads": {conductor: format_length(lead) for conductor, lead in end.leads.items()}} for end in cut.ends])
+    return entry
+
+
+def whole(value: float) -> float | int:
+    return int(value) if float(value).is_integer() else value
+
+
 def wire_entry(source: dict, wire: dict, route) -> dict:
     """One wire: its ends, signal, gauge, colours (none when not chosen), cut length and route."""
     start, end = wire_end(wire["from"]), wire_end(wire["to"])
@@ -27,7 +47,7 @@ def wire_entry(source: dict, wire: dict, route) -> dict:
             "signal": wire.get("signal") or pin_label(source["connectors"].get(start[0], {}), start[1]),
             "gauge": str(wire.get("gauge", "")), "color": wire.get("color", ""),
             "colors": [display_color(part) for part in color_parts(wire["color"])] if wire.get("color") else [],
-            "cut_length": route.cut_length_text(), "twist": wire.get("twist", ""), "cable": wire.get("cable", ""),
+            "cut_length": "" if wire.get("cable") else route.cut_length_text(), "twist": wire.get("twist", ""), "cable": wire.get("cable", ""),
             "route": route.node_names()}
 
 
@@ -62,11 +82,8 @@ def harness_model(analysis) -> dict:
         segments.append(entry)
     nodes = [{"id": node, "kind": ("splice" if is_splice(connectors[node]) else "connector") if node in connectors else "breakout",
               "x": round(placement.x[node], 1), "y": round(placement.y[node], 1)} for node in tree.order]
-    cables = [{"id": cable_id, "description": cable.get("desc", ""), "part_number": cable.get("pn", ""),
-               "conductors": cable.get("conductors") or sum(1 for wire in source["wires"] if wire.get("cable") == cable_id),
-               "color": display_color(color_parts(cable["color"])[0]) if cable.get("color") else None,
-               "wires": [wire["id"] for wire in source["wires"] if wire.get("cable") == cable_id]}
-              for cable_id, cable in source["cables"].items()]
+    cuts = {cut.cable: cut for cut in analysis.cable_cuts}
+    cables = [cable_entry(source, cable_id, cable, cuts.get(cable_id)) for cable_id, cable in source["cables"].items()]
     return {"format": model_format, "title": drawing.get("title", ""), "number": drawing.get("number", ""),
             "rev": drawing.get("rev", ""), "units": drawing.get("units", "mm"),
             "geometry": f"{tree.geometry.dimensions}d" if tree.geometry else "schematic", "root": tree.root,

@@ -12,6 +12,7 @@ def validate_source(source: HarnessSource, findings: Findings) -> None:
     """Report and remove values in the source that are the wrong kind of thing."""
     validate_drawing(source["drawing"], findings)
     validate_connectors(source["connectors"], findings)
+    expand_cables(source, findings)
     validate_wires(source, findings)
     validate_layout(source["layout"], findings)
 
@@ -116,6 +117,29 @@ def face_problems(designator: str, connector: dict) -> list[str]:
         if unplaced:
             problems.append(f"{designator}: face cavities do not place pins {', '.join(unplaced)}")
     return problems
+
+
+# A cable is one item; its conductors are named within it, by colour or number (W5-RD, W5-1).
+# Each conductor becomes a wire of the cable for the checks, the netlist and the tables, so a
+# wire's own cable key, from the older form, is refused rather than guessed at.
+def expand_cables(source: HarnessSource, findings: Findings) -> None:
+    """Turn each cable's conductors into wires of that cable."""
+    for wire in source["wires"]:
+        if "cable" in wire:
+            findings.error(f"{wire.get('id', '?')}: list a cable's conductors under cables.{wire['cable']}.conductors; "
+                           "a wire's cable key is not read")
+            wire.pop("cable")
+    for cable_id, cable in source["cables"].items():
+        for position, conductor in enumerate(cable.get("conductors") or [], 1):
+            name = conductor.get("color", conductor.get("number"))
+            if name is None:
+                findings.error(f"cable {cable_id}: conductor {position} needs a color or a number")
+                continue
+            wire = {key: value for key, value in conductor.items() if key != "number"}
+            wire.update(id=f"{cable_id}-{name}", cable=cable_id)
+            if "gauge" in cable and "gauge" not in wire:
+                wire["gauge"] = cable["gauge"]
+            source["wires"].append(wire)
 
 
 # Give every wire an id first, so each later finding can name the wire it is about. A wire

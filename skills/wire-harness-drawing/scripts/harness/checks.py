@@ -20,7 +20,7 @@ def check_harness(source: HarnessSource, tree: HarnessTree | None, routes: list[
     check_shared_cavities(source, cavities, findings)
     check_connector_use(source, tree, cavities, findings)
     check_twists(source, findings)
-    check_cables(source, findings)
+    check_cables(source, routes, findings)
     if tree:
         check_layout_use(source, tree, routes, findings)
         check_coverings_and_labels(source, tree, findings)
@@ -136,14 +136,15 @@ def check_twists(source: HarnessSource, findings: Findings) -> None:
             findings.warn(f"twist {twist}: wires go to different connectors; twist only over the shared segments")
 
 
-def check_cables(source: HarnessSource, findings: Findings) -> None:
-    """Report cables with no wires, or more wires than conductors."""
-    for cable_id, cable in source["cables"].items():
-        wire_count = sum(1 for wire in source["wires"] if wire.get("cable") == cable_id)
-        if not wire_count:
-            findings.warn(f"cable {cable_id} has no wires")
-        if cable.get("conductors") and wire_count > cable["conductors"]:
-            findings.error(f"cable {cable_id}: {wire_count} wires assigned, only {cable['conductors']} conductors")
+def check_cables(source: HarnessSource, routes: list[Route], findings: Findings) -> None:
+    """Report cables with no conductors, and cables whose conductors share no run for a jacket."""
+    for cable_id in source["cables"]:
+        members = [route for wire, route in zip(source["wires"], routes) if wire.get("cable") == cable_id]
+        if not members:
+            findings.warn(f"cable {cable_id} has no conductors")
+        elif all(route.segments for route in members) and not set.intersection(
+                *({frozenset(segment) for segment in route.segments} for route in members)):
+            findings.error(f"cable {cable_id}: its conductors share no segment, so there is no run for its jacket")
 
 
 def check_layout_use(source: HarnessSource, tree: HarnessTree, routes: list[Route], findings: Findings) -> None:
