@@ -75,6 +75,14 @@ class CableSourceTest(unittest.TestCase):
         source = split_cable_harness.replace('{color: RD, from: "P1:2"', '{from: "P1:2"')
         self.assertIn("ERROR  cable W5: conductor 1 needs a color or a number", self.findings_for(source))
 
+    def test_a_drain_wire_is_a_conductor_named_for_the_shield(self) -> None:
+        source = split_cable_harness.replace('      - {color: GN, from: "P1:5", to: "J3:2", signal: B-}\n',
+                                              '      - {color: GN, from: "P1:5", to: "J3:2", signal: B-}\n      - {drain: true, from: "P1:1", to: "J3:2"}\n')
+        package = GeneratedPackage(source)
+        self.addCleanup(package.close)
+        rows = {row["wire"]: row for row in csv.DictReader(package.read("wirelist.csv").splitlines())}
+        self.assertEqual((rows["W5-SH"]["color"], rows["W5-SH"]["cable"]), ("SR", "W5"))
+
     def test_a_conductor_number_names_it(self) -> None:
         source = split_cable_harness.replace('{color: RD, from: "P1:2"', '{number: 1, from: "P1:2"')
         self.assertNotIn("ERROR", self.findings_for(source))

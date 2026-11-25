@@ -129,3 +129,19 @@ test("the initial view fits the whole harness in a frame of any shape, without l
     assert.ok(Math.max(...reach) >= 0.75, `aspect ${aspect}: the harness fills too little of the view`);
   }
 });
+
+test("the pinout popover puts each numbered contact where the model's face does, scaled evenly", () => {
+  const xlr = JSON.parse(readFileSync(new URL("examples/xlr-mic-cable/xlr-mic-cable.harness.json", root), "utf8"));
+  for (const connector of xlr.connectors) {
+    const svg = pinoutSvg(connector, xlr, null);
+    const circles = [...svg.matchAll(/<circle cx="([-\d.]+)" cy="([-\d.]+)" r="10"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+    const labels = [...svg.matchAll(/<text[^>]*>([^<]+)<\/text>/g)].map((m) => m[1]);
+    const face = connector.face.cavities;
+    const [a, b] = Object.keys(face);
+    const drawn = Object.fromEntries(labels.map((label, i) => [label, circles[i]]));
+    const scale = Math.hypot(drawn[b][0] - drawn[a][0], drawn[b][1] - drawn[a][1]) / Math.hypot(face[b][0] - face[a][0], face[b][1] - face[a][1]);
+    for (const [pin, [x, y]] of Object.entries(face)) {
+      assert.ok(near(drawn[pin], [drawn[a][0] + scale * (x - face[a][0]), drawn[a][1] + scale * (y - face[a][1])], 0.01), `${connector.id} pin ${pin}`);
+    }
+  }
+});

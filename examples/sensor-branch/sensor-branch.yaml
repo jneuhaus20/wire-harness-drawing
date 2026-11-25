@@ -23,7 +23,9 @@ connectors:
     pincount: 9
     pinlabels: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, SHLD, NC]
     gender: male
-    face: {view: mating face, cavities: {1: [0, 0], 2: [1, 0], 3: [2, 0], 4: [3, 0], 5: [4, 0], 6: [0.5, 1], 7: [1.5, 1], 8: [2.5, 1], 9: [3.5, 1]}}
+    # contact positions in mm, mating face: 2.77 mm along a row, 2.84 mm between rows (KiCad DSUB-9_Pins_Vertical)
+    face: {view: mating face, cavities: {1: [0, 0], 2: [2.77, 0], 3: [5.54, 0], 4: [8.31, 0], 5: [11.08, 0],
+                                         6: [1.385, 2.84], 7: [4.155, 2.84], 8: [6.925, 2.84], 9: [9.695, 2.84]}}
     accessories: [{desc: "Cable clamp kit, DE-9, zinc, 4-40, 9.4 mm max", pn: 5745171-5, manufacturer: TE}]
     awg: [20, 28]          # TE states 20 AWG maximum for the solder cup and no minimum; 28 is this drawing's floor
   J1:

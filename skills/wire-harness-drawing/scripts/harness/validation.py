@@ -141,7 +141,8 @@ def read_colors(source: HarnessSource, findings: Findings) -> None:
             read(conductor, f"cable {cable_id}: conductor {position}")
 
 
-# A cable is one item; its conductors are named within it, by colour or number (W5-RD, W5-1).
+# A cable is one item; its conductors are named within it, by colour or number (W5-RD, W5-1), and its
+# shield's drain wire as SH (W5-SH), bare tinned copper.
 # Each conductor becomes a wire of the cable for the checks, the netlist and the tables, so a
 # wire's own cable key, from the older form, is refused rather than guessed at.
 def expand_cables(source: HarnessSource, findings: Findings) -> None:
@@ -153,11 +154,14 @@ def expand_cables(source: HarnessSource, findings: Findings) -> None:
             wire.pop("cable")
     for cable_id, cable in source["cables"].items():
         for position, conductor in enumerate(cable.get("conductors") or [], 1):
-            name = conductor.get("color", conductor.get("number"))
+            if conductor.get("drain"):
+                name, conductor = "SH", {"color": "SR", **conductor}
+            else:
+                name = conductor.get("color", conductor.get("number"))
             if name is None:
                 findings.error(f"cable {cable_id}: conductor {position} needs a color or a number")
                 continue
-            wire = {key: value for key, value in conductor.items() if key != "number"}
+            wire = {key: value for key, value in conductor.items() if key not in ("number", "drain")}
             wire.update(id=f"{cable_id}-{name}", cable=cable_id)
             if "gauge" in cable and "gauge" not in wire:
                 wire["gauge"] = cable["gauge"]

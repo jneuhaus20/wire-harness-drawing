@@ -19,6 +19,7 @@
     <a href="#package">Package</a>
     <a href="#checks">Checks</a>
     <a href="#cables">Cables</a>
+    <a href="#pinouts">Pinouts</a>
     <a href="#unknowns">Unknowns</a>
     <a href="#install">Install</a>
     <a href="https://github.com/jneuhaus20/wire-harness-drawing">GitHub</a>
@@ -131,6 +132,24 @@
       <div class="aside">
         <h3>Twists and shields</h3>
         <p>Wires that share a <code>twist</code> group are drawn twisted, listed with their group in the wire list, and cut long by the twist take-up. A cable with <code>shield: true</code> is drawn shielded in the wiring diagram.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="pinouts" class="band" data-example="xlr-mic-cable">
+    <div class="section-head">
+      <h2>Pinouts as the connector really is.</h2>
+      <p>An XLR’s three contacts are neither numbered in order round the face nor evenly spaced, and a female face is the mirror of a male one. The source states each contact’s position from the datasheet, and every pinout, on the drawing and in the 3D view, puts each numbered contact exactly there, seen from the side it names.</p>
+    </div>
+    <div class="split wide-figure">
+      <figure class="explorer-figure">
+        <wire-harness-explorer data-model="xlr-mic-cable" view="2d"></wire-harness-explorer>
+        <figcaption><span>Click either plug to see its face.</span>
+          <span class="files"><a href="examples/xlr-mic-cable/xlr-mic-cable.yaml">source</a> <a href="examples/xlr-mic-cable/xlr-mic-cable.sheet2.svg">tables and pinouts</a></span></figcaption>
+      </figure>
+      <div class="aside">
+        <h3>Checked against the parts</h3>
+        <p>The tests read Neutrik’s XLR and a 9-way D-sub’s footprints from the KiCad library and require every pinout to be those contacts, numbered the same, scaled evenly, never turned or mirrored.</p>
       </div>
     </div>
   </section>
