@@ -1145,5 +1145,48 @@
     "W18"
    ]
   }
- ]
+ ],
+ "labels": [
+  {
+   "text": "P1 CTRL",
+   "at": "P1",
+   "toward": "B1",
+   "distance": 50,
+   "item": "LBL",
+   "x": 230.0,
+   "y": 373.5
+  },
+  {
+   "text": "J1 SNS-A",
+   "at": "J1",
+   "toward": "B2",
+   "distance": 50,
+   "item": "LBL",
+   "x": 1068.2,
+   "y": 224.5
+  },
+  {
+   "text": "J2 SNS-B",
+   "at": "J2",
+   "toward": "B3",
+   "distance": 50,
+   "item": "LBL",
+   "x": 1111.4,
+   "y": 522.5
+  },
+  {
+   "text": "J3 SPI",
+   "at": "J3",
+   "toward": "B3",
+   "distance": 50,
+   "item": "LBL",
+   "x": 1310.0,
+   "y": 373.5
+  }
+ ],
+ "release": {
+  "errors": 0,
+  "warnings": 0,
+  "for_release": true
+ }
 }

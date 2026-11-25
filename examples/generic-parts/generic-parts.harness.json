@@ -170,5 +170,11 @@
     "W2"
    ]
   }
- ]
+ ],
+ "labels": [],
+ "release": {
+  "errors": 0,
+  "warnings": 1,
+  "for_release": true
+ }
 }

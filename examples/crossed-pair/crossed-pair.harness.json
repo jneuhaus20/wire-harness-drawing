@@ -199,5 +199,11 @@
     "W4"
    ]
   }
- ]
+ ],
+ "labels": [],
+ "release": {
+  "errors": 1,
+  "warnings": 0,
+  "for_release": false
+ }
 }

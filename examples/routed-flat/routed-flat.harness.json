@@ -233,5 +233,11 @@
     ]
    ]
   }
- ]
+ ],
+ "labels": [],
+ "release": {
+  "errors": 0,
+  "warnings": 0,
+  "for_release": true
+ }
 }

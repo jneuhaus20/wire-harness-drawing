@@ -32,6 +32,14 @@ class SheetLayout:
     bodies: list[tuple[str, Box]] = field(default_factory=list)
     leaders: list[tuple[str, SegmentLine, set[str]]] = field(default_factory=list)
     extension_lines: list[tuple[str, SegmentLine, set[str]]] = field(default_factory=list)
+    labels: list[dict] = field(default_factory=list)  # each label as placed: its source fields and drawn centre
+
+    def place_label(self, label: dict, toward: str, x: float, y: float) -> None:
+        """Record where a label is drawn, for the explorer to show it in the same place."""
+        distance = float(label["distance"])
+        self.labels.append({"text": label["text"], "at": label["at"], "toward": toward,
+                            "distance": int(distance) if distance.is_integer() else distance,
+                            "item": label.get("item", ""), "x": round(x, 1), "y": round(y, 1)})
 
     def boxes(self) -> list[tuple[str, Box]]:
         """Every recorded box, whatever its kind."""
@@ -528,6 +536,7 @@ class FormboardSheet:
         self.out.append(rect(x - width / 2, y - 9, width, 18, fill="white", stroke_width=1))
         self.out.append(text(x, y + 4, content, 10, "middle"))
         self.layout.texts.append((f"label {content}", (x - width / 2, y - 9, x + width / 2, y + 9)))
+        self.layout.place_label({**label, "distance": distance}, neighbour, x, y)
         segment_child = node if node != self.tree.root else neighbour
         segment_runs_up = self.y[segment_child] < self.y[self.tree.parent[segment_child]]
         side = 1 if segment_runs_up else -1
@@ -706,6 +715,7 @@ class RoutedFormboardSheet(FormboardSheet):
         self.out.append(rect(x - width / 2, y - 9, width, 18, fill="white", stroke_width=1))
         self.out.append(text(x, y + 4, content, 10, "middle"))
         self.layout.texts.append((f"label {content}", (x - width / 2, y - 9, x + width / 2, y + 9)))
+        self.layout.place_label({**label, "distance": distance}, neighbour, x, y)
         note = f"{format_length(distance)} FROM {node}"
         self.out.append(text(x, y + 22, note, 9, "middle", fill="#333"))
         note_width = text_width(note, 9, False)

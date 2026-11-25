@@ -6,7 +6,7 @@ from tests.generator import example_directory, example_source
 from tests.test_output_integrity import generate, two_wire_harness
 
 from harness.explorer_model import harness_model  # noqa: E402  (tests.generator puts scripts/ on the path)
-from harness.formboard import sheet_placement
+from harness.formboard import formboard_sheet, sheet_placement
 from harness.package import analyse
 from harness.source import display_colors, load_source
 
@@ -53,6 +53,28 @@ class ExampleModelTest(unittest.TestCase):
 
     def test_without_routing_geometry_it_says_the_layout_is_schematic(self) -> None:
         self.assertEqual(self.model["geometry"], "schematic")
+
+    # The labels are where sheet 1 draws them, along the segment they sit on.
+    def test_it_carries_each_label_where_sheet_one_draws_it(self) -> None:
+        _, layout = formboard_sheet(self.analysis.source, self.analysis.tree, self.analysis.routes, self.analysis.bom, 1, 0,
+                                    self.analysis.spacing)
+        drawn = {name.removeprefix("label "): box for name, box in layout.texts if name.startswith("label ") and name.count(" ") == 2}
+        self.assertEqual([label["text"] for label in self.model["labels"]], ["P1 CTRL", "J1 SNS-A", "J2 SNS-B", "J3 SPI"])
+        for label in self.model["labels"]:
+            box = drawn[label["text"]]
+            self.assertEqual((label["x"], label["y"]), (round((box[0] + box[2]) / 2, 1), round((box[1] + box[3]) / 2, 1)))
+        p1 = self.model["labels"][0]
+        self.assertEqual({key: p1[key] for key in ("at", "toward", "distance")}, {"at": "P1", "toward": "B1", "distance": 50})
+
+    def test_a_clean_harness_is_for_release(self) -> None:
+        self.assertEqual(self.model["release"], {"errors": 0, "warnings": 0, "for_release": True})
+
+
+class FailedChecksModelTest(unittest.TestCase):
+    def test_a_harness_whose_checks_fail_says_so(self) -> None:
+        model = json.loads(generate(self, two_wire_harness + "expect: {nets: {GND: [P1:1, J1:2]}}\n").read("harness.json"))
+        self.assertFalse(model["release"]["for_release"])
+        self.assertGreater(model["release"]["errors"], 0)
 
 
 class ModelFileTest(unittest.TestCase):
