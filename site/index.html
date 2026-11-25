@@ -167,32 +167,21 @@
     </div>
   </section>
 
-  <section id="unknowns" class="band">
+  <section id="unknowns" class="band" data-example="unknowns">
     <div class="section-head">
       <h2>Say what isn’t known yet.</h2>
-      <p>Drawings start before every part is chosen. A length can be a minimum or TBD, a colour can be TBD, and a connector can be just a pin count and a shape. The package shows each as open, carries it into every cut length it touches, and keeps going.</p>
+      <p>Drawings start before every part is chosen. A length can be set, a minimum or TBD; a colour can be chosen or TBD; a connector can be a chosen part or just a pin count and a shape. The package shows each open item as open, carries it into every cut length it touches, and keeps going.</p>
     </div>
-    <div class="pair" data-example="unknowns">
+    <div class="pair">
       <figure class="sheet">
-        <a href="examples/unknowns/unknowns.sheet1.svg"><img src="examples/unknowns/unknowns.sheet1.svg" alt="Sheet 1 of a harness with one branch given as a 200 mm minimum and one left TBD, drawn with break marks." loading="lazy"></a>
-        <figcaption>One branch at least 200 mm, one TBD, each drawn broken. <a href="examples/unknowns/unknowns.checks.txt">The report</a> lists the lengths every cut waits on.</figcaption>
+        <a href="examples/unknowns/unknowns.sheet1.svg"><img src="examples/unknowns/unknowns.sheet1.svg" alt="Sheet 1 of a harness with one branch set, one given as a 200 mm minimum and one TBD, the open ones drawn broken." loading="lazy"></a>
+        <figcaption>One branch set, one at least 200 mm, one TBD. <a href="examples/unknowns/unknowns.checks.txt">The report</a> lists the lengths every cut waits on.</figcaption>
       </figure>
       <figure class="explorer-figure">
-        <wire-harness-explorer data-model="unknowns" view="2d"></wire-harness-explorer>
-        <figcaption><span>The same harness. Click W2: its colour is TBD, so it is drawn grey and listed as not chosen.</span>
+        <wire-harness-explorer data-model="unknowns"></wire-harness-explorer>
+        <figcaption><span>The same harness. J1 and J2 are chosen Molex housings; P1 is known only as a male circular 2-way. W1 is black; W2’s colour is TBD.</span>
           <span class="files"><a href="examples/unknowns/unknowns.yaml">source</a></span></figcaption>
       </figure>
-    </div>
-    <div class="split wide-figure" data-example="generic-parts">
-      <figure class="explorer-figure">
-        <wire-harness-explorer data-model="generic-parts"></wire-harness-explorer>
-        <figcaption><span>Click P1, then J1.</span>
-          <span class="files"><a href="examples/generic-parts/generic-parts.yaml">source</a> <a href="examples/generic-parts/generic-parts.sheet1.svg">drawing</a></span></figcaption>
-      </figure>
-      <div class="aside">
-        <h3>A connector not chosen yet</h3>
-        <p>P1 is known only as a male circular 4-way, so it is drawn generic and its BOM line reads P/N TBD. J1 is a chosen Molex part whose face the source states, so it gets its pinout.</p>
-      </div>
     </div>
   </section>
 
@@ -209,6 +198,13 @@
       <figure class="sheet">
         <a href="examples/routed-flat/routed-flat.sheet1.svg"><img src="examples/routed-flat/routed-flat.sheet1.svg" alt="Sheet 1 of a routed harness drawn to scale, with one branch bent around an obstacle." loading="lazy"></a>
         <figcaption>Your route in 2D: drawn to scale, with the E1 branch bent round an obstacle. <a href="examples/routed-flat/routed-flat.yaml">Source</a>.</figcaption>
+      </figure>
+    </div>
+    <div class="wide">
+        <figure class="explorer-figure">
+        <wire-harness-explorer data-model="taz6-y-z"></wire-harness-explorer>
+        <figcaption><span>Your route in 3D: the TAZ 6 harness, routed along the printer’s frame. Turn it to see the bends.</span>
+          <span class="files"><a href="examples/taz6-y-z/taz6-y-z.yaml">source</a></span></figcaption>
       </figure>
     </div>
   </section>

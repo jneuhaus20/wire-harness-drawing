@@ -447,7 +447,11 @@ const fanLength = 26;
 
 function buildPlan(model) {
   // In 2D a cable's jacket runs right up to where its conductors fan into their connector.
-  const scene = buildScene({ ...model, geometry: "schematic" }, { exit: fanLength + 2 });
+  // Bodies are drawn in their true proportions, scaled together so the largest is no longer
+  // than a drawing's connector symbol.
+  const extent = (body) => !body ? 0 : body.shape === "model" ? Math.max(...body.mesh.max.map((v, k) => v - body.mesh.min[k])) : Math.max(body.length, body.width, body.height ?? 0);
+  const largest = Math.max(1, ...model.connectors.map((connector) => extent(connector.body)));
+  const scene = buildScene({ ...model, geometry: "schematic" }, { exit: fanLength + 2, bodyScale: Math.min(3, 110 / largest) });
   const nodes = Object.fromEntries(model.nodes.map((node) => [node.id, [node.x, node.y]]));
   const fans = [];
   for (const body of scene.bodies.filter((b) => b.kind === "connector")) {
@@ -488,8 +492,8 @@ function zoomedViewBox([x, y, width, height], factor, [px, py]) {
 
 function planSvg(model, plan) {
   const xs = model.nodes.map((node) => node.x), ys = model.nodes.map((node) => node.y);
-  const margin = 90;
-  const box = [Math.min(...xs) - margin, Math.min(...ys) - margin, Math.max(...xs) - Math.min(...xs) + 2 * margin,
+  const margin = 90, side = 180;  // room at the sides for the connectors' captions
+  const box = [Math.min(...xs) - side, Math.min(...ys) - margin, Math.max(...xs) - Math.min(...xs) + 2 * side,
     Math.max(...ys) - Math.min(...ys) + 2 * margin];
   const parts = [];
   // Loose wires make the bundle, drawn beside any cable sheath that shares the segment; a
@@ -500,46 +504,49 @@ function planSvg(model, plan) {
   // Each loose wire runs the length of the bundle in its own colour, side by side in the order
   // it lies in the bed, so a wire can be followed from end to end.
   const wiresById = Object.fromEntries(model.wires.map((wire) => [wire.id, wire]));
+  // A segment's cables and its loose bundle lie side by side, cables first in the order the model
+  // lists them, so they keep their places from segment to segment and never cross.
+  const cableOrder = (model.cables || []).map((cable) => cable.id);
   for (const segment of plan.segments) {
     const loose = segment.order.filter((id) => !sheathed.has(`${id}|${segment.nodes[0]}|${segment.nodes[1]}`));
-    if (!loose.length) continue;
-    const sides = loose.map((id) => segment.placement[id].centre[0]);
-    const side = sides.length === segment.wires.length ? 0 : (Math.min(...sides) + Math.max(...sides)) / 2;
+    const cables = cableOrder.filter((id) => segment.cables?.[id]);
+    const strand = loose.length ? Math.min(2.4, 30 / loose.length) : 0;
+    const units = [...cables.map((id) => ({ cable: id, width: segment.cables[id].radius * 2 })), ...(loose.length ? [{ loose, width: strand * loose.length }] : [])];
+    const gap = 1.5, total = units.reduce((sum, unit) => sum + unit.width, 0) + gap * (units.length - 1);
+    let at = -total / 2;
     const along = (offset) => polylineData(offsetPolyline(segment.polyline, segment.polyline.map(() => [offset, 0])).map(([x, , z]) => [x, z]));
-    const d = side ? along(side) : segment.path;
-    const strand = Math.min(2.4, 30 / loose.length), width = strand * loose.length;
-    const strands = loose.map((id, index) => {
-      const wire = wiresById[id], path = along(side + (index - (loose.length - 1) / 2) * strand);
-      if (!wire.colors.length) return `<path d="${path}" fill="none" stroke="var(--muted)" stroke-width="${(strand * 0.8).toFixed(2)}" stroke-dasharray="3 3" data-strand="${escapeHtml(id)}"/>`;
-      const [base, stripe] = wire.colors;
-      return `<path d="${path}" fill="none" stroke="${base}" stroke-width="${(strand * 0.85).toFixed(2)}" data-strand="${escapeHtml(id)}"/>`
-        + (stripe ? `<path d="${path}" fill="none" stroke="${stripe}" stroke-width="${(strand * 0.4).toFixed(2)}" stroke-dasharray="3 4"/>` : "");
-    }).join("");
     const key = `${segment.nodes[0]}|${segment.nodes[1]}`;
-    parts.push(`<g class="bundle" data-segment="${escapeHtml(key)}"><path d="${d}" fill="none" stroke="transparent" stroke-width="14"/>
-      <path d="${d}" fill="none" stroke="var(--bundle-edge)" stroke-width="${(width + 2.5).toFixed(1)}" stroke-linecap="round"/>
-      <path d="${d}" fill="none" stroke="var(--bundle)" stroke-width="${(width + 0.5).toFixed(1)}" stroke-linecap="round"/>
-      <g class="strands">${strands}</g></g>`);
+    for (const unit of units) {
+      const middle = at + unit.width / 2, d = along(middle);
+      at += unit.width + gap;
+      if (unit.cable) {
+        const cable = model.cables.find((c) => c.id === unit.cable);
+        parts.push(`<g class="jacket" data-cable="${escapeHtml(cable.id)}" data-along="${escapeHtml(key)}" data-offset="${middle.toFixed(2)}"><path d="${d}" fill="none" stroke="transparent" stroke-width="14"/>
+          <path d="${d}" fill="none" stroke="var(--bundle-edge)" stroke-width="${(unit.width + 1.5).toFixed(1)}" stroke-linecap="round"/>
+          <path d="${d}" fill="none" stroke="${cable.color ? `color-mix(in srgb, ${cable.color} 70%, var(--bundle))` : "var(--sheath)"}" stroke-width="${unit.width.toFixed(1)}" stroke-linecap="round"/>${cable.shield
+            ? `<path class="shield" d="${d}" fill="none" stroke="#d6d6d1" stroke-opacity=".55" stroke-width="0.8" stroke-dasharray="1.5 2.5"/>` : ""}</g>`);
+        continue;
+      }
+      const strands = unit.loose.map((id, index) => {
+        const wire = wiresById[id], path = along(middle + (index - (unit.loose.length - 1) / 2) * strand);
+        if (!wire.colors.length) return `<path d="${path}" fill="none" stroke="var(--muted)" stroke-width="${(strand * 0.8).toFixed(2)}" stroke-dasharray="3 3" data-strand="${escapeHtml(id)}" data-wire="${escapeHtml(id)}"/>`;
+        const [base, stripe] = wire.colors;
+        return `<path d="${path}" fill="none" stroke="${base}" stroke-width="${(strand * 0.85).toFixed(2)}" data-strand="${escapeHtml(id)}" data-wire="${escapeHtml(id)}"/>`
+          + (stripe ? `<path d="${path}" fill="none" stroke="${stripe}" stroke-width="${(strand * 0.4).toFixed(2)}" stroke-dasharray="3 4"/>` : "");
+      }).join("");
+      parts.push(`<g class="bundle" data-segment="${escapeHtml(key)}"><path d="${d}" fill="none" stroke="transparent" stroke-width="14"/>
+        <path d="${d}" fill="none" stroke="var(--bundle-edge)" stroke-width="${(unit.width + 2.5).toFixed(1)}" stroke-linecap="round"/>
+        <path d="${d}" fill="none" stroke="var(--bundle)" stroke-width="${(unit.width + 0.5).toFixed(1)}" stroke-linecap="round"/>
+        <g class="strands">${strands}</g></g>`);
+    }
   }
   for (const wire of model.wires) {
     const paths = model.segments.filter((segment) => segment.wires.includes(wire.id)).map((segment) => segment.path);
     const casing = paths.map((d) => `<path d="${d}" fill="none" stroke="var(--select)" stroke-opacity=".6" stroke-width="7" stroke-linecap="round"/>`).join("");
     parts.push(`<g class="route" data-route="${escapeHtml(wire.id)}">${casing}${paths.map((d) => stripePaths(d, wire, 3.2, ' stroke-linecap="round"')).join("")}</g>`);
   }
-  for (const sheath of plan.sheaths) {
-    const d = sheath.points.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
-    parts.push(`<g class="jacket" data-cable="${escapeHtml(sheath.cable)}"><path d="${d}" fill="none" stroke="transparent" stroke-width="14"/>
-      <path d="${d}" fill="none" stroke="var(--bundle-edge)" stroke-width="${(sheath.radius * 1.05 + 2).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="${d}" fill="none" stroke="${sheath.color ? `color-mix(in srgb, ${sheath.color} 70%, var(--bundle))` : "var(--sheath)"}" stroke-width="${(sheath.radius * 1.05).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/>${sheath.shield
-        ? `<path class="shield" d="${d}" fill="none" stroke="#c9c9c4" stroke-width="${(sheath.radius * 0.35).toFixed(1)}" stroke-dasharray="2 3" stroke-linecap="butt"/>` : ""}</g>`);
-  }
   for (const { wire, d } of plan.fans) {
     parts.push(`<g class="wire" data-wire="${escapeHtml(wire.id)}"><path d="${d}" fill="none" stroke="transparent" stroke-width="7"/>${stripePaths(d, wire, 2)}</g>`);
-  }
-  for (const segment of plan.segments) {
-    const [x, , z] = pointAlong(segment.polyline, runLengths(segment.polyline).at(-1) / 2);
-    const unknown = segment.known ? "" : ' font-style="italic"';
-    parts.push(`<text x="${x.toFixed(1)}" y="${z.toFixed(1)}" dy="1.6em" text-anchor="middle" class="length"${unknown}>${escapeHtml(segment.length)}</text>`);
   }
   for (const node of plan.nodes.filter((n) => n.kind === "breakout")) {
     parts.push(`<circle cx="${node.x}" cy="${node.y}" r="4" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.2"/>
@@ -561,14 +568,10 @@ function planSvg(model, plan) {
       continue;
     }
     const [cx, , cz] = body.centre;
-    const angle = (Math.atan2(body.axis[2], body.axis[0]) * 180) / Math.PI;
-    const [bodyLength, , bodyWidth] = body.size;
-    const generic = body.connector.generic;
-    const round = body.connector.shape === "circular" ? 12 : 3;
-    parts.push(`<g class="connector" data-connector="${id}"><rect x="${cx - bodyLength / 2}" y="${cz - bodyWidth / 2}" width="${bodyLength}" height="${bodyWidth}" rx="${round}"
-      fill="${generic ? "var(--ground)" : "var(--panel)"}" stroke="var(--ink)" stroke-width="1.2"${generic ? ' stroke-dasharray="5 3"' : ""} transform="rotate(${angle.toFixed(1)} ${cx} ${cz})"/>
-      <text x="${cx}" y="${cz + bodyWidth / 2 + 3}" dy="1em" text-anchor="middle" class="name">${id}</text>${body.connector.label
-        ? `<text x="${cx}" y="${cz + bodyWidth / 2 + 3}" dy="2.35em" text-anchor="middle" class="caption">${escapeHtml(body.connector.label)}</text>` : ""}</g>`);
+    const reach = Math.max(Math.abs(body.axis[0]) * body.size[2], Math.abs(body.axis[2]) * body.size[0], body.size[2]) / 2;
+    parts.push(`<g class="connector" data-connector="${id}">${planBodySvg(body)}
+      <text x="${cx}" y="${cz + reach + 3}" dy="1em" text-anchor="middle" class="name">${id}</text>${body.connector.label
+        ? `<text x="${cx}" y="${cz + reach + 3}" dy="2.35em" text-anchor="middle" class="caption">${escapeHtml(body.connector.label)}</text>` : ""}</g>`);
   }
   return `<svg class="plan" role="img" aria-label="2D layout of the ${escapeHtml(model.title)} harness" viewBox="${box.join(" ")}"
     preserveAspectRatio="xMidYMid meet">${parts.join("")}</svg>`;
@@ -590,9 +593,15 @@ function connectorBody(segments, centre, connector, sizes, lift) {
   // gives; one not stated is a faint placeholder box sized from its pin count, and says so.
   const stated = Boolean(connector.body);
   if (connector.body?.shape === "model") {
-    // A model in one plain colour (many makers' models carry none) takes the body's stated colour.
+    // Makers' models often carry no colour, only a plain grey: the lightest colour in the model
+    // takes the body's stated colour (its housing or shell), and darker parts such as a boot keep theirs.
     const model = turnedModel(connector.body.mesh, connector.body.rotate);
-    if (connector.body.color && connector.body.mesh.palette.length === 1) model.colors = model.colors.map(() => hexToRgb(connector.body.color));
+    if (connector.body.color) {
+      const lightness = (rgb) => rgb[0] + rgb[1] + rgb[2];
+      const lightest = connector.body.mesh.palette.map((rgb) => rgb.map((v) => v / 255)).sort((a, b) => lightness(b) - lightness(a))[0];
+      const stated = hexToRgb(connector.body.color);
+      model.colors = model.colors.map((rgb) => (rgb.every((v, k) => Math.abs(v - lightest[k]) < 1e-6) ? stated : rgb));
+    }
     const size = [model.max[0] - model.min[0], model.max[2] - model.min[2], model.max[1] - model.min[1]].map((v) => v * sizes.bodyScale);
     return { connector, kind: "connector", centre: add(near, scale(axis, size[0] / 2)), axis, size, stated, shape: "model", model,
              scale: sizes.bodyScale, color: [0.6, 0.6, 0.6] };
@@ -1425,10 +1434,15 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
   // A bundle's popover lists the wires in it; picking a row selects that wire.
   _segmentPopover(key, x, y) {
     const segment = this._model.segments.find((s) => `${s.nodes[0]}|${s.nodes[1]}` === key);
-    const rows = segment.wires.map((id) => this._model.wires.find((w) => w.id === id)).map((w) =>
+    const { loose, cables } = segmentContents(this._model, segment);
+    const rows = loose.map((id) => this._model.wires.find((w) => w.id === id)).map((w) =>
       `<tr data-pick="${escapeHtml(w.id)}"><td>${escapeHtml(w.id)}</td><td>${swatch(w)}</td><td>${escapeHtml(w.signal)}</td>
-        <td>${escapeHtml(w.from.connector)}:${escapeHtml(w.from.pin)} → ${escapeHtml(w.to.connector)}:${escapeHtml(w.to.pin)}</td></tr>`).join("");
-    this._place(this._picking(this._popover("", `<h3>${escapeHtml(segment.nodes.join("–"))} · ${escapeHtml(segment.length)} · ${segment.wires.length} wires</h3>
+        <td>${escapeHtml(w.from.connector)}:${escapeHtml(w.from.pin)} → ${escapeHtml(w.to.connector)}:${escapeHtml(w.to.pin)}</td></tr>`).join("")
+      + cables.map((id) => this._model.cables.find((c) => c.id === id)).map((c) =>
+        `<tr><td>${escapeHtml(c.id)}</td><td colspan="3">${escapeHtml(c.description)} · ${c.conductors} conductors</td></tr>`).join("");
+    const count = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+    const contents = [loose.length && count(loose.length, "wire"), cables.length && count(cables.length, "cable")].filter(Boolean).join(", ");
+    this._place(this._picking(this._popover("", `<h3>${escapeHtml(segment.nodes.join("–"))} · ${escapeHtml(segment.length)} · ${contents}</h3>
       <table><thead><tr><th>Wire</th><th>Colour</th><th>Signal</th><th>From → to</th></tr></thead><tbody>${rows}</tbody></table>`)), [x - 6, y - 6, x + 6, y + 6]);
   }
 
@@ -1447,17 +1461,14 @@ class WireHarnessExplorer extends (globalThis.HTMLElement ?? class {}) {
   // connectors a wire's popovers are about. Each candidate is kept inside the stage.
   _place(popover, around, keepClear = []) {
     this._stage.append(popover);
-    const width = popover.offsetWidth, height = popover.offsetHeight;
-    const stageWidth = this._stage.clientWidth, stageHeight = this._stage.clientHeight;
     const blocked = [...[...this._stage.querySelectorAll(".popover")].filter((other) => other !== popover)
       .map((other) => [other.offsetLeft, other.offsetTop, other.offsetLeft + other.offsetWidth, other.offsetTop + other.offsetHeight]),
-      ...keepClear, around];
-    const [l, t, r, b] = around, cx = (l + r) / 2, cy = (t + b) / 2, gap = 8;
-    const candidates = [[cx - width / 2, b + gap], [cx - width / 2, t - height - gap], [r + gap, cy - height / 2], [l - width - gap, cy - height / 2],
-      ...blocked.flatMap(([bl, bt, br, bb]) => [[cx - width / 2, bb + gap], [cx - width / 2, bt - height - gap], [br + gap, bt], [bl - width - gap, bt]])]
-      .map(([x, y]) => [Math.min(Math.max(x, 6), stageWidth - width - 6), Math.min(Math.max(y, 6), stageHeight - height - 6)]);
-    const clear = ([x, y]) => blocked.every(([bl, bt, br, bb]) => x + width <= bl || x >= br || y + height <= bt || y >= bb);
-    const [left, top] = candidates.find(clear) ?? candidates[0];
+      ...keepClear];
+    // The part of the stage the reader can see: the page may have scrolled part of it away.
+    const stage = this._stage.getBoundingClientRect();
+    const visible = [Math.max(0, -stage.left), Math.max(0, -stage.top),
+      Math.min(stage.width, window.innerWidth - stage.left), Math.min(stage.height, window.innerHeight - stage.top)];
+    const [left, top] = placePopover({ width: popover.offsetWidth, height: popover.offsetHeight }, around, blocked, visible);
     popover.style.left = `${left}px`;
     popover.style.top = `${top}px`;
   }
@@ -1571,16 +1582,20 @@ function pinoutSvg(connector, model, highlightPin) {
   const pitch = 28, radius = 10, margin = 12;
   const cavities = Object.entries(connector.face.cavities);
   const spanX = Math.max(...cavities.map(([, [x]]) => x)) * pitch, spanY = Math.max(...cavities.map(([, [, y]]) => y)) * pitch;
-  const width = spanX + 2 * (radius + margin), height = spanY + 2 * (radius + margin);
+  // A round face is drawn whole: a square frame round the circle, the cavities centred in it.
+  const round = connector.face.round;
+  const side = Math.max(spanX, spanY) + 2 * (radius + margin);
+  const width = round ? side * 1.1 : spanX + 2 * (radius + margin), height = round ? side * 1.1 : spanY + 2 * (radius + margin);
+  const offset = [(width - spanX) / 2 - radius - margin, (height - spanY) / 2 - radius - margin];
   const colorOf = (pin) => {
     const wire = model.wires.find((w) => (w.from.connector === connector.id && w.from.pin === pin) || (w.to.connector === connector.id && w.to.pin === pin));
     return wire?.colors?.[0] || "none";
   };
   const outline = connector.face.round
-    ? `<ellipse cx="${width / 2}" cy="${height / 2}" rx="${Math.max(width, height) / 2 - 1}" ry="${Math.max(width, height) / 2 - 1}" fill="var(--ground)" stroke="var(--ink)"/>`
+    ? `<ellipse cx="${width / 2}" cy="${height / 2}" rx="${width / 2 - 1}" ry="${height / 2 - 1}" fill="var(--ground)" stroke="var(--ink)"/>`
     : `<rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="6" fill="var(--ground)" stroke="var(--ink)"/>`;
   const marks = cavities.map(([pin, [x, y]]) => {
-    const cx = radius + margin + x * pitch, cy = radius + margin + y * pitch;
+    const cx = offset[0] + radius + margin + x * pitch, cy = offset[1] + radius + margin + y * pitch;
     const ring = pin === highlightPin ? `<circle cx="${cx}" cy="${cy}" r="${radius + 3.5}" fill="none" stroke="var(--select)" stroke-width="3"/>` : "";
     return `${ring}<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${colorOf(pin)}" stroke="var(--ink)"/>
       <text x="${cx}" y="${cy + 3.5}" text-anchor="middle" font-size="10" font-weight="600" fill="var(--ink)" paint-order="stroke" stroke="var(--panel)" stroke-width="2">${escapeHtml(pin)}</text>`;
@@ -1620,6 +1635,66 @@ function bodyNote(connector, units) {
   if (!body) return `<p class="na">Body not stated: drawn as a placeholder.</p>`;
   const size = body.shape === "cylinder" ? `Ø${body.width} × ${body.length}` : `${body.length} × ${body.width} × ${body.height}`;
   return `<p class="na">Body drawn as its outline only, ${size} ${escapeHtml(units)}.</p>`;
+}
+
+// What a bundle segment carries: its loose wires, and the cables whose jackets run through it
+// (their conductors are inside the cable, not loose in the bundle).
+function segmentContents(model, segment) {
+  const [a, b] = segment.nodes;
+  const cables = (model.cables || []).filter((cable) => (cable.run || []).some((node, i) =>
+    i + 1 < cable.run.length && ((node === a && cable.run[i + 1] === b) || (node === b && cable.run[i + 1] === a))));
+  const inside = new Set(cables.flatMap((cable) => cable.wires));
+  return { loose: segment.wires.filter((id) => !inside.has(id)), cables: cables.map((cable) => cable.id) };
+}
+
+// A connector in the 2D view, drawn as its part from above: a maker's model as its silhouette, a
+// cylinder with rounded ends, a D-sub as cable clamp, flange and shell, any other stated body as
+// its outline, and a body not stated as a dashed placeholder.
+function planBodySvg(body) {
+  const [cx, , cz] = body.centre, [length, , width] = body.size;
+  const angle = (Math.atan2(body.axis[2], body.axis[0]) * 180) / Math.PI;
+  const turn = `transform="rotate(${angle.toFixed(1)} ${cx.toFixed(1)} ${cz.toFixed(1)})"`;
+  const fill = body.color ? `rgb(${body.color.map((v) => Math.round(v * 255)).join(",")})` : "var(--panel)";
+  const rect = (from, to, w, extra = "") => `<rect x="${(cx - length / 2 + from * length).toFixed(1)}" y="${(cz - w / 2).toFixed(1)}" width="${((to - from) * length).toFixed(1)}" height="${w.toFixed(1)}" ${extra} ${turn}/>`;
+  if (body.shape === "model") {
+    const [x, , z] = bodyFrame(body.axis), { model } = body, s = body.scale;
+    const middle = [0, 1, 2].map((axis) => (model.min[axis] + model.max[axis]) / 2);
+    const place = (p) => add(body.centre, add(scale(x, (p[0] - middle[0]) * s), scale(z, -(p[1] - middle[1]) * s)));
+    const faces = new Map();
+    for (let t = 0; t < model.indices.length / 3; t++) {
+      const corners = [0, 1, 2].map((k) => place(model.points[model.indices[3 * t + k]]));
+      const area = Math.abs((corners[1][0] - corners[0][0]) * (corners[2][2] - corners[0][2]) - (corners[2][0] - corners[0][0]) * (corners[1][2] - corners[0][2]));
+      if (area < 0.02) continue;
+      const colour = `rgb(${model.colors[t].map((v) => Math.round(v * 255)).join(",")})`;
+      faces.set(colour, (faces.get(colour) || "") + `M${corners.map((c) => `${c[0].toFixed(1)},${c[2].toFixed(1)}`).join("L")}Z`);
+    }
+    // An outline under the faces, so a black housing still reads against a dark page.
+    const all = [...faces.values()].join("");
+    return `<g class="silhouette"><path d="${all}" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linejoin="round"/>${[...faces].map(([colour, d]) => `<path d="${d}" fill="${colour}" stroke="${colour}" stroke-width="0.4"/>`).join("")}</g>`;
+  }
+  const outline = 'stroke="var(--ink)" stroke-width="1.2"';
+  if (body.placeholder) return rect(0, 1, width, `rx="3" fill="var(--ground)" ${outline} stroke-dasharray="5 3"`);
+  if (body.shape === "cylinder") return rect(0, 1, width, `rx="${(width / 2).toFixed(1)}" fill="${fill}" ${outline}`);
+  if (body.shape === "dsub") {
+    return rect(0, 0.87, width * 0.81, `rx="2" fill="${fill}" ${outline}`) + rect(0.87, 0.89, width, `fill="${fill}" ${outline}`)
+      + rect(0.89, 1, width * 0.55, `rx="1.5" fill="${fill}" ${outline}`);
+  }
+  return rect(0, 1, width, `rx="2" fill="${fill}" ${outline}`);
+}
+
+// Where a popover goes: beside what it is about (below, above, right, then left of it, or of the
+// popovers already open), inside the visible area, clear of everything it must not cover. If no
+// place is clear, the one covering least, still inside the visible area.
+function placePopover({ width, height }, around, blocked, [x0, y0, x1, y1]) {
+  const avoid = [...blocked, around], gap = 8, margin = 6;
+  const [l, t, r, b] = around, cx = (l + r) / 2, cy = (t + b) / 2;
+  const fit = ([x, y]) => [Math.min(Math.max(x, x0 + margin), x1 - width - margin), Math.min(Math.max(y, y0 + margin), y1 - height - margin)];
+  const candidates = [[cx - width / 2, b + gap], [cx - width / 2, t - height - gap], [r + gap, cy - height / 2], [l - width - gap, cy - height / 2],
+    ...avoid.flatMap(([bl, bt, br, bb]) => [[cx - width / 2, bb + gap], [cx - width / 2, bt - height - gap], [br + gap, bt], [bl - width - gap, bt]]),
+    [x0 + margin, y0 + margin], [x1 - width - margin, y0 + margin], [x0 + margin, y1 - height - margin], [x1 - width - margin, y1 - height - margin]].map(fit);
+  const overlap = ([x, y]) => avoid.reduce((sum, [bl, bt, br, bb]) =>
+    sum + Math.max(0, Math.min(x + width, br) - Math.max(x, bl)) * Math.max(0, Math.min(y + height, bb) - Math.max(y, bt)), 0);
+  return candidates.reduce((best, candidate) => (overlap(candidate) < overlap(best) ? candidate : best));
 }
 
 function swatch(wire) {
@@ -1670,4 +1745,4 @@ if (globalThis.customElements && !customElements.get("wire-harness-explorer")) {
   customElements.define("wire-harness-explorer", WireHarnessExplorer);
 }
 
-export { WireHarnessExplorer, version, planUnit, samplePath, buildScene, buildPlan, planSvg, pinoutSvg, boxMesh, fitDistance, viewBasis, fieldOfView, zoomedViewBox, cableEndsTable, bodyMesh, bodyNote, decodeMesh };
+export { WireHarnessExplorer, version, planUnit, samplePath, buildScene, buildPlan, planSvg, pinoutSvg, boxMesh, fitDistance, viewBasis, fieldOfView, zoomedViewBox, cableEndsTable, bodyMesh, bodyNote, decodeMesh, segmentContents, planBodySvg, placePopover };

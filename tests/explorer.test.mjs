@@ -5,7 +5,7 @@ import { test } from "node:test";
 
 const root = new URL("..", import.meta.url);
 const componentPath = new URL("skills/wire-harness-drawing/explorer/wire-harness-explorer.js", root);
-const { bodyMesh, bodyNote, decodeMesh, boxMesh, buildPlan, buildScene, cableEndsTable, pinoutSvg, planSvg, samplePath, version, zoomedViewBox } = await import(componentPath);
+const { bodyMesh, bodyNote, decodeMesh, boxMesh, segmentContents, planBodySvg, placePopover, buildPlan, buildScene, cableEndsTable, pinoutSvg, planSvg, samplePath, version, zoomedViewBox } = await import(componentPath);
 const example = JSON.parse(readFileSync(new URL("examples/sensor-branch/sensor-branch.harness.json", root), "utf8"));
 const routed = JSON.parse(process.env.ROUTED_MODEL);
 
@@ -282,4 +282,79 @@ test("a connector's popover notes its body only where the drawing could mislead:
   assert.equal(bodyNote({ splice: true }, "mm"), "");
   assert.match(bodyNote({ body: { shape: "box", length: 12.7, width: 10.72, height: 6.63 } }, "mm"), /outline only, 12\.7 × 10\.72 × 6\.63 mm/);
   assert.match(bodyNote({ body: null }, "mm"), /not stated/);
+});
+
+test("each example's maker model lies as its housing does: length along the axis, thickness up, width across", () => {
+  for (const [name, id, [length, height, width]] of [["sensor-branch", "J1", [12.7, 6.63, 10.72]], ["taz6-y-z", "P1", [24.26, 5.99, 42.67]]]) {
+    const model = JSON.parse(readFileSync(new URL(`examples/${name}/${name}.harness.json`, root), "utf8"));
+    const body = buildScene(model).bodies.find((b) => b.connector.id === id);
+    const scale = body.size[0] / length;
+    assert.ok(near(body.size, [length * scale, height * scale, width * scale], 0.05 * scale), `${name} ${id}: ${body.size}`);
+  }
+});
+
+test("the 2D view carries no length labels; lengths are in the popovers", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/taz6-y-z/taz6-y-z.harness.json", root), "utf8"));
+  assert.doesNotMatch(planSvg(model, buildPlan(model)), /class="length"/);
+});
+
+test("in 2D each loose wire is its own clickable wire, and a bundle lists only what is loose in it, with cables as cables", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/split-cable/split-cable.harness.json", root), "utf8"));
+  const svg = planSvg(model, buildPlan(model));
+  assert.match(svg, /data-strand="W1"[^>]*data-wire="W1"|data-wire="W1"[^>]*data-strand="W1"/);
+  const segment = model.segments.find((s) => s.nodes.join("|") === "P1|B1");
+  assert.deepEqual(segmentContents(model, segment), { loose: ["W1"], cables: ["W5"] });
+});
+
+test("a round pinout is drawn whole, not clipped to its pins' bounding box", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/xlr-mic-cable/xlr-mic-cable.harness.json", root), "utf8"));
+  for (const connector of model.connectors) {
+    const svg = pinoutSvg(connector, model, null);
+    const [, width, height] = svg.match(/width="([\d.]+)" height="([\d.]+)"/).map(Number);
+    const [, cx, cy, r] = svg.match(/<ellipse cx="([\d.]+)" cy="([\d.]+)" rx="([\d.]+)"/).map(Number);
+    assert.ok(cx - r >= 0 && cy - r >= 0 && cx + r <= width && cy + r <= height, `${connector.id}: ${width}×${height}, circle ${cx},${cy} r${r}`);
+  }
+});
+
+test("in 2D a connector is drawn as its part: a maker's model as its silhouette, a cylinder rounded, a D-sub with its shell", () => {
+  const xlr = JSON.parse(readFileSync(new URL("examples/xlr-mic-cable/xlr-mic-cable.harness.json", root), "utf8"));
+  const plan = buildPlan(xlr);
+  const p1 = planBodySvg(plan.bodies.find((b) => b.connector.id === "P1"));
+  assert.match(p1, /class="silhouette"/);
+  const sensor = JSON.parse(readFileSync(new URL("examples/sensor-branch/sensor-branch.harness.json", root), "utf8"));
+  const dsub = planBodySvg(buildPlan(sensor).bodies.find((b) => b.connector.id === "P1"));
+  assert.equal((dsub.match(/<path|<rect/g) || []).length >= 3, true, "backshell, flange and shell");
+  const two = JSON.parse(readFileSync(new URL("examples/two-wire/two-wire.harness.json", root), "utf8"));
+  assert.match(planBodySvg(buildPlan(two).bodies.find((b) => b.connector.id === "P1")), /stroke-dasharray/);
+});
+
+test("a model with a plain grey and a dark part takes the body's colour on the grey and keeps the dark", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/xlr-mic-cable/xlr-mic-cable.harness.json", root), "utf8"));
+  const body = buildScene(model).bodies.find((b) => b.connector.id === "P1");
+  const colours = new Set(body.model.colors.map((c) => c.map((v) => Math.round(v * 255)).join(",")));
+  assert.ok(colours.has("195,196,194"), "nickel on the shell");
+  assert.ok(colours.has("55,55,55"), "the dark boot kept");
+});
+
+test("in 2D the cables in a bundle lie side by side in one order along every segment, so they never cross", () => {
+  const model = JSON.parse(readFileSync(new URL("examples/taz6-y-z/taz6-y-z.harness.json", root), "utf8"));
+  const svg = planSvg(model, buildPlan(model));
+  const order = [...svg.matchAll(/<g class="jacket" data-cable="([^"]+)" data-along="([^"]+)" data-offset="([-\d.]+)"/g)]
+    .map(([, cable, segment, offset]) => ({ cable, segment, offset: Number(offset) }));
+  assert.ok(order.length >= 6, "each cable drawn in each segment it runs through");
+  for (const segment of new Set(order.map((o) => o.segment))) {
+    const here = order.filter((o) => o.segment === segment).sort((a, b) => a.offset - b.offset).map((o) => o.cable);
+    assert.deepEqual(here, [...here].sort(), `${segment}: ${here}`);
+  }
+});
+
+test("a popover goes where the reader can see it: inside the part of the frame on screen, clear of what it is about", () => {
+  // The frame is 600 tall but only its top 300 is on screen; the clicked thing is at y 200.
+  const visible = [0, 0, 800, 300];
+  const [left, top] = placePopover({ width: 200, height: 120 }, [390, 195, 410, 205], [], visible);
+  assert.ok(top >= 0 && top + 120 <= 300, `on screen: top ${top}`);
+  assert.ok(top + 120 <= 195 || top >= 205 || left + 200 <= 390 || left >= 410, "clear of the thing clicked");
+  // Even when nothing fits clear, it stays on screen.
+  const [, top2] = placePopover({ width: 700, height: 280 }, [390, 140, 410, 160], [], visible);
+  assert.ok(top2 >= 0 && top2 + 280 <= 300);
 });

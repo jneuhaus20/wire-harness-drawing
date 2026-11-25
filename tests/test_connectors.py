@@ -9,7 +9,7 @@ from tests.test_output_integrity import generate, two_wire_harness
 
 from harness.source import cavity_positions, display_colors  # noqa: E402  (tests.generator puts scripts/ on the path)
 
-generic_harness = example_text("generic-parts")
+generic_harness = example_text("unknowns")
 
 
 class GenericConnectorTest(unittest.TestCase):
@@ -18,15 +18,15 @@ class GenericConnectorTest(unittest.TestCase):
 
     def test_the_bom_names_it_as_a_generic_part(self) -> None:
         row = generate(self, generic_harness).bom_rows()[0]
-        self.assertEqual((row["pn"], row["description"]), ("TBD", "Generic 4-position connector, circular, male"))
+        self.assertEqual((row["pn"], row["description"]), ("TBD", "Generic 2-position connector, circular, male"))
 
     def test_sheet_one_draws_it_as_generic_in_its_shape_and_gender(self) -> None:
         sheet = generate(self, generic_harness).sheets()[0]
         self.assertEqual(len(re.findall(r'class="connector-body generic circular"', sheet)), 1)
-        self.assertEqual(len(re.findall(r'class="connector-body rectangular"', sheet)), 1)
+        self.assertEqual(len(re.findall(r'class="connector-body rectangular"', sheet)), 2)
         self.assertEqual(sheet.count('class="mating-male"'), 1)
-        self.assertEqual(sheet.count('class="mating-female"'), 1)
-        self.assertIn(">GENERIC 4-PIN<", sheet)
+        self.assertEqual(sheet.count('class="mating-female"'), 2)
+        self.assertIn(">GENERIC 2-PIN<", sheet)
 
     def test_a_chosen_connector_is_not_called_generic(self) -> None:
         self.assertNotIn("generic", generate(self, two_wire_harness.replace("pincount: 2,", "pincount: 2, pn: X1,")).sheets()[0])

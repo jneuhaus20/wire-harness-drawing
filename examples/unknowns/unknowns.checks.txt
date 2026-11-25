@@ -1,4 +1,2 @@
 WARN   P1: no part number; drawn as a generic connector
-WARN   J1: no part number; drawn as a generic connector
-WARN   J2: no part number; drawn as a generic connector
 INFO   2 segment length(s) TBD (B1-J1 (≥200), B1-J2); cut lengths through them are TBD

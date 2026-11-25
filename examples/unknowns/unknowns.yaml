@@ -1,9 +1,25 @@
-# What is not known yet: a length known only as a minimum, a TBD length, a colour not chosen, and connectors with no part number.
+# What is known and what is not yet: one length set, one only a minimum, one TBD; one wire's
+# colour chosen, one TBD; two connectors chosen (Molex KK 254), one known only as a male circular
+# 2-way.
 drawing: {title: UNKNOWNS, number: T-4, rev: A}
 connectors:
-  P1: {type: KK 254, pincount: 2}
-  J1: {type: KK 254, pincount: 1}
-  J2: {type: KK 254, pincount: 1}
+  P1: {pincount: 2, shape: circular, gender: male}
+  J1:
+    type: KK 254
+    pn: 22-01-3047
+    manufacturer: Molex
+    pincount: 4
+    gender: female
+    face: {grid: [1, 4], view: mating face}
+    body: {model: meshes/22-01-3047.json, rotate: [90, 0, 90], shape: box, length: 12.7, width: 10.72, height: 6.63, color: natural}
+  J2:
+    type: KK 254
+    pn: 22-01-3047
+    manufacturer: Molex
+    pincount: 4
+    gender: female
+    face: {grid: [1, 4], view: mating face}
+    body: {model: meshes/22-01-3047.json, rotate: [90, 0, 90], shape: box, length: 12.7, width: 10.72, height: 6.63, color: natural}
 wires:
   - {id: W1, from: "P1:1", to: "J1:1", gauge: 24 AWG, color: BK}
   - {id: W2, from: "P1:2", to: "J2:1", gauge: 24 AWG, color: TBD}
