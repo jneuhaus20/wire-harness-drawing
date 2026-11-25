@@ -173,6 +173,15 @@ class WiringDiagramTest(unittest.TestCase):
         self.assertFalse(names & layout_names, names & layout_names)
         self.assertIn("SP1-J1", names)
 
+    # WireViz lays its diagram out left to right in the order each connection names its ends, so a
+    # wire listed from the far end would loop back over the connector tables.
+    def test_every_connection_runs_away_from_the_root(self) -> None:
+        source = two_wire_harness.replace('{id: W2, from: "P1:2", to: "J1:2"', '{id: W2, from: "J1:2", to: "P1:2"')
+        self.assertIn('from: "J1:2", to: "P1:2"', source)
+        for connection in self.wireviz_source(source)["connections"]:
+            ends = [next(iter(end)) if isinstance(end, dict) else end for end in (connection[0], connection[-1])]
+            self.assertEqual(ends, ["P1", "J1"])
+
     def test_a_cable_is_drawn_as_that_cable(self) -> None:
         source = two_wire_harness.split("wires:")[0] + """cables:
   C1:
