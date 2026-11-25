@@ -62,7 +62,7 @@ def write_wire_list_csv(path: Path, source: HarnessSource, routes: list[Route]) 
         for wire, route in zip(source["wires"], routes):
             (start, start_pin), (end, end_pin) = wire_end(wire["from"]), wire_end(wire["to"])
             writer.writerow([wire["id"], start, start_pin, end, end_pin, wire.get("signal", ""), wire.get("gauge", ""),
-                             wire.get("color", ""), format_length(route.cut_length), wire.get("twist", ""),
+                             wire.get("color", ""), route.cut_length_text(), wire.get("twist", ""),
                              wire.get("cable", ""), connectors.get(start, {}).get("strip", ""),
                              connectors.get(end, {}).get("strip", ""), " > ".join(route.node_names())])
 

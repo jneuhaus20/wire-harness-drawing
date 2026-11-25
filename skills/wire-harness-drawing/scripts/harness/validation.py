@@ -27,6 +27,17 @@ def segment_length_value(segment: list | dict):
     return segment.get("length")
 
 
+def parse_segment_length(value) -> tuple[float | None, float | None]:
+    """A validated segment length as (length, minimum): a number, TBD (None, None), or {min: N} (None, N)."""
+    if isinstance(value, dict):
+        return None, float(value["min"])
+    return (None, None) if value in (None, "TBD") else (float(value), None)
+
+
+def is_minimum_length(value) -> bool:
+    return isinstance(value, dict) and set(value) == {"min"} and is_number(value["min"]) and value["min"] >= 0
+
+
 def covered_segment_ends(covered: str | list) -> list:
     """The two nodes of a segment a covering names, as 'A-B' or [A, B]."""
     return covered.split("-") if isinstance(covered, str) else list(covered)
@@ -92,11 +103,15 @@ def validate_layout(layout: dict, findings: Findings) -> None:
     segments = layout.get("segments") or []
     for index, segment in enumerate(segments):
         length = segment_length_value(segment)
-        if length is None or length == "TBD" or (is_number(length) and length >= 0):
+        if length is None or length == "TBD" or (is_number(length) and length >= 0) or is_minimum_length(length):
             continue
         start, end = segment_ends(segment)
         if is_number(length):
             findings.error(f"layout segment {start}-{end}: length {format_length(length)} is negative")
+        elif isinstance(length, dict) and set(length) == {"min"}:
+            findings.error(f"layout segment {start}-{end}: minimum length '{length['min']}' must be a number of 0 or more")
+        elif isinstance(length, dict):
+            findings.error(f"layout segment {start}-{end}: length {length} must be a number, TBD or {{min: N}}")
         else:
             findings.error(f"layout segment {start}-{end}: length '{length}' must be a number or TBD")
         segments[index] = [start, end, "TBD"]

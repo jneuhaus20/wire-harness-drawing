@@ -146,7 +146,9 @@ def check_cables(source: HarnessSource, findings: Findings) -> None:
 
 def check_layout_use(source: HarnessSource, tree: HarnessTree, routes: list[Route], findings: Findings) -> None:
     """Note TBD segments, and report segments no wire uses and leaves that are not connectors."""
-    to_be_decided = ["-".join(sorted(segment)) for segment, length in tree.segment_lengths.items() if length is None]
+    to_be_decided = ["-".join(sorted(segment)) + (f" (≥{format_length(tree.segment_minimums[segment])})"
+                                                  if segment in tree.segment_minimums else "")
+                     for segment, length in tree.segment_lengths.items() if length is None]
     if to_be_decided:
         findings.info(f"{len(to_be_decided)} segment length(s) TBD ({', '.join(to_be_decided)}); cut lengths through them are TBD")
     used = {frozenset(segment) for route in routes for segment in route.segments}

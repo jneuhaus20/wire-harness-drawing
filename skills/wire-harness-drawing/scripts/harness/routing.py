@@ -3,24 +3,33 @@ import math
 from collections import defaultdict
 from dataclasses import dataclass
 
-from harness.source import Findings, HarnessSource, conventions, twist_takeup, wire_connectors
-from harness.validation import segment_ends, segment_length_value
+from harness.source import Findings, HarnessSource, conventions, format_length, twist_takeup, wire_connectors
+from harness.validation import parse_segment_length, segment_ends, segment_length_value
 
 Segment = frozenset  # the two nodes a segment joins, in no order
 
 
 # The layout read as a tree hanging from its root connector. Every node but the root has
-# one parent; a segment's length is None while it is TBD.
+# one parent. A segment's length is None while it is unknown; an unknown length may still
+# have a known minimum. Depths are from the root: exact when every segment on the way is
+# known, a minimum when every unknown one has a minimum.
 @dataclass
 class HarnessTree:
     root: str
     parent: dict[str, str | None]
     children: dict[str, list[str]]
     segment_lengths: dict[Segment, float | None]
+    segment_minimums: dict[Segment, float]
     depth: dict[str, float | None]
+    minimum_depth: dict[str, float | None]
     order: list[str]
     nodes: set[str]
     stand_in_length: float
+
+    def length_or_minimum(self, segment: Segment) -> float | None:
+        """A segment's length, or its minimum while the length is unknown, or None."""
+        length = self.segment_lengths[segment]
+        return length if length is not None else self.segment_minimums.get(segment)
 
     def path(self, start: str, end: str) -> list[tuple[str, str]]:
         """The segments from start to end, each as an ordered pair of nodes."""
@@ -52,15 +61,24 @@ class HarnessTree:
         if length is not None:
             return length
         known = sorted(value for value in self.segment_lengths.values() if value is not None)
-        return known[len(known) // 2] if known else float(self.stand_in_length)
+        stand_in = known[len(known) // 2] if known else float(self.stand_in_length)
+        return max(stand_in, self.segment_minimums.get(segment, 0))
 
 
 # A wire's way through the tree and the length to cut it; both are empty or None when the
-# wire's connectors are not on the layout, and the length is None through a TBD segment.
+# wire's connectors are not on the layout. Through an unknown segment the length is None,
+# and its minimum is known when every unknown segment on the way has a minimum.
 @dataclass
 class Route:
     segments: list[tuple[str, str]]
     cut_length: float | None
+    minimum_cut_length: float | None = None
+
+    def cut_length_text(self) -> str:
+        """The cut length as printed: the length, ≥ its minimum, or TBD."""
+        if self.cut_length is None and self.minimum_cut_length is not None:
+            return f"≥{format_length(self.minimum_cut_length)}"
+        return format_length(self.cut_length)
 
     def node_names(self) -> list[str]:
         """The nodes the route passes, in order."""
@@ -76,13 +94,15 @@ def build_tree(source: HarnessSource, findings: Findings) -> HarnessTree | None:
     layout = source["layout"]
     segments = layout.get("segments") or []
     neighbours = defaultdict(list)
-    segment_lengths = {}
+    segment_lengths, segment_minimums = {}, {}
     for segment in segments:
         start, end = segment_ends(segment)
-        length = segment_length_value(segment)
+        length, minimum = parse_segment_length(segment_length_value(segment))
         neighbours[start].append(end)
         neighbours[end].append(start)
-        segment_lengths[frozenset((start, end))] = None if length in (None, "TBD") else float(length)
+        segment_lengths[frozenset((start, end))] = length
+        if minimum is not None:
+            segment_minimums[frozenset((start, end))] = minimum
     root = layout.get("root") or next(iter(source["connectors"]), None)
     if root not in neighbours:
         findings.error(f"layout.root '{root}' is not on any segment")
@@ -104,11 +124,14 @@ def build_tree(source: HarnessSource, findings: Findings) -> HarnessTree | None:
     children = defaultdict(list)
     for node in order[1:]:
         children[parent[node]].append(node)
-    depth = {root: 0.0}
+    depth, minimum_depth = {root: 0.0}, {root: 0.0}
     for node in order[1:]:
-        length, parent_depth = segment_lengths[frozenset((node, parent[node]))], depth[parent[node]]
+        segment = frozenset((node, parent[node]))
+        length, parent_depth = segment_lengths[segment], depth[parent[node]]
         depth[node] = None if length is None or parent_depth is None else parent_depth + length
-    return HarnessTree(root, parent, children, segment_lengths, depth, order, seen,
+        least, parent_least = segment_minimums.get(segment) if length is None else length, minimum_depth[parent[node]]
+        minimum_depth[node] = None if least is None or parent_least is None else parent_least + least
+    return HarnessTree(root, parent, children, segment_lengths, segment_minimums, depth, minimum_depth, order, seen,
                        conventions(source["drawing"])["stand_in_length"])
 
 
@@ -127,14 +150,12 @@ def twisted_segments(source: HarnessSource, tree: HarnessTree) -> list[set[Segme
 
 # A cut length is the route's segments, plus twist take-up over the twisted run, plus the
 # per-wire extra and each end's allowance, rounded up to round_to. A loopback (both ends on
-# one connector) has no segments and is cut to loopback_length. A length override is used as given.
+# one connector) has no segments and is cut to loopback_length. A length override is used as
+# given. Through unknown segments that all have minimums, the same sum of the minimums is the
+# minimum cut length.
 def route_wires(source: HarnessSource, tree: HarnessTree | None) -> list[Route]:
     """Each wire's route and cut length, in source order."""
-    drawing = source["drawing"]
-    rounding = float(drawing.get("round_to", conventions(drawing)["round_to"]))
-    extra = float(drawing.get("extra_per_wire", 0))
     twisted = twisted_segments(source, tree) if tree else [set() for _ in source["wires"]]
-    takeup = twist_takeup(drawing)
     routes = []
     for wire, twisted_run in zip(source["wires"], twisted):
         start, end = wire_connectors(wire)
@@ -142,21 +163,31 @@ def route_wires(source: HarnessSource, tree: HarnessTree | None) -> list[Route]:
             routes.append(Route([], None))
             continue
         segments = tree.path(start, end)
-        lengths = [tree.segment_lengths[frozenset(segment)] for segment in segments]
         if "length" in wire:
             routes.append(Route(segments, float(wire["length"])))
             continue
-        if None in lengths:
-            routes.append(Route(segments, None))
+        lengths = {frozenset(segment): tree.segment_lengths[frozenset(segment)] for segment in segments}
+        if None not in lengths.values():
+            routes.append(Route(segments, cut_length(source, wire, lengths, twisted_run)))
             continue
-        length = sum(lengths) + takeup * sum(tree.segment_lengths[segment] for segment in twisted_run)
-        if not segments:
-            length = float(drawing.get("loopback_length", conventions(drawing)["loopback_length"]))
-        length += extra
-        length += float(source["connectors"].get(start, {}).get("wire_allowance", 0))
-        length += float(source["connectors"].get(end, {}).get("wire_allowance", 0))
-        routes.append(Route(segments, math.ceil(round(length / rounding, 9)) * rounding))
+        least = {segment: tree.length_or_minimum(segment) for segment in lengths}
+        minimum = None if None in least.values() else cut_length(source, wire, least, twisted_run)
+        routes.append(Route(segments, None, minimum))
     return routes
+
+
+def cut_length(source: HarnessSource, wire: dict, lengths: dict[Segment, float], twisted_run: set[Segment]) -> float:
+    """The cut length of a wire over segments of the given lengths."""
+    drawing = source["drawing"]
+    start, end = wire_connectors(wire)
+    length = sum(lengths.values()) + twist_takeup(drawing) * sum(lengths[segment] for segment in twisted_run)
+    if not lengths:
+        length = float(drawing.get("loopback_length", conventions(drawing)["loopback_length"]))
+    length += float(drawing.get("extra_per_wire", 0))
+    length += float(source["connectors"].get(start, {}).get("wire_allowance", 0))
+    length += float(source["connectors"].get(end, {}).get("wire_allowance", 0))
+    rounding = float(drawing.get("round_to", conventions(drawing)["round_to"]))
+    return math.ceil(round(length / rounding, 9)) * rounding
 
 
 def wire_counts_by_segment(routes: list[Route]) -> dict[Segment, int]:

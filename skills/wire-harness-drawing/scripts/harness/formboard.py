@@ -11,7 +11,7 @@ from harness.source import (HarnessSource, color_parts, conventions, default_twi
                             is_splice, pins_of, tolerance_for, wire_end)
 from harness.svg import (balloon_pitch, balloon_radius, balloon_stack, horizontal_dimension, ink, line, rect,
                          sheet_height, sheet_width, text, text_width)
-from harness.validation import covered_segment_ends
+from harness.validation import covered_segment_ends, parse_segment_length, segment_length_value
 
 SegmentLine = tuple[float, float, float, float]  # x1, y1, x2, y2
 
@@ -265,13 +265,16 @@ class FormboardSheet:
         return marks
 
     def draw_bundles(self, wire_counts: dict) -> None:
-        """Each segment as a bundle whose width grows with its wire count."""
+        """Each segment as a bundle whose width grows with its wire count; an unknown length shows a break."""
         for node in self.tree.order[1:]:
             parent = self.tree.parent[node]
             thickness = 1.6 * math.sqrt(max(wire_counts.get(frozenset((node, parent)), 0), 1))
-            path, _ = bundle_path(self.x[parent], self.y[parent], self.x[node], self.y[node])
+            path, (run_start, run_end) = bundle_path(self.x[parent], self.y[parent], self.x[node], self.y[node])
             self.out.append(f'<path d="{path}" fill="none" stroke="#333" stroke-width="{3 + thickness:.1f}" stroke-linecap="round"/>')
             self.out.append(f'<path d="{path}" fill="none" stroke="#9a9a9a" stroke-width="{1 + thickness:.1f}" stroke-linecap="round"/>')
+            if self.tree.segment_lengths[frozenset((node, parent))] is None:
+                self.out.append(length_break((run_start + run_end) / 2, self.y[node], 3 + thickness))
+
 
     # A straight segment gets a dimension line beside it; a bent branch gets its length
     # called out along its run, as NTS drawings do.
@@ -280,7 +283,7 @@ class FormboardSheet:
         for node in self.tree.order[1:]:
             parent = self.tree.parent[node]
             length = self.tree.segment_lengths[frozenset((node, parent))]
-            label = f"{format_length(length)} ±{format_length(tolerance_for(self.drawing, length))}" if length is not None else "TBD"
+            label = segment_dimension_label(self.drawing, length, self.tree.segment_minimums.get(frozenset((node, parent))))
             what = f"dimension {parent}–{node}"
             if abs(self.y[parent] - self.y[node]) < 0.5:
                 dimension_y = self.y[node] + (-30 if self.y[node] < self.y[parent] else 34)
@@ -449,8 +452,8 @@ class FormboardSheet:
                         key=lambda node: self.x[node])
         first_row = max(max(self.y.values()) + 100, self.box[3] + 60)
         for index, leaf in enumerate(leaves):
-            length = tree.depth[leaf]
-            label = f"{format_length(length)} REF" if length is not None else "TBD REF"
+            length, minimum = tree.depth[leaf], tree.minimum_depth[leaf]
+            label = f"{format_length(length)} REF" if length is not None else f"{unknown_length_text(minimum)} REF"
             what = f"overall dimension {root}–{leaf}"
             row_y = first_row + index * 24
             self.out.append(draw_dimension(self.layout, what, self.x[root], self.x[leaf], row_y, f"{label}  ({root}–{leaf})"))
@@ -477,6 +480,30 @@ class FormboardSheet:
         self.layout.regions["notes"] = (left, top - 20, left + widest, frame_box[3])
 
 
+def unknown_length_text(minimum: float | None) -> str:
+    """An unknown length as printed: ≥ its minimum, or TBD."""
+    return f"≥{format_length(minimum)}" if minimum is not None else "TBD"
+
+
+def segment_dimension_label(drawing: dict, length: float | None, minimum: float | None) -> str:
+    """A segment's dimension: the length with its tolerance, or the unknown length's text."""
+    if length is None:
+        return unknown_length_text(minimum)
+    return f"{format_length(length)} ±{format_length(tolerance_for(drawing, length))}"
+
+
+# The drafting break: a gap across the bundle between two slanted strokes, marking a
+# length that is not drawn to its value.
+def length_break(x, y, bundle_width) -> str:
+    """A break mark across a bundle at (x, y)."""
+    half = bundle_width / 2 + 5
+    return (f'<g class="length-break">'
+            f'<rect x="{x - 4:.1f}" y="{y - half:.1f}" width="8" height="{2 * half:.1f}" fill="white"/>'
+            f'<line x1="{x - 7:.1f}" y1="{y + half:.1f}" x2="{x - 1:.1f}" y2="{y - half:.1f}" stroke="{ink}" stroke-width="1.2"/>'
+            f'<line x1="{x + 1:.1f}" y1="{y + half:.1f}" x2="{x + 7:.1f}" y2="{y - half:.1f}" stroke="{ink}" stroke-width="1.2"/>'
+            '</g>')
+
+
 # The standard notes, then any the source adds, each wrapped to 150 characters.
 def default_notes(source: HarnessSource) -> list[str]:
     """The notes printed on sheet 1."""
@@ -498,9 +525,12 @@ def default_notes(source: HarnessSource) -> list[str]:
     if source["layout"].get("labels"):
         notes.append("LABELS READ TOWARD THE CONNECTOR; POSITION DIMENSIONED FROM DATUM TO LABEL CENTRE.")
     notes.append("CONTINUITY-TEST 100% AGAINST THE WIRE LIST; NO SHORTS BETWEEN NETS.")
-    if any(len(segment) > 2 and segment[2] in (None, "TBD") for segment in source["layout"].get("segments") or []
-           if isinstance(segment, list)):
+    lengths = [parse_segment_length(segment_length_value(segment)) for segment in source["layout"].get("segments") or []]
+    if any(length is None and minimum is None for length, minimum in lengths):
         notes.append("LENGTHS MARKED TBD ARE NOT YET SET; SEGMENTS SO MARKED ARE DRAWN AT A STAND-IN LENGTH. "
                      "DO NOT CUT FROM THIS REVISION.")
+    if any(minimum is not None for _, minimum in lengths):
+        notes.append("LENGTHS MARKED ≥ ARE MINIMUMS; THE FINAL LENGTH IS NOT YET SET. "
+                     "SEGMENTS WITH A BREAK ARE NOT DRAWN TO THEIR LENGTH.")
     notes += drawing.get("notes", [])
     return [textwrap.fill(note, 150, subsequent_indent="     ") for note in notes]

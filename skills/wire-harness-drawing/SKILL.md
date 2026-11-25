@@ -49,7 +49,7 @@ Setup (once per machine): `pip install pyyaml wireviz cairosvg pypdf` and Graphv
 - **Twists** (external): "TWIST INDICATED WIRES PER IPC/WHMA-A-620"; L3Harris examples are ≥4 twists/inch pairs, 3 triples, 2.5 quads. The default note cites the standard without a rate; add a rate in notes when the signal needs one. Twisting shortens a wire's reach, so cut lengths add `drawing.twist_takeup` (default 3 %, a shop convention; set it from your twist rate) over the segments the group runs through together, and a note states it.
 - **Pinout view**: state whether a connector table is mating face or wire-insertion side (`view:`), because the two are mirror images.
 - **Sealed connectors**: `sealed: true` makes empty cavities show "(seal)" and adds an INFO line for sealing plugs.
-- **Not to scale**: harness drawings are normally NTS; dimensions govern. A 1:1 nailboard print is a separate step this tool does not do (see Limits).
+- **Not to scale**: harness drawings are normally NTS; dimensions govern. A segment whose length is unknown (TBD or a minimum) carries a break mark on the bundle. A 1:1 nailboard print is a separate step this tool does not do (see Limits).
 
 ## Checks performed
 
@@ -101,6 +101,7 @@ layout:
   segments:                # tree of bundle segments: [from, to, length]
     - [P1, B1, 300]        # nodes that are not connectors are breakouts
     - [B1, J2, TBD]        # length not known yet: prints TBD, drawn at a stand-in length, adds a DO NOT CUT note
+    - [B1, J3, {min: 200}] # only a minimum known: prints ≥200, cut lengths and BOM quantities through it print as ≥ minimums
   coverings:
     - {item: SLV1, segments: [P1-B1, B1-B2]}
       # optional: display_color: "#9aa7b8", display_width: 16 (how the covering is shaded on the sheet)

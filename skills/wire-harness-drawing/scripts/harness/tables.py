@@ -34,7 +34,7 @@ def wire_list_table(source: HarnessSource, routes: list[Route], bom: list[BomLin
                      format_length(connectors.get(start, {}).get("strip", "")),
                      wire.get("signal") or pin_label(connectors.get(start, {}), start_pin), end, end_pin,
                      format_length(connectors.get(end, {}).get("strip", "")), wire.get("gauge", ""), wire.get("color", ""),
-                     format_length(route.cut_length), wire.get("twist") or wire.get("cable") or "", wire.get("note", "")])
+                     route.cut_length_text(), wire.get("twist") or wire.get("cable") or "", wire.get("note", "")])
     columns = [("WIRE", 50, "c"), ("FIND", 40, "c"), ("FROM", 46, "c"), ("PIN", 34, "c"), ("STRIP", 44, "c"),
                ("SIGNAL", 110, "l"), ("TO", 46, "c"), ("PIN", 34, "c"), ("STRIP", 44, "c"), ("GAUGE", 62, "c"),
                ("COLOR", 50, "c"), ("CUT LEN", 58, "c"), ("TWIST/CBL", 64, "c"), ("NOTE", 120, "l")]

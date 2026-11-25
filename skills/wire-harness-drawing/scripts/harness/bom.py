@@ -12,7 +12,8 @@ PartKind = Literal["splice", "connector", "contact", "accessory", "cable", "wire
 
 
 # One BOM line. Quantities add up as parts with the same key are found; a length that runs
-# through a TBD segment makes the whole line TBD. As-required (AR) lines are lengths.
+# through an unknown segment makes the whole line TBD, and its minimum stays known while every
+# unknown contribution has one. As-required (AR) lines are lengths.
 @dataclass
 class BomLine:
     kind: PartKind
@@ -24,27 +25,39 @@ class BomLine:
     as_required: bool
     quantity: float = 0
     to_be_decided: bool = False
+    minimum: float | None = 0
     refs: list = field(default_factory=list)
     find: int = 0
 
-    def add(self, quantity: float | None, refs: list) -> None:
-        """Add a quantity (None for a TBD length) and the references it comes from."""
+    def add(self, quantity: float | None, refs: list, minimum: float | None = None) -> None:
+        """Add a quantity, or None and its minimum (None when unknown) for a length not yet known."""
         if quantity is None:
             self.to_be_decided = True
+            self.minimum = None if minimum is None or self.minimum is None else self.minimum + minimum
         else:
             self.quantity += quantity
+            self.minimum = None if self.minimum is None else self.minimum + quantity
         self.refs += refs
 
+    def has_minimum(self) -> bool:
+        return self.to_be_decided and bool(self.minimum)
+
     def sheet_quantity(self) -> str:
-        """The QTY cell on the BOM sheet: AR lines show the computed length in brackets."""
+        """The QTY cell on the BOM sheet: AR lines show the computed length, or its minimum, in brackets."""
         if self.as_required:
+            if self.has_minimum():
+                return f"AR (≥{self.minimum:.2f})"
             if self.to_be_decided:
                 return "AR (TBD)"
             return f"AR ({self.quantity:.2f})" if self.quantity else "AR"
+        if self.has_minimum():
+            return f"≥{format_length(round(self.minimum, 3))}"
         return "TBD" if self.to_be_decided else format_length(round(self.quantity, 3))
 
     def csv_quantity(self) -> str:
-        """The qty in bom.csv: a number purchasing can use, or a word when there is none yet."""
+        """The qty in bom.csv: a number purchasing can use, its minimum, or a word when there is none yet."""
+        if self.has_minimum():
+            return f"≥{format_length(round(self.minimum, 3))}"
         if self.to_be_decided:
             return "TBD"
         if self.as_required and not self.quantity:
@@ -75,10 +88,10 @@ class BomBuilder:
         self.lines: dict[tuple, BomLine] = {}
 
     def add(self, kind: PartKind, key: tuple, *, description: str, part_number: str, manufacturer: str,
-            quantity: float | None, unit: str, refs: list, as_required: bool) -> None:
+            quantity: float | None, unit: str, refs: list, as_required: bool, minimum: float | None = None) -> None:
         line = self.lines.setdefault((kind, *key), BomLine(kind, (kind, *key), description, part_number, manufacturer,
                                                             unit, as_required))
-        line.add(quantity, refs)
+        line.add(quantity, refs, minimum)
 
     def numbered(self) -> list[BomLine]:
         """The lines with find numbers 1, 2, ... in the order found."""
@@ -139,11 +152,14 @@ def add_cables_and_wires(builder: BomBuilder, source: HarnessSource, routes: lis
     """Add each cable and each loose wire as lengths."""
     purchase_unit = conventions(source["drawing"])["purchase_unit"]
     for cable_id, cable in source["cables"].items():
-        cable_lengths = [route.cut_length for wire, route in zip(source["wires"], routes) if wire.get("cable") == cable_id]
+        cable_routes = [route for wire, route in zip(source["wires"], routes) if wire.get("cable") == cable_id]
+        cable_lengths = [route.cut_length for route in cable_routes]
         longest = None if None in cable_lengths else max(cable_lengths or [0])
+        least = [route.cut_length if route.cut_length is not None else route.minimum_cut_length for route in cable_routes]
         builder.add("cable", (cable.get("pn", cable_id),), description=cable.get("desc", "Cable"),
                     part_number=cable.get("pn", ""), manufacturer=cable.get("manufacturer", ""),
-                    quantity=purchased_length(source, longest), unit=purchase_unit, refs=[cable_id], as_required=True)
+                    quantity=purchased_length(source, longest), unit=purchase_unit, refs=[cable_id], as_required=True,
+                    minimum=purchased_length(source, None if None in least else max(least or [0])))
     for wire, route in zip(source["wires"], routes):
         if wire.get("cable"):
             continue
@@ -153,7 +169,8 @@ def add_cables_and_wires(builder: BomBuilder, source: HarnessSource, routes: lis
         builder.add("wire", (wire_type, gauge, color, part_number),
                     description=", ".join(x for x in (wire_type, gauge, color) if x), part_number=part_number,
                     manufacturer=wire.get("manufacturer", ""), quantity=purchased_length(source, route.cut_length),
-                    unit=purchase_unit, refs=[wire["id"]], as_required=True)
+                    unit=purchase_unit, refs=[wire["id"]], as_required=True,
+                    minimum=purchased_length(source, route.minimum_cut_length))
 
 
 # An AR item that covers segments is bought at their total length; an item with no qty that
@@ -170,20 +187,23 @@ def add_items(builder: BomBuilder, source: HarnessSource, tree: HarnessTree) -> 
         refs = list(item.get("refs", []))
         coverings = [covering for covering in layout.get("coverings") or [] if covering.get("item") == item_id]
         labels = [label for label in layout.get("labels") or [] if label.get("item") == item_id]
+        minimum = None
         if as_required and coverings:
-            covered = []
+            covered, least = [], []
             for covering in coverings:
                 for segment in covering["segments"]:
                     covered.append(tree.segment_lengths.get(frozenset(covered_segment_ends(segment))))
+                    least.append(tree.length_or_minimum(frozenset(covered_segment_ends(segment))))
                 refs += [covered_segment_name(segment) for segment in covering["segments"]]
             quantity, unit = purchased_length(source, None if None in covered else sum(covered)), purchase_unit
+            minimum = purchased_length(source, None if None in least else sum(least))
         elif quantity is None and labels:
             quantity, as_required = len(labels), False
             refs += [label["at"] for label in labels]
         counted = quantity if isinstance(quantity, (int, float)) or (as_required and coverings) else 0
         builder.add("item", (item_id,), description=item.get("desc", ""), part_number=item.get("pn", ""),
                     manufacturer=item.get("manufacturer", ""), quantity=counted, unit=unit, refs=refs,
-                    as_required=as_required)
+                    as_required=as_required, minimum=minimum)
 
 
 def find_numbers(bom: list[BomLine], kind: PartKind, ref: str) -> list[int]:
