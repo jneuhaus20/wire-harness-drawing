@@ -63,6 +63,8 @@ def harness_model(analysis) -> dict:
     nodes = [{"id": node, "kind": ("splice" if is_splice(connectors[node]) else "connector") if node in connectors else "breakout",
               "x": round(placement.x[node], 1), "y": round(placement.y[node], 1)} for node in tree.order]
     cables = [{"id": cable_id, "description": cable.get("desc", ""), "part_number": cable.get("pn", ""),
+               "conductors": cable.get("conductors") or sum(1 for wire in source["wires"] if wire.get("cable") == cable_id),
+               "color": display_color(color_parts(cable["color"])[0]) if cable.get("color") else None,
                "wires": [wire["id"] for wire in source["wires"] if wire.get("cable") == cable_id]}
               for cable_id, cable in source["cables"].items()]
     return {"format": model_format, "title": drawing.get("title", ""), "number": drawing.get("number", ""),

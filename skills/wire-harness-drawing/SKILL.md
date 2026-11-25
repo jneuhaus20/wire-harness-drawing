@@ -96,7 +96,7 @@ connectors:
   SP1: {type: splice, desc: str, pn: str}   # wires end at "SP1"
 
 cables:                    # optional multi-conductor cables
-  C1: {desc, pn, manufacturer, conductors: 4}
+  C1: {desc, pn, manufacturer, conductors: 4, color: BK}   # color: jacket colour code, drawn by the explorer
 
 wires:                     # the from-to list, one row per conductor
   - {id: W1, from: "P1:1", to: "J1:1", signal: GND, gauge: "22 AWG", color: BK,

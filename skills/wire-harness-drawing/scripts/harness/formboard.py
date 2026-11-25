@@ -203,9 +203,9 @@ def place_nodes(tree: HarnessTree, box: Box) -> Placement:
 def drawing_box(source: HarnessSource, tree: HarnessTree) -> Box:
     """The box the harness itself is laid out in on sheet 1."""
     leaf_count = sum(1 for node in tree.order if node in source["connectors"] and node != tree.root and tree.is_leaf(node))
-    notes = default_notes(source, tree, standard_scales[-1] if tree.geometry else None)
+    notes = default_notes(source, tree, standard_scales[-1] if drawn_to_scale(tree) else None)
     notes_top = frame_box[3] - 12 - 15 * sum(note.count("\n") + 1 for note in notes) - 30
-    dimensions_height = 0 if tree.geometry else 24 * leaf_count + 40
+    dimensions_height = 0 if drawn_to_scale(tree) else 24 * leaf_count + 40
     bottom = min(notes_top, sheet_height - 150) - dimensions_height - 70
     return (170, 150, sheet_width - 230, max(bottom, 420))
 
@@ -213,10 +213,17 @@ def drawing_box(source: HarnessSource, tree: HarnessTree) -> Box:
 def sheet_placement(source: HarnessSource, tree: HarnessTree) -> Placement:
     """Where sheet 1 draws each node; the explorer's 2D view uses the same placement."""
     box = drawing_box(source, tree)
-    return routed_placement(source, tree, box) if tree.geometry else place_nodes(tree, box)
+    return routed_placement(source, tree, box) if drawn_to_scale(tree) else place_nodes(tree, box)
 
 
 standard_scales = (1, 2, 2.5, 4, 5, 10, 20, 25, 50, 100, 200)
+
+
+# A flat (2D) route is the shape the harness lies in on the board, so sheet 1 draws it to scale.
+# A 3D route is how it sits in the machine; on the board it lies flattened, so sheet 1 keeps the
+# automatic layout with the route's lengths, and the explorer shows the 3D shape.
+def drawn_to_scale(tree: HarnessTree) -> bool:
+    return tree.geometry is not None and tree.geometry.dimensions == 2
 sheet_unit_mm = 0.2625  # one drawing unit printed on A3
 
 
@@ -250,6 +257,7 @@ def routed_placement(source: HarnessSource, tree: HarnessTree, box: Box) -> Plac
 # A route drawn through its points with each bend rounded, so it reads as a bundle laid on a board.
 def polyline_path(points: list[tuple[float, float]], bend_radius: float = 14) -> str:
     """SVG path data for a polyline with rounded corners."""
+    points = [point for index, point in enumerate(points) if index == 0 or math.dist(point, points[index - 1]) > 1e-6]
     out = [f"M{points[0][0]:.1f},{points[0][1]:.1f}"]
     for before, corner, after in zip(points, points[1:], points[2:]):
         into, out_of = math.dist(before, corner), math.dist(corner, after)
@@ -301,7 +309,7 @@ def formboard_sheet(source: HarnessSource, tree: HarnessTree, routes: list[Route
     """Sheet 1's SVG and the record of what it draws where."""
     placement = sheet_placement(source, tree)
     out, regions = frame(source, 1, sheet_count, "HARNESS DRAWING", check_errors, placement.scale_text())
-    sheet_class = RoutedFormboardSheet if tree.geometry else FormboardSheet
+    sheet_class = RoutedFormboardSheet if drawn_to_scale(tree) else FormboardSheet
     sheet = sheet_class(source, tree, bom, out, SheetLayout(regions), placement)
     covering_marks = sheet.draw_coverings()
     sheet.draw_bundles(wire_counts_by_segment(routes))
@@ -778,7 +786,7 @@ def default_notes(source: HarnessSource, tree: HarnessTree, scale_denominator: f
          "DRAWING NOT TO SCALE.") + " WIRE CUT LENGTHS PER WIRE LIST; CONNECTIONS PER CONNECTOR TABLES AND WIRING DIAGRAM.",
     ]
     if tree.geometry and tree.geometry.dimensions == 3:
-        notes.append("PLAN VIEW (X–Y) OF THE 3D ROUTE. HEIGHTS ARE NOT SHOWN ON THIS SHEET.")
+        notes.append("THE 3D ROUTE IS SHOWN FLATTENED, AS LAID ON THE FORMBOARD; SEE THE 3D VIEW FOR ITS SHAPE IN PLACE.")
     if any(wire.get("twist") for wire in source["wires"]):
         notes.append("TWIST INDICATED WIRES PER IPC/WHMA-A-620.")
         notes.append(f"TWISTED WIRE CUT LENGTHS INCLUDE {drawing.get('twist_takeup', default_twist_takeup)} "

@@ -112,9 +112,18 @@ class GeometryModelTest(unittest.TestCase):
         branch = next(segment for segment in model["segments"] if segment["nodes"] == ["B1", "E1"])
         self.assertEqual(branch["points"][1], [300, 40, 100])
 
-    def test_sheet_one_draws_a_3d_route_in_plan(self) -> None:
-        notes = " ".join(svg_texts(generate(self, routed_3d_harness).sheets()[0]))
-        self.assertIn("PLAN VIEW (X–Y) OF THE 3D ROUTE", notes)
+    def test_sheet_one_draws_a_3d_route_flattened_as_on_the_board(self) -> None:
+        texts = svg_texts(generate(self, routed_3d_harness).sheets()[0])
+        notes = " ".join(texts)
+        self.assertIn("THE 3D ROUTE IS SHOWN FLATTENED, AS LAID ON THE FORMBOARD", notes)
+        self.assertIn("NOT TO SCALE", notes)
+        self.assertIn("550 REF  (P1–E1)", texts)
+
+    def test_a_3d_route_with_a_vertical_run_still_draws(self) -> None:
+        source = routed_3d_harness.replace("B1: [300, 0, 0]", "B1: [300, 0, 0], B2: [300, 0, -80]").replace(
+            "[P1, B1, 300]", "[P1, B1, 300]\n    - [B1, B2, 80]").replace("[B1, E1, 250, {via", "[B2, E1, 170, {via").replace(
+            "via: [[300, 100, 0], [400, 150, 0]]", "via: [[300, 0, 0], [300, 100, 0]]")
+        self.assertNotIn("Traceback", generate(self, source).process.stderr)
 
 
 if __name__ == "__main__":
