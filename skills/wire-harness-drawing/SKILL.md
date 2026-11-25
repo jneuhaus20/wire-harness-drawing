@@ -20,6 +20,7 @@ From one `harness.yaml`, `scripts/harnessgen.py` (in this skill's directory) wri
 | last sheet | WireViz wiring diagram (connector pin tables, wires coloured and labelled; each twist group a named bundle, each harness cable drawn as that cable with its P/N and shield), embedded. |
 | `*.pdf` | All sheets combined. |
 | `*.bom.csv`, `*.wirelist.csv` | Same data for purchasing and cut/strip/crimp work (wire list includes routing path). |
+| `*.harness.json` | The harness model the interactive explorer draws (see [explorer/README.md](explorer/README.md)). |
 | `*.wireviz.yaml`, `*.wiring.svg`, `*.wiring.png` | The generated WireViz input and WireViz's own render of it, in case someone wants to tweak the diagram by hand. |
 
 ## Workflow
@@ -109,6 +110,12 @@ layout:
     - [P1, B1, 300]        # nodes that are not connectors are breakouts
     - [B1, J2, TBD]        # length not known yet: prints TBD, drawn at a stand-in length, adds a DO NOT CUT note
     - [B1, J3, {min: 200}] # only a minimum known: prints ≥200, cut lengths and BOM quantities through it print as ≥ minimums
+    - [B1, E1, 250, {via: [[300, 100], [400, 150]]}]   # bend points on the way, when layout.nodes is given
+  nodes:                   # optional fixed routing geometry: every node or none, all [x, y] or all [x, y, z]
+    P1: [0, 0]             # x right, y down the sheet as the harness lies on the table, z up from it
+    B1: [300, 0]           # a stated segment length must match its route within tolerance (ERROR if not);
+                           # a TBD or {min} length is taken from the route. Sheet 1 is then drawn to a
+                           # standard scale (1:k on A3, in the title block), in plan for a 3D route.
   coverings:
     - {item: SLV1, segments: [P1-B1, B1-B2]}
       # optional: display_color: "#9aa7b8", display_width: 16 (how the covering is shaded on the sheet)
@@ -123,9 +130,13 @@ expect:
   nets: {GND: ["P1:1", "J1:1"], ...}
 ```
 
+## Interactive explorer
+
+To give a harness an interactive 2D/3D view (in a build guide, a README, a docs site), follow [explorer/README.md](explorer/README.md). It uses the `*.harness.json` above and the one component file in `explorer/`; never write a second view of the harness by hand.
+
 ## Limits (say these when they matter)
 
 - Connector bodies are generic boxes. If a face view matters (keying, clocking), add a note and the manufacturer's face drawing as a separate detail; do not invent one.
 - Layout is automatic: the farthest-reaching child continues the trunk, other branches alternate above and below. Past ~10 leaves or very uneven lengths the drawing stops fitting the sheet, which the checks report as an ERROR; split into sub-harnesses joined at an in-line connector.
 - Shields are modelled as a wire (drain) plus a covering item; overbraid termination details go in notes.
-- No 1:1 formboard/nailboard output. Lay out on the board from the dimensions, or add a to-scale mode when someone needs it.
+- No 1:1 formboard/nailboard print. With routing geometry, sheet 1 is to a standard scale, not full size.

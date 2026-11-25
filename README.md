@@ -14,6 +14,7 @@ A Claude skill that turns one YAML description of a wire harness into the drawin
 | last sheet | Wiring diagram drawn by [WireViz](https://github.com/wireviz/WireViz). |
 | `*.pdf` | All sheets. |
 | `*.bom.csv`, `*.wirelist.csv` | The same data for purchasing and for cut, strip and crimp work. |
+| `*.harness.json` | The harness model for the interactive 2D/3D explorer, a single dependency-free web component in [`skills/wire-harness-drawing/explorer/`](skills/wire-harness-drawing/explorer/). |
 
 [`SKILL.md`](skills/wire-harness-drawing/SKILL.md) holds the input schema, the checks, the drafting conventions the drawing follows, and the limits.
 

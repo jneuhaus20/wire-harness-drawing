@@ -10,6 +10,7 @@ border_box: Box = (20, 20, sheet_width - 20, sheet_height - 20)
 frame_box: Box = (32, 32, sheet_width - 32, sheet_height - 32)
 release_mark_box: Box = (frame_box[0] + 10, frame_box[1] + 8, frame_box[0] + 610, frame_box[1] + 46)
 title_block_width, title_block_height = 560, 120
+not_to_scale = "NONE (NTS)"
 revision_block_width = 490
 
 
@@ -26,8 +27,8 @@ def release_mark(check_errors: int) -> str:
 
 # Draw the frame of one sheet. Return its opening SVG elements and the blocks a drawing on
 # the sheet must keep clear of.
-def frame(source: HarnessSource, sheet: int, sheet_count: int, sheet_title: str,
-          check_errors: int) -> tuple[list[str], dict[str, Box]]:
+def frame(source: HarnessSource, sheet: int, sheet_count: int, sheet_title: str, check_errors: int,
+          scale: str = not_to_scale) -> tuple[list[str], dict[str, Box]]:
     """The border, zones, title and revision blocks of a sheet, and the boxes the blocks take up."""
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
            f'viewBox="0 0 {sheet_width} {sheet_height}" width="420mm" height="297mm">',
@@ -35,7 +36,7 @@ def frame(source: HarnessSource, sheet: int, sheet_count: int, sheet_title: str,
            rect(border_box[0], border_box[1], border_box[2] - border_box[0], border_box[3] - border_box[1], stroke_width=0.8),
            rect(frame_box[0], frame_box[1], frame_box[2] - frame_box[0], frame_box[3] - frame_box[1], stroke_width=2)]
     out += zone_grid()
-    title_box = title_block(out, source["drawing"], sheet, sheet_count, sheet_title)
+    title_box = title_block(out, source["drawing"], sheet, sheet_count, sheet_title, scale)
     revision_box = revision_block(out, source["drawing"])
     if check_errors:
         out.append(release_mark(check_errors))
@@ -62,7 +63,7 @@ def zone_grid() -> list[str]:
     return out
 
 
-def title_block(out: list[str], drawing: dict, sheet: int, sheet_count: int, sheet_title: str) -> Box:
+def title_block(out: list[str], drawing: dict, sheet: int, sheet_count: int, sheet_title: str, scale: str) -> Box:
     """Draw the title block at the bottom right and return its box."""
     x, y = frame_box[2] - title_block_width, frame_box[3] - title_block_height
     out.append(rect(x, y, title_block_width, title_block_height, fill="white", stroke_width=1.5))
@@ -74,7 +75,7 @@ def title_block(out: list[str], drawing: dict, sheet: int, sheet_count: int, she
         (x, y + 64, 140, 28, "DRAWN", drawing.get("drawn_by", "")),
         (x + 140, y + 64, 120, 28, "DATE", drawing.get("date", "")),
         (x + 260, y + 64, 120, 28, "CHECKED", drawing.get("checked_by", "")),
-        (x + 380, y + 64, 180, 28, "SCALE", "NONE (NTS)"),
+        (x + 380, y + 64, 180, 28, "SCALE", scale),
         (x, y + 92, 260, 28, "UNITS", drawing.get("units", "mm")),
         (x + 260, y + 92, 300, 28, "THIS SHEET", sheet_title),
     ]

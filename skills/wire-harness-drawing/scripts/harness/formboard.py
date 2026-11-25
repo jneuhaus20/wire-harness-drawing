@@ -5,13 +5,13 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 
 from harness.bom import BomLine, find_numbers, item_find_numbers
-from harness.frame import Box, frame, frame_box
+from harness.frame import Box, frame, frame_box, not_to_scale
 from harness.routing import HarnessTree, Route, wire_counts_by_segment
 from harness.source import (HarnessSource, color_parts, conventions, default_twist_takeup, display_color, format_length,
                             is_generic, is_splice, pins_of, tolerance_for, wire_end)
 from harness.svg import (balloon_pitch, balloon_radius, balloon_stack, horizontal_dimension, ink, line, rect,
                          sheet_height, sheet_width, text, text_width)
-from harness.validation import covered_segment_ends, parse_segment_length, segment_length_value
+from harness.validation import covered_segment_ends
 
 SegmentLine = tuple[float, float, float, float]  # x1, y1, x2, y2
 
@@ -112,10 +112,18 @@ def draw_broken_extension(layout: SheetLayout, what: str, x, y1, y2, exempt: set
 # ---------- Placing the nodes ----------
 
 
+# Where sheet 1 draws each node. A routed harness also has each segment's drawn points, from
+# its parent to its child, and the denominator of the scale it is drawn at.
 @dataclass
 class Placement:
     x: dict[str, float]
     y: dict[str, float]
+    segment_points: dict[tuple[str, str], list[tuple[float, float]]] = field(default_factory=dict)
+    scale_denominator: float | None = None
+    units_to_sheet: float | None = None
+
+    def scale_text(self) -> str:
+        return f"1:{format_length(self.scale_denominator)}" if self.scale_denominator else not_to_scale
 
 
 # At each node the child that reaches farthest continues the trunk; the other branches
@@ -189,6 +197,90 @@ def place_nodes(tree: HarnessTree, box: Box) -> Placement:
     return Placement(xs, ys)
 
 
+# The drawing gets the frame above the overall dimensions, which get the space above the notes.
+# A routed drawing has no overall dimensions, so it gets that space too. The notes are counted
+# at the longest scale text, since the scale is chosen to fit this box.
+def drawing_box(source: HarnessSource, tree: HarnessTree) -> Box:
+    """The box the harness itself is laid out in on sheet 1."""
+    leaf_count = sum(1 for node in tree.order if node in source["connectors"] and node != tree.root and tree.is_leaf(node))
+    notes = default_notes(source, tree, standard_scales[-1] if tree.geometry else None)
+    notes_top = frame_box[3] - 12 - 15 * sum(note.count("\n") + 1 for note in notes) - 30
+    dimensions_height = 0 if tree.geometry else 24 * leaf_count + 40
+    bottom = min(notes_top, sheet_height - 150) - dimensions_height - 70
+    return (170, 150, sheet_width - 230, max(bottom, 420))
+
+
+def sheet_placement(source: HarnessSource, tree: HarnessTree) -> Placement:
+    """Where sheet 1 draws each node; the explorer's 2D view uses the same placement."""
+    box = drawing_box(source, tree)
+    return routed_placement(source, tree, box) if tree.geometry else place_nodes(tree, box)
+
+
+standard_scales = (1, 2, 2.5, 4, 5, 10, 20, 25, 50, 100, 200)
+sheet_unit_mm = 0.2625  # one drawing unit printed on A3
+
+
+# A routed harness is drawn in plan (x across, y down) at the largest standard scale that
+# fits the box, centred in it.
+def routed_placement(source: HarnessSource, tree: HarnessTree, box: Box) -> Placement:
+    """Where sheet 1 draws each node and route point of a routed harness."""
+    geometry = tree.geometry
+    plan = [point for points in geometry.segment_points.values() for point in points]
+    low_x, high_x = min(p[0] for p in plan), max(p[0] for p in plan)
+    low_y, high_y = min(p[1] for p in plan), max(p[1] for p in plan)
+    unit_mm = 25.4 if source["drawing"].get("units") == "in" else 1
+    left, top, right, bottom = box
+    for denominator in standard_scales:
+        units_to_sheet = unit_mm / (denominator * sheet_unit_mm)
+        if (high_x - low_x) * units_to_sheet <= right - left and (high_y - low_y) * units_to_sheet <= bottom - top:
+            break
+    offset_x = left + (right - left - (high_x - low_x) * units_to_sheet) / 2 - low_x * units_to_sheet
+    offset_y = top + (bottom - top - (high_y - low_y) * units_to_sheet) / 2 - low_y * units_to_sheet
+
+    def on_sheet(point):
+        return (offset_x + point[0] * units_to_sheet, offset_y + point[1] * units_to_sheet)
+
+    xs = {node: on_sheet(position)[0] for node, position in geometry.positions.items()}
+    ys = {node: on_sheet(position)[1] for node, position in geometry.positions.items()}
+    segment_points = {(tree.parent[node], node): [on_sheet(point) for point in geometry.points(tree.parent[node], node)]
+                      for node in tree.order[1:]}
+    return Placement(xs, ys, segment_points, denominator, units_to_sheet)
+
+
+# A route drawn through its points with each bend rounded, so it reads as a bundle laid on a board.
+def polyline_path(points: list[tuple[float, float]], bend_radius: float = 14) -> str:
+    """SVG path data for a polyline with rounded corners."""
+    out = [f"M{points[0][0]:.1f},{points[0][1]:.1f}"]
+    for before, corner, after in zip(points, points[1:], points[2:]):
+        into, out_of = math.dist(before, corner), math.dist(corner, after)
+        radius = min(bend_radius, into / 2, out_of / 2)
+        start = (corner[0] + (before[0] - corner[0]) * radius / into, corner[1] + (before[1] - corner[1]) * radius / into)
+        end = (corner[0] + (after[0] - corner[0]) * radius / out_of, corner[1] + (after[1] - corner[1]) * radius / out_of)
+        out.append(f"L{start[0]:.1f},{start[1]:.1f} C{corner[0]:.1f},{corner[1]:.1f} {corner[0]:.1f},{corner[1]:.1f} "
+                   f"{end[0]:.1f},{end[1]:.1f}")
+    out.append(f"L{points[-1][0]:.1f},{points[-1][1]:.1f}")
+    return " ".join(out)
+
+
+def point_along(points: list[tuple[float, float]], distance: float) -> tuple[float, float, float]:
+    """The point a distance along a polyline (clamped to it), and the polyline's direction there in radians."""
+    for start, end in zip(points, points[1:]):
+        step = math.dist(start, end)
+        if distance <= step or end == points[-1]:
+            fraction = min(distance / step, 1) if step else 0
+            return (start[0] + (end[0] - start[0]) * fraction, start[1] + (end[1] - start[1]) * fraction,
+                    math.atan2(end[1] - start[1], end[0] - start[0]))
+        distance -= step
+    return (*points[-1], 0.0)
+
+
+def segment_path(placement: Placement, parent: str, child: str) -> str:
+    """The SVG path sheet 1 draws a segment's bundle along."""
+    if placement.segment_points:
+        return polyline_path(placement.segment_points[(parent, child)])
+    return bundle_path(placement.x[parent], placement.y[parent], placement.x[child], placement.y[child])[0]
+
+
 def bundle_path(parent_x, parent_y, child_x, child_y) -> tuple[str, tuple[float, float]]:
     """The SVG path of a segment, and the x range of its straight run after any bend."""
     if abs(parent_y - child_y) < 0.5:
@@ -207,8 +299,10 @@ def bundle_path(parent_x, parent_y, child_x, child_y) -> tuple[str, tuple[float,
 def formboard_sheet(source: HarnessSource, tree: HarnessTree, routes: list[Route], bom: list[BomLine],
                     sheet_count: int, check_errors: int) -> tuple[str, SheetLayout]:
     """Sheet 1's SVG and the record of what it draws where."""
-    out, regions = frame(source, 1, sheet_count, "HARNESS DRAWING", check_errors)
-    sheet = FormboardSheet(source, tree, bom, out, SheetLayout(regions))
+    placement = sheet_placement(source, tree)
+    out, regions = frame(source, 1, sheet_count, "HARNESS DRAWING", check_errors, placement.scale_text())
+    sheet_class = RoutedFormboardSheet if tree.geometry else FormboardSheet
+    sheet = sheet_class(source, tree, bom, out, SheetLayout(regions), placement)
     covering_marks = sheet.draw_coverings()
     sheet.draw_bundles(wire_counts_by_segment(routes))
     sheet.draw_segment_dimensions()
@@ -226,23 +320,14 @@ class FormboardSheet:
     """Sheet 1 while it is being drawn: the source, where each node sits, and what is drawn so far."""
 
     def __init__(self, source: HarnessSource, tree: HarnessTree, bom: list[BomLine], out: list[str],
-                 layout: SheetLayout) -> None:
+                 layout: SheetLayout, placement: Placement) -> None:
         self.source, self.tree, self.bom, self.out, self.layout = source, tree, bom, out, layout
         self.drawing = source["drawing"]
         self.connectors = source["connectors"]
-        self.box = self.drawing_box()
-        placement = place_nodes(tree, self.box)
+        self.box = drawing_box(source, tree)
+        self.placement = placement
         self.x, self.y = placement.x, placement.y
         self.caption_bottom: dict[str, float] = {}
-
-    # The drawing gets the frame above the overall dimensions, which get the space above the notes.
-    def drawing_box(self) -> Box:
-        """The box the harness itself is laid out in."""
-        tree = self.tree
-        leaf_count = sum(1 for node in tree.order if node in self.connectors and node != tree.root and tree.is_leaf(node))
-        notes_top = frame_box[3] - 12 - 15 * sum(note.count("\n") + 1 for note in default_notes(self.source)) - 30
-        bottom = min(notes_top, sheet_height - 150) - (24 * leaf_count + 40) - 70
-        return (170, 150, sheet_width - 230, max(bottom, 420))
 
     def parent_and_child(self, ends) -> tuple[str, str]:
         start, end = ends
@@ -469,7 +554,7 @@ class FormboardSheet:
     def draw_notes(self) -> None:
         """The numbered notes at the bottom left, recorded as a block the drawing keeps clear of."""
         lines = []
-        for number, note in enumerate(default_notes(self.source), 1):
+        for number, note in enumerate(default_notes(self.source, self.tree, self.placement.scale_denominator), 1):
             for index, content in enumerate(note.split("\n")):
                 lines.append((f"{number}.  " if index == 0 else "") + content)
         top = frame_box[3] - 12 - 15 * len(lines)
@@ -479,6 +564,145 @@ class FormboardSheet:
             self.out.append(text(left, top + 12 + index * 15, content, 10.5, extra='xml:space="preserve"'))
         widest = max(text_width(content, 10.5, False) for content in lines)
         self.layout.regions["notes"] = (left, top - 20, left + widest, frame_box[3])
+
+
+# Sheet 1 for a routed harness: every node and bend where the route puts it, at scale. Each
+# connector lies along the direction its bundle arrives in; segment dimensions sit beside their
+# bundle's midpoint; labels sit at their true distance; there are no overall dimensions, since
+# the drawing is to scale and the wire list gives every length.
+class RoutedFormboardSheet(FormboardSheet):
+    """Sheet 1 of a harness with routing geometry."""
+
+    def points(self, parent: str, child: str) -> list[tuple[float, float]]:
+        return self.placement.segment_points[(parent, child)]
+
+    def midpoint(self, parent: str, child: str) -> tuple[float, float, float]:
+        points = self.points(parent, child)
+        total = sum(math.dist(a, b) for a, b in zip(points, points[1:]))
+        return point_along(points, total / 2)
+
+    def draw_coverings(self) -> list[tuple[dict, float, float, bool]]:
+        marks = []
+        for covering in self.source["layout"].get("coverings") or []:
+            covered = [tuple(covered_segment_ends(segment)) for segment in covering["segments"]]
+            drawn = [self.parent_and_child(ends) for ends in covered if frozenset(ends) in self.tree.segment_lengths]
+            for parent, child in drawn:
+                self.out.append(f'<path d="{polyline_path(self.points(parent, child))}" fill="none" '
+                                f'stroke="{covering.get("display_color", "#9aa7b8")}" stroke-width="{covering.get("display_width", 16)}" '
+                                'stroke-linecap="butt" opacity="0.55"/>')
+            if drawn:
+                x, y, angle = self.midpoint(*drawn[0])
+                marks.append((covering, x, y, angle))
+        return marks
+
+    def draw_bundles(self, wire_counts: dict) -> None:
+        for node in self.tree.order[1:]:
+            parent = self.tree.parent[node]
+            thickness = 1.6 * math.sqrt(max(wire_counts.get(frozenset((node, parent)), 0), 1))
+            path = polyline_path(self.points(parent, node))
+            self.out.append(f'<path d="{path}" fill="none" stroke="#333" stroke-width="{3 + thickness:.1f}" stroke-linecap="round" '
+                            'stroke-linejoin="round"/>')
+            self.out.append(f'<path d="{path}" fill="none" stroke="#9a9a9a" stroke-width="{1 + thickness:.1f}" stroke-linecap="round" '
+                            'stroke-linejoin="round"/>')
+            if self.tree.segment_lengths[frozenset((node, parent))] is None:
+                x, y, angle = self.midpoint(parent, node)
+                self.out.append(f'<g transform="rotate({math.degrees(angle):.1f} {x:.1f} {y:.1f})">{length_break(x, y, 3 + thickness)}</g>')
+
+    def draw_segment_dimensions(self) -> None:
+        """Each segment's length and tolerance beside the middle of its bundle, on its left."""
+        for node in self.tree.order[1:]:
+            parent = self.tree.parent[node]
+            key = frozenset((node, parent))
+            label = segment_dimension_label(self.drawing, self.tree.segment_lengths[key], self.tree.segment_minimums.get(key))
+            x, y, angle = self.midpoint(parent, node)
+            width = text_width(label, 11, False) + 8
+            reach = 18 + 0.5 * abs(math.sin(angle)) * width
+            label_x, label_y = x + math.sin(angle) * reach, y - math.cos(angle) * reach
+            self.layout.texts.append((f"dimension {parent}–{node}", (label_x - width / 2, label_y - 7, label_x + width / 2, label_y + 7)))
+            self.out.append(rect(label_x - width / 2, label_y - 7, width, 14, fill="white", stroke="none"))
+            self.out.append(text(label_x, label_y + 4, label, 11, "middle"))
+
+    def connector_axis(self, designator: str) -> tuple[float, float]:
+        """The direction a connector points: away from its bundle."""
+        if designator == self.tree.root:
+            points = self.points(designator, self.tree.children[designator][0])
+            before, at = points[1], points[0]
+        else:
+            points = self.points(self.tree.parent[designator], designator)
+            before, at = points[-2], points[-1]
+        reach = math.dist(before, at) or 1
+        return ((at[0] - before[0]) / reach, (at[1] - before[1]) / reach)
+
+    # Draw the connector as on the automatic layout, facing right from its node, inside a
+    # rotation onto its axis; its caption and balloons stay upright beside it.
+    def draw_connector(self, designator: str, connector: dict) -> None:
+        x, y = self.x[designator], self.y[designator]
+        axis_x, axis_y = self.connector_axis(designator)
+        body_height = min(110, max(44, 8 + len(pins_of(connector)) * 3.2))
+        first = len(self.out)
+        self.draw_wire_fan(designator, 0, 0, body_height, 1)
+        self.out.append(connector_body(connector, 0, -body_height / 2, body_height))
+        self.out.append(mating_face(connector, 0, 0, body_height, False))
+        drawn = "".join(self.out[first:])
+        del self.out[first:]
+        self.out.append(f'<g transform="translate({x:.1f} {y:.1f}) rotate({math.degrees(math.atan2(axis_y, axis_x)):.1f})">{drawn}</g>')
+        corners = [(along, across) for along in (-connector_fan_length, connector_body_width) for across in (-body_height / 2, body_height / 2)]
+        on_sheet = [(x + along * axis_x - across * axis_y, y + along * axis_y + across * axis_x) for along, across in corners]
+        box = (min(p[0] for p in on_sheet), min(p[1] for p in on_sheet), max(p[0] for p in on_sheet), max(p[1] for p in on_sheet))
+        self.layout.bodies.append((f"connector {designator}", box))
+        description = connector.get("label") or connector.get("type", "")
+        if is_generic(connector):
+            generic = f"GENERIC {len(pins_of(connector))}-PIN"
+            description = f"{description} · {generic}" if description else generic
+        caption_width = max(text_width(designator, 14, True), text_width(description, 9.5, False))
+        centre_x = (box[0] + box[2]) / 2
+        self.out.append(text(centre_x, box[3] + 18, designator, 14, "middle", "bold", extra='text-decoration="underline"'))
+        self.out.append(text(centre_x, box[3] + 32, description, 9.5, "middle", fill="#333"))
+        self.layout.texts.append((f"connector {designator} caption", (centre_x - caption_width / 2, box[3] + 4,
+                                                                      centre_x + caption_width / 2, box[3] + 35)))
+        numbers = (find_numbers(self.bom, "connector", designator) + find_numbers(self.bom, "contact", designator)
+                   + find_numbers(self.bom, "accessory", designator))
+        quantities = {}
+        contact_numbers = find_numbers(self.bom, "contact", designator)
+        if contact_numbers:
+            pins_used = {wire_end(wire[end])[1] for wire in self.source["wires"] for end in ("from", "to")
+                         if wire_end(wire[end])[0] == designator}
+            quantities[contact_numbers[0]] = f"{len(pins_used)}X"
+        self.out.append(draw_balloons(self.layout, f"{designator} balloons", box[2] + 30, box[1] - 30, numbers,
+                                      centre_x, box[1], f"connector {designator}", quantities))
+
+    def draw_label(self, label: dict, node: str, neighbour: str) -> None:
+        """A label at its true distance along its segment, with that distance written under it."""
+        distance = float(label.get("distance", conventions(self.drawing)["label_distance"]))
+        parent, child = (neighbour, node) if self.tree.parent.get(node) == neighbour else (node, neighbour)
+        points = self.points(parent, child)
+        points = points[::-1] if node == child else points
+        x, y, _ = point_along(points, distance * self.placement.units_to_sheet)
+        content = label["text"]
+        width = max(46, text_width(content, 10, False) + 12)
+        self.out.append(rect(x - width / 2, y - 9, width, 18, fill="white", stroke_width=1))
+        self.out.append(text(x, y + 4, content, 10, "middle"))
+        self.layout.texts.append((f"label {content}", (x - width / 2, y - 9, x + width / 2, y + 9)))
+        note = f"{format_length(distance)} FROM {node}"
+        self.out.append(text(x, y + 22, note, 9, "middle", fill="#333"))
+        note_width = text_width(note, 9, False)
+        self.layout.texts.append((f"label {content} distance", (x - note_width / 2, y + 13, x + note_width / 2, y + 25)))
+        numbers = item_find_numbers(self.bom, label["item"]) if label.get("item") else []
+        if numbers:
+            self.out.append(draw_balloons(self.layout, f"label {content} balloon", x + width / 2 + 22, y - 32, numbers,
+                                          x + width / 2 - 6, y - 9, f"label {content}"))
+
+    def draw_covering_balloons(self, marks) -> None:
+        for covering, x, y, angle in marks:
+            numbers = item_find_numbers(self.bom, covering.get("item"))
+            if numbers:
+                normal_x, normal_y = -math.sin(angle), math.cos(angle)
+                self.out.append(draw_balloons(self.layout, f"{covering.get('item')} balloon", x + normal_x * 50, y + normal_y * 50,
+                                              numbers, x + normal_x * 9, y + normal_y * 9, f"{covering.get('item')} covering",
+                                              {numbers[0]: "AR"}))
+
+    def draw_overall_dimensions(self) -> None:
+        """None: a routed drawing is to scale, and the wire list gives every cut length."""
 
 
 # A connector body in side view. A generic part, one not yet chosen, is drawn pale with a
@@ -536,8 +760,9 @@ def length_break(x, y, bundle_width) -> str:
             '</g>')
 
 
-# The standard notes, then any the source adds, each wrapped to 150 characters.
-def default_notes(source: HarnessSource) -> list[str]:
+# The standard notes, then any the source adds, each wrapped to 150 characters. A routed
+# harness is drawn to scale, and a 3D route is drawn in plan.
+def default_notes(source: HarnessSource, tree: HarnessTree, scale_denominator: float | None) -> list[str]:
     """The notes printed on sheet 1."""
     drawing = source["drawing"]
     datum = drawing.get("datum", "connector rear face")
@@ -547,9 +772,13 @@ def default_notes(source: HarnessSource) -> list[str]:
         f"FABRICATE, INSPECT AND TEST PER IPC/WHMA-A-620, CLASS {drawing.get('ipc_class', 2)}.",
         f"ALL DIMENSIONS IN {drawing.get('units', 'mm').upper()}. LENGTHS ARE MEASURED FROM {datum.upper()} TO BREAKOUT CENTRE "
         f"OR TO THE NEXT {datum.upper()}.",
-        f"LENGTH TOLERANCES UNLESS OTHERWISE SPECIFIED: {tolerances}. SEGMENT DIMENSIONS GOVERN; OVERALL DIMENSIONS ARE REFERENCE.",
-        "DRAWING NOT TO SCALE. WIRE CUT LENGTHS PER WIRE LIST; CONNECTIONS PER CONNECTOR TABLES AND WIRING DIAGRAM.",
+        f"LENGTH TOLERANCES UNLESS OTHERWISE SPECIFIED: {tolerances}."
+        + ("" if scale_denominator else " SEGMENT DIMENSIONS GOVERN; OVERALL DIMENSIONS ARE REFERENCE."),
+        (f"DRAWN TO SCALE 1:{format_length(scale_denominator)} ON A3; DIMENSIONS GOVERN." if scale_denominator else
+         "DRAWING NOT TO SCALE.") + " WIRE CUT LENGTHS PER WIRE LIST; CONNECTIONS PER CONNECTOR TABLES AND WIRING DIAGRAM.",
     ]
+    if tree.geometry and tree.geometry.dimensions == 3:
+        notes.append("PLAN VIEW (X–Y) OF THE 3D ROUTE. HEIGHTS ARE NOT SHOWN ON THIS SHEET.")
     if any(wire.get("twist") for wire in source["wires"]):
         notes.append("TWIST INDICATED WIRES PER IPC/WHMA-A-620.")
         notes.append(f"TWISTED WIRE CUT LENGTHS INCLUDE {drawing.get('twist_takeup', default_twist_takeup)} "
@@ -557,7 +786,7 @@ def default_notes(source: HarnessSource) -> list[str]:
     if source["layout"].get("labels"):
         notes.append("LABELS READ TOWARD THE CONNECTOR; POSITION DIMENSIONED FROM DATUM TO LABEL CENTRE.")
     notes.append("CONTINUITY-TEST 100% AGAINST THE WIRE LIST; NO SHORTS BETWEEN NETS.")
-    lengths = [parse_segment_length(segment_length_value(segment)) for segment in source["layout"].get("segments") or []]
+    lengths = [(tree.segment_lengths[segment], tree.segment_minimums.get(segment)) for segment in tree.segment_lengths]
     if any(length is None and minimum is None for length, minimum in lengths):
         notes.append("LENGTHS MARKED TBD ARE NOT YET SET; SEGMENTS SO MARKED ARE DRAWN AT A STAND-IN LENGTH. "
                      "DO NOT CUT FROM THIS REVISION.")

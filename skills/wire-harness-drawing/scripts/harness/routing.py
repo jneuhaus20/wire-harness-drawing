@@ -3,7 +3,8 @@ import math
 from collections import defaultdict
 from dataclasses import dataclass
 
-from harness.source import Findings, HarnessSource, conventions, format_length, twist_takeup, wire_connectors
+from harness.geometry import RouteGeometry, polyline_length, route_geometry
+from harness.source import Findings, HarnessSource, conventions, format_length, tolerance_for, twist_takeup, wire_connectors
 from harness.validation import parse_segment_length, segment_ends, segment_length_value
 
 Segment = frozenset  # the two nodes a segment joins, in no order
@@ -25,6 +26,7 @@ class HarnessTree:
     order: list[str]
     nodes: set[str]
     stand_in_length: float
+    geometry: RouteGeometry | None = None
 
     def length_or_minimum(self, segment: Segment) -> float | None:
         """A segment's length, or its minimum while the length is unknown, or None."""
@@ -103,6 +105,9 @@ def build_tree(source: HarnessSource, findings: Findings) -> HarnessTree | None:
         segment_lengths[frozenset((start, end))] = length
         if minimum is not None:
             segment_minimums[frozenset((start, end))] = minimum
+    geometry = route_geometry(source, findings)
+    if geometry:
+        reconcile_with_geometry(source["drawing"], geometry, segment_lengths, segment_minimums, findings)
     root = layout.get("root") or next(iter(source["connectors"]), None)
     if root not in neighbours:
         findings.error(f"layout.root '{root}' is not on any segment")
@@ -132,7 +137,30 @@ def build_tree(source: HarnessSource, findings: Findings) -> HarnessTree | None:
         least, parent_least = segment_minimums.get(segment) if length is None else length, minimum_depth[parent[node]]
         minimum_depth[node] = None if least is None or parent_least is None else parent_least + least
     return HarnessTree(root, parent, children, segment_lengths, segment_minimums, depth, minimum_depth, order, seen,
-                       conventions(source["drawing"])["stand_in_length"])
+                       conventions(source["drawing"])["stand_in_length"], geometry)
+
+
+# A route fixes its segment's length: a stated length must agree with it within the length's
+# tolerance, and an unknown length (or one known only as a minimum) is taken from it.
+def reconcile_with_geometry(drawing: dict, geometry: RouteGeometry, segment_lengths: dict, segment_minimums: dict,
+                            findings: Findings) -> None:
+    """Check stated segment lengths against their routes and fill unknown ones from them."""
+    for (start, end), points in geometry.segment_points.items():
+        key = frozenset((start, end))
+        routed = round(polyline_length(points), 1)
+        stated = segment_lengths.get(key)
+        if stated is not None:
+            tolerance = tolerance_for(drawing, stated)
+            if abs(routed - stated) > tolerance:
+                findings.error(f"layout segment {start}-{end}: its route is {format_length(round(routed, 1))} long, "
+                               f"but its length is {format_length(stated)} ±{format_length(tolerance)}")
+            continue
+        minimum = segment_minimums.pop(key, None)
+        if minimum is not None and routed < minimum:
+            findings.error(f"layout segment {start}-{end}: its route is {format_length(round(routed, 1))} long, "
+                           f"shorter than its minimum {format_length(minimum)}")
+        segment_lengths[key] = routed
+        findings.info(f"layout segment {start}-{end}: length taken from its route, {format_length(round(routed, 1))}")
 
 
 # Wires twisted together lie twisted only where they run together: the segments every wire

@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from tests.generator import example_source
+from tests.test_geometry import routed_harness
 from tests.test_output_integrity import generate, svg_texts, two_wire_harness
 
 from harness.formboard import formboard_sheet  # noqa: E402  (tests.generator puts scripts/ on the path)
@@ -64,6 +65,14 @@ class ExampleSheetOneLayoutTest(unittest.TestCase):
                      for what, box in self.layout.texts
                      if what not in exempt and segment_crosses_box(segment, box)]
         self.assertEqual(crossings, [])
+
+
+class RoutedSheetOneLayoutTest(ExampleSheetOneLayoutTest):
+    @classmethod
+    def setUpClass(cls) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            (Path(directory) / "harness.yaml").write_text(routed_harness)
+            cls.layout = lay_out_sheet_one(Path(directory) / "harness.yaml")
 
 
 class FrameTest(unittest.TestCase):

@@ -1,14 +1,16 @@
 """The whole package from one harness source: checks, then CSVs, sheets and the combined PDF."""
 import argparse
 import csv
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
 from harness.bom import BomLine, build_bom
 from harness.checks import check_harness
+from harness.explorer_model import harness_model
 from harness.formboard import formboard_sheet, sheet_misfits
 from harness.routing import HarnessTree, Route, build_tree, route_wires
-from harness.source import Findings, HarnessSource, format_length, load_source, wire_end
+from harness.source import Findings, HarnessSource, load_source, wire_end
 from harness.tables import table_sheet_bodies, table_sheets
 from harness.validation import validate_source
 from harness.wiring import render_wiring_diagram, wireviz_available, wireviz_source, wiring_sheet
@@ -95,6 +97,9 @@ def write_package(analysis: Analysis, output_directory: Path, base: str, *, with
     source, routes, bom, errors = analysis.source, analysis.routes, analysis.bom, analysis.findings.error_count
     write_bom_csv(output_directory / f"{base}.bom.csv", bom)
     write_wire_list_csv(output_directory / f"{base}.wirelist.csv", source, routes)
+    # Escaping "</" keeps the JSON valid and safe to inline inside a script element.
+    model = json.dumps(harness_model(analysis), indent=1, ensure_ascii=False).replace("</", "<\\/")
+    (output_directory / f"{base}.harness.json").write_text(model + "\n")
     diagram_path = None
     if not with_wiring_diagram:
         print("NOTE  ", "skipped (--no-wireviz)")

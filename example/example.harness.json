@@ -1,0 +1,1134 @@
+{
+ "format": "wire-harness-explorer/1",
+ "title": "SENSOR BRANCH HARNESS",
+ "number": "EX-0001",
+ "rev": "A",
+ "units": "mm",
+ "geometry": "schematic",
+ "root": "P1",
+ "connectors": [
+  {
+   "id": "P1",
+   "label": "TO CONTROLLER",
+   "type": "DE-9",
+   "part_number": "5-747904-2",
+   "manufacturer": "TE",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": "male",
+   "pins": [
+    {
+     "pin": "1",
+     "label": "GND"
+    },
+    {
+     "pin": "2",
+     "label": "+5V"
+    },
+    {
+     "pin": "3",
+     "label": "SCL"
+    },
+    {
+     "pin": "4",
+     "label": "SDA"
+    },
+    {
+     "pin": "5",
+     "label": "MISO"
+    },
+    {
+     "pin": "6",
+     "label": "MOSI"
+    },
+    {
+     "pin": "7",
+     "label": "SCK"
+    },
+    {
+     "pin": "8",
+     "label": "SHLD"
+    },
+    {
+     "pin": "9",
+     "label": "NC"
+    }
+   ],
+   "face": {
+    "view": "mating face",
+    "round": false,
+    "cavities": {
+     "1": [
+      0.0,
+      0.0
+     ],
+     "2": [
+      1.0,
+      0.0
+     ],
+     "3": [
+      2.0,
+      0.0
+     ],
+     "4": [
+      3.0,
+      0.0
+     ],
+     "5": [
+      4.0,
+      0.0
+     ],
+     "6": [
+      0.5,
+      1.0
+     ],
+     "7": [
+      1.5,
+      1.0
+     ],
+     "8": [
+      2.5,
+      1.0
+     ],
+     "9": [
+      3.5,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "J1",
+   "label": "SENSOR A",
+   "type": "KK 254",
+   "part_number": "22-01-3047",
+   "manufacturer": "Molex",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": "female",
+   "pins": [
+    {
+     "pin": "1",
+     "label": "GND"
+    },
+    {
+     "pin": "2",
+     "label": "+5V"
+    },
+    {
+     "pin": "3",
+     "label": "SCL"
+    },
+    {
+     "pin": "4",
+     "label": "SDA"
+    }
+   ],
+   "face": {
+    "view": "mating face",
+    "round": false,
+    "cavities": {
+     "1": [
+      0,
+      0
+     ],
+     "2": [
+      1,
+      0
+     ],
+     "3": [
+      2,
+      0
+     ],
+     "4": [
+      3,
+      0
+     ]
+    }
+   }
+  },
+  {
+   "id": "J2",
+   "label": "SENSOR B",
+   "type": "KK 254",
+   "part_number": "22-01-3047",
+   "manufacturer": "Molex",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": "female",
+   "pins": [
+    {
+     "pin": "1",
+     "label": "GND"
+    },
+    {
+     "pin": "2",
+     "label": "+5V"
+    },
+    {
+     "pin": "3",
+     "label": "SCL"
+    },
+    {
+     "pin": "4",
+     "label": "SDA"
+    }
+   ],
+   "face": {
+    "view": "mating face",
+    "round": false,
+    "cavities": {
+     "1": [
+      0,
+      0
+     ],
+     "2": [
+      1,
+      0
+     ],
+     "3": [
+      2,
+      0
+     ],
+     "4": [
+      3,
+      0
+     ]
+    }
+   }
+  },
+  {
+   "id": "J3",
+   "label": "SPI DEVICE",
+   "type": "KK 254",
+   "part_number": "22-01-3057",
+   "manufacturer": "Molex",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": "female",
+   "pins": [
+    {
+     "pin": "1",
+     "label": "GND"
+    },
+    {
+     "pin": "2",
+     "label": "+5V"
+    },
+    {
+     "pin": "3",
+     "label": "MISO"
+    },
+    {
+     "pin": "4",
+     "label": "MOSI"
+    },
+    {
+     "pin": "5",
+     "label": "SCK"
+    }
+   ],
+   "face": {
+    "view": "mating face",
+    "round": false,
+    "cavities": {
+     "1": [
+      0,
+      0
+     ],
+     "2": [
+      1,
+      0
+     ],
+     "3": [
+      2,
+      0
+     ],
+     "4": [
+      3,
+      0
+     ],
+     "5": [
+      4,
+      0
+     ]
+    }
+   }
+  },
+  {
+   "id": "E1",
+   "label": "CHASSIS GND",
+   "type": "Ring lug",
+   "part_number": "PV18-6R-CY",
+   "manufacturer": "Panduit",
+   "splice": false,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": "SHLD"
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "SP1",
+   "label": "",
+   "type": "splice",
+   "part_number": "D-436-52",
+   "manufacturer": "TE",
+   "splice": true,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "SP2",
+   "label": "",
+   "type": "splice",
+   "part_number": "D-436-52",
+   "manufacturer": "TE",
+   "splice": true,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "SP3",
+   "label": "",
+   "type": "splice",
+   "part_number": "D-436-52",
+   "manufacturer": "TE",
+   "splice": true,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    }
+   ],
+   "face": null
+  },
+  {
+   "id": "SP4",
+   "label": "",
+   "type": "splice",
+   "part_number": "D-436-52",
+   "manufacturer": "TE",
+   "splice": true,
+   "generic": false,
+   "shape": null,
+   "gender": null,
+   "pins": [
+    {
+     "pin": "1",
+     "label": ""
+    }
+   ],
+   "face": null
+  }
+ ],
+ "wires": [
+  {
+   "id": "W1",
+   "from": {
+    "connector": "P1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "SP1",
+    "pin": "1"
+   },
+   "signal": "GND",
+   "gauge": "20 AWG",
+   "color": "BK",
+   "colors": [
+    "#1a1a1a"
+   ],
+   "cut_length": "360",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "SP1"
+   ]
+  },
+  {
+   "id": "W2",
+   "from": {
+    "connector": "SP1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "1"
+   },
+   "signal": "GND",
+   "gauge": "24 AWG",
+   "color": "BK",
+   "colors": [
+    "#1a1a1a"
+   ],
+   "cut_length": "490",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "SP1",
+    "SP2",
+    "SP3",
+    "SP4",
+    "B2",
+    "J1"
+   ]
+  },
+  {
+   "id": "W3",
+   "from": {
+    "connector": "SP1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J2",
+    "pin": "1"
+   },
+   "signal": "GND",
+   "gauge": "24 AWG",
+   "color": "BK",
+   "colors": [
+    "#1a1a1a"
+   ],
+   "cut_length": "540",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "SP1",
+    "SP2",
+    "SP3",
+    "SP4",
+    "B2",
+    "B3",
+    "J2"
+   ]
+  },
+  {
+   "id": "W4",
+   "from": {
+    "connector": "SP1",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "1"
+   },
+   "signal": "GND",
+   "gauge": "24 AWG",
+   "color": "BK",
+   "colors": [
+    "#1a1a1a"
+   ],
+   "cut_length": "770",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "SP1",
+    "SP2",
+    "SP3",
+    "SP4",
+    "B2",
+    "B3",
+    "J3"
+   ]
+  },
+  {
+   "id": "W5",
+   "from": {
+    "connector": "P1",
+    "pin": "2"
+   },
+   "to": {
+    "connector": "SP2",
+    "pin": "1"
+   },
+   "signal": "+5V",
+   "gauge": "20 AWG",
+   "color": "RD",
+   "colors": [
+    "#e01e1e"
+   ],
+   "cut_length": "380",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "SP1",
+    "SP2"
+   ]
+  },
+  {
+   "id": "W6",
+   "from": {
+    "connector": "SP2",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "2"
+   },
+   "signal": "+5V",
+   "gauge": "24 AWG",
+   "color": "RD",
+   "colors": [
+    "#e01e1e"
+   ],
+   "cut_length": "470",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "SP2",
+    "SP3",
+    "SP4",
+    "B2",
+    "J1"
+   ]
+  },
+  {
+   "id": "W7",
+   "from": {
+    "connector": "SP2",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J2",
+    "pin": "2"
+   },
+   "signal": "+5V",
+   "gauge": "24 AWG",
+   "color": "RD",
+   "colors": [
+    "#e01e1e"
+   ],
+   "cut_length": "520",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "SP2",
+    "SP3",
+    "SP4",
+    "B2",
+    "B3",
+    "J2"
+   ]
+  },
+  {
+   "id": "W8",
+   "from": {
+    "connector": "P1",
+    "pin": "3"
+   },
+   "to": {
+    "connector": "SP3",
+    "pin": "1"
+   },
+   "signal": "SCL",
+   "gauge": "20 AWG",
+   "color": "YE",
+   "colors": [
+    "#f2d600"
+   ],
+   "cut_length": "400",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "SP1",
+    "SP2",
+    "SP3"
+   ]
+  },
+  {
+   "id": "W9",
+   "from": {
+    "connector": "P1",
+    "pin": "4"
+   },
+   "to": {
+    "connector": "SP4",
+    "pin": "1"
+   },
+   "signal": "SDA",
+   "gauge": "20 AWG",
+   "color": "GN",
+   "colors": [
+    "#14a33a"
+   ],
+   "cut_length": "420",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "SP1",
+    "SP2",
+    "SP3",
+    "SP4"
+   ]
+  },
+  {
+   "id": "W10",
+   "from": {
+    "connector": "P1",
+    "pin": "5"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "3"
+   },
+   "signal": "MISO",
+   "gauge": "24 AWG",
+   "color": "BU",
+   "colors": [
+    "#1f5fd6"
+   ],
+   "cut_length": "1110",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "SP1",
+    "SP2",
+    "SP3",
+    "SP4",
+    "B2",
+    "B3",
+    "J3"
+   ]
+  },
+  {
+   "id": "W11",
+   "from": {
+    "connector": "P1",
+    "pin": "6"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "4"
+   },
+   "signal": "MOSI",
+   "gauge": "24 AWG",
+   "color": "OG",
+   "colors": [
+    "#ff8c00"
+   ],
+   "cut_length": "1110",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "SP1",
+    "SP2",
+    "SP3",
+    "SP4",
+    "B2",
+    "B3",
+    "J3"
+   ]
+  },
+  {
+   "id": "W12",
+   "from": {
+    "connector": "P1",
+    "pin": "7"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "5"
+   },
+   "signal": "SCK",
+   "gauge": "24 AWG",
+   "color": "VT",
+   "colors": [
+    "#8a2be2"
+   ],
+   "cut_length": "1110",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "SP1",
+    "SP2",
+    "SP3",
+    "SP4",
+    "B2",
+    "B3",
+    "J3"
+   ]
+  },
+  {
+   "id": "W13",
+   "from": {
+    "connector": "P1",
+    "pin": "8"
+   },
+   "to": {
+    "connector": "E1",
+    "pin": "1"
+   },
+   "signal": "SHLD",
+   "gauge": "22 AWG",
+   "color": "GNYE",
+   "colors": [
+    "#14a33a",
+    "#f2d600"
+   ],
+   "cut_length": "470",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "P1",
+    "B1",
+    "E1"
+   ]
+  },
+  {
+   "id": "W14",
+   "from": {
+    "connector": "SP3",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "3"
+   },
+   "signal": "SCL",
+   "gauge": "24 AWG",
+   "color": "YE",
+   "colors": [
+    "#f2d600"
+   ],
+   "cut_length": "450",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "SP3",
+    "SP4",
+    "B2",
+    "J1"
+   ]
+  },
+  {
+   "id": "W15",
+   "from": {
+    "connector": "SP3",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J2",
+    "pin": "3"
+   },
+   "signal": "SCL",
+   "gauge": "24 AWG",
+   "color": "YE",
+   "colors": [
+    "#f2d600"
+   ],
+   "cut_length": "500",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "SP3",
+    "SP4",
+    "B2",
+    "B3",
+    "J2"
+   ]
+  },
+  {
+   "id": "W16",
+   "from": {
+    "connector": "SP4",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J1",
+    "pin": "4"
+   },
+   "signal": "SDA",
+   "gauge": "24 AWG",
+   "color": "GN",
+   "colors": [
+    "#14a33a"
+   ],
+   "cut_length": "430",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "SP4",
+    "B2",
+    "J1"
+   ]
+  },
+  {
+   "id": "W17",
+   "from": {
+    "connector": "SP4",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J2",
+    "pin": "4"
+   },
+   "signal": "SDA",
+   "gauge": "24 AWG",
+   "color": "GN",
+   "colors": [
+    "#14a33a"
+   ],
+   "cut_length": "480",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "SP4",
+    "B2",
+    "B3",
+    "J2"
+   ]
+  },
+  {
+   "id": "W18",
+   "from": {
+    "connector": "SP2",
+    "pin": "1"
+   },
+   "to": {
+    "connector": "J3",
+    "pin": "2"
+   },
+   "signal": "+5V",
+   "gauge": "24 AWG",
+   "color": "RD",
+   "colors": [
+    "#e01e1e"
+   ],
+   "cut_length": "750",
+   "twist": "",
+   "cable": "",
+   "route": [
+    "SP2",
+    "SP3",
+    "SP4",
+    "B2",
+    "B3",
+    "J3"
+   ]
+  }
+ ],
+ "cables": [],
+ "nodes": [
+  {
+   "id": "P1",
+   "kind": "connector",
+   "x": 170.0,
+   "y": 379.1
+  },
+  {
+   "id": "B1",
+   "kind": "breakout",
+   "x": 429.1,
+   "y": 379.1
+  },
+  {
+   "id": "E1",
+   "kind": "connector",
+   "x": 558.6,
+   "y": 684.6
+  },
+  {
+   "id": "SP1",
+   "kind": "splice",
+   "x": 515.3,
+   "y": 379.1
+  },
+  {
+   "id": "SP2",
+   "kind": "splice",
+   "x": 601.6,
+   "y": 379.1
+  },
+  {
+   "id": "SP3",
+   "kind": "splice",
+   "x": 687.9,
+   "y": 379.1
+  },
+  {
+   "id": "SP4",
+   "kind": "splice",
+   "x": 774.2,
+   "y": 379.1
+  },
+  {
+   "id": "B2",
+   "kind": "breakout",
+   "x": 912.3,
+   "y": 379.1
+  },
+  {
+   "id": "J1",
+   "kind": "connector",
+   "x": 1128.2,
+   "y": 226.4
+  },
+  {
+   "id": "B3",
+   "kind": "breakout",
+   "x": 1067.8,
+   "y": 379.1
+  },
+  {
+   "id": "J2",
+   "kind": "connector",
+   "x": 1171.4,
+   "y": 531.9
+  },
+  {
+   "id": "J3",
+   "kind": "connector",
+   "x": 1370.0,
+   "y": 379.1
+  }
+ ],
+ "segments": [
+  {
+   "nodes": [
+    "P1",
+    "B1"
+   ],
+   "known": true,
+   "length": "300 ±5",
+   "path": "M170.0,379.1 L429.1,379.1",
+   "wires": [
+    "W1",
+    "W5",
+    "W8",
+    "W9",
+    "W10",
+    "W11",
+    "W12",
+    "W13"
+   ]
+  },
+  {
+   "nodes": [
+    "B1",
+    "E1"
+   ],
+   "known": true,
+   "length": "150 ±5",
+   "path": "M429.1,379.1 C464.7,379.1 464.7,684.6 500.3,684.6 L558.6,684.6",
+   "wires": [
+    "W13"
+   ]
+  },
+  {
+   "nodes": [
+    "B1",
+    "SP1"
+   ],
+   "known": true,
+   "length": "40 ±5",
+   "path": "M429.1,379.1 L515.3,379.1",
+   "wires": [
+    "W1",
+    "W5",
+    "W8",
+    "W9",
+    "W10",
+    "W11",
+    "W12"
+   ]
+  },
+  {
+   "nodes": [
+    "SP1",
+    "SP2"
+   ],
+   "known": true,
+   "length": "20 ±5",
+   "path": "M515.3,379.1 L601.6,379.1",
+   "wires": [
+    "W2",
+    "W3",
+    "W4",
+    "W5",
+    "W8",
+    "W9",
+    "W10",
+    "W11",
+    "W12"
+   ]
+  },
+  {
+   "nodes": [
+    "SP2",
+    "SP3"
+   ],
+   "known": true,
+   "length": "20 ±5",
+   "path": "M601.6,379.1 L687.9,379.1",
+   "wires": [
+    "W2",
+    "W3",
+    "W4",
+    "W6",
+    "W7",
+    "W8",
+    "W9",
+    "W10",
+    "W11",
+    "W12",
+    "W18"
+   ]
+  },
+  {
+   "nodes": [
+    "SP3",
+    "SP4"
+   ],
+   "known": true,
+   "length": "20 ±5",
+   "path": "M687.9,379.1 L774.2,379.1",
+   "wires": [
+    "W2",
+    "W3",
+    "W4",
+    "W6",
+    "W7",
+    "W9",
+    "W10",
+    "W11",
+    "W12",
+    "W14",
+    "W15",
+    "W18"
+   ]
+  },
+  {
+   "nodes": [
+    "SP4",
+    "B2"
+   ],
+   "known": true,
+   "length": "160 ±5",
+   "path": "M774.2,379.1 L912.3,379.1",
+   "wires": [
+    "W2",
+    "W3",
+    "W4",
+    "W6",
+    "W7",
+    "W10",
+    "W11",
+    "W12",
+    "W14",
+    "W15",
+    "W16",
+    "W17",
+    "W18"
+   ]
+  },
+  {
+   "nodes": [
+    "B2",
+    "J1"
+   ],
+   "known": true,
+   "length": "250 ±5",
+   "path": "M912.3,379.1 C971.7,379.1 971.7,226.4 1031.1,226.4 L1128.2,226.4",
+   "wires": [
+    "W2",
+    "W6",
+    "W14",
+    "W16"
+   ]
+  },
+  {
+   "nodes": [
+    "B2",
+    "B3"
+   ],
+   "known": true,
+   "length": "180 ±5",
+   "path": "M912.3,379.1 L1067.8,379.1",
+   "wires": [
+    "W3",
+    "W4",
+    "W7",
+    "W10",
+    "W11",
+    "W12",
+    "W15",
+    "W17",
+    "W18"
+   ]
+  },
+  {
+   "nodes": [
+    "B3",
+    "J2"
+   ],
+   "known": true,
+   "length": "120 ±5",
+   "path": "M1067.8,379.1 C1096.3,379.1 1096.3,531.9 1124.8,531.9 L1171.4,531.9",
+   "wires": [
+    "W3",
+    "W7",
+    "W15",
+    "W17"
+   ]
+  },
+  {
+   "nodes": [
+    "B3",
+    "J3"
+   ],
+   "known": true,
+   "length": "350 ±10",
+   "path": "M1067.8,379.1 L1370.0,379.1",
+   "wires": [
+    "W4",
+    "W10",
+    "W11",
+    "W12",
+    "W18"
+   ]
+  }
+ ]
+}
