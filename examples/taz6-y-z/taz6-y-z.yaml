@@ -35,7 +35,7 @@ connectors:
     pincount: 16
     gender: male
     contact: {pn: 16-02-0107, desc: "SL crimp pin, male, 22-24 AWG", manufacturer: Molex}
-    body: {model: meshes/70107-0015.json, rotate: [0, 90, 0], shape: box, length: 24.26, width: 42.67, height: 5.99, color: black}   # envelope measured from Molex's 3D model; black
+    body: {model: meshes/70107-0015.json, rotate: [90, 0, 90], shape: box, length: 24.26, width: 42.67, height: 5.99, color: black}   # envelope measured from Molex's 3D model; black
     strip: 4
   J1:
     label: Z LEFT MOTOR

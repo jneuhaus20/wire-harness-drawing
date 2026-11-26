@@ -140,3 +140,6 @@ figcaption.after { margin-top: .6rem; }
 .caution { margin-top: 2rem; max-width: var(--measure); border-left: 3px solid var(--accent); padding: .2rem 0 .2rem 1.1rem; }
 .caution h3 { margin-bottom: .3rem; }
 .caution p { color: var(--muted); margin: 0; }
+
+.wide { margin-top: 2rem; }
+.explorer-figure figcaption { gap: .25rem 1rem; }
